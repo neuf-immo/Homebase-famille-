@@ -244,6 +244,67 @@ tr:hover td { background:var(--bg); }
   .form-row { grid-template-columns:1fr; }
 }
 
+/* ── MOBILE PERFORMANCE ── */
+@media(max-width:768px){
+  .page { contain: layout style; }
+  .card, .kpi, .chantier-card, .obj-card { will-change: auto; }
+  * { -webkit-tap-highlight-color: transparent; }
+  .sidebar { transform: translateZ(0); }
+}
+/* ── Bottom nav mobile ── */
+.bottom-nav {
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:950;
+  background:var(--card); border-top:1px solid var(--border);
+  padding:4px 0 env(safe-area-inset-bottom,0); box-shadow:0 -4px 20px rgba(0,0,0,.1);
+}
+.bottom-nav-items { display:flex; justify-content:space-around; }
+.bn-item { display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:6px 8px; border-radius:8px; cursor:pointer; transition:var(--transition);
+  color:var(--text3); font-size:.58rem; font-weight:600; min-width:50px; }
+.bn-item.active { color:var(--accent); }
+.bn-item span:first-child { font-size:1.3rem; }
+.bn-more-menu { display:none; position:fixed; bottom:60px; left:0; right:0; z-index:940;
+  background:var(--card); border-top:1px solid var(--border); padding:12px;
+  flex-wrap:wrap; gap:8px; }
+.bn-more-menu.open { display:flex; }
+.bn-more-item { display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:10px 14px; border-radius:10px; cursor:pointer; background:var(--bg2);
+  font-size:.72rem; font-weight:600; color:var(--text2); flex:1; min-width:80px; max-width:100px; }
+.bn-more-item:active { background:var(--accent); color:#fff; }
+@media(max-width:768px){
+  .sidebar { display:none; }
+  .main { margin-left:0 !important; margin-bottom:70px; }
+  .bottom-nav { display:block; }
+  .topbar { padding:0 14px; }
+}
+
+/* ── RESSOURCES ── */
+.ressource-item {
+  display:flex; align-items:center; gap:12px; padding:12px 14px;
+  border-radius:var(--radius2); border:1px solid var(--border); margin-bottom:8px;
+  background:var(--card); transition:var(--transition);
+}
+.ressource-item:hover { border-color:var(--accent2); }
+.ressource-source-tag {
+  display:inline-flex; align-items:center; gap:5px; padding:4px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:700; font-family:var(--mono);
+  background:rgba(82,183,136,.12); color:var(--accent);
+}
+.ressource-montant { font-family:var(--mono); font-weight:800; font-size:1rem; color:var(--gold); }
+.ressource-jour { font-size:.72rem; color:var(--text3); font-family:var(--mono); }
+
+/* ── CRÉANCES ── */
+.creance-card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.creance-card.retard { border-color:var(--red); }
+.creance-card.retard::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--red),var(--red2)); }
+.creance-card.ok::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+.creance-nom { font-weight:700; font-size:1rem; margin-bottom:2px; }
+.creance-montant { font-family:var(--mono); font-weight:800; font-size:1.2rem; color:var(--gold); }
+.creance-date { font-size:.76rem; color:var(--text2); font-family:var(--mono); margin-top:4px; }
+
 /* ── CALENDRIER ── */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px;}
 .cal-head{font-size:.66rem;font-weight:700;text-align:center;color:var(--text3);font-family:var(--mono);padding:4px 0;}
@@ -358,7 +419,7 @@ tr:hover td { background:var(--bg); }
       <div id="auth-error" class="auth-error">❌ Identifiants incorrects</div>
       <div class="auth-input-wrap">
         <label class="auth-label">Nom d'utilisateur</label>
-        <input class="auth-input" id="auth-username" placeholder="ex: papa, maman, admin" autocomplete="username">
+        <input class="auth-input" id="auth-username" placeholder="Votre identifiant" autocomplete="username">
       </div>
       <div class="auth-input-wrap">
         <label class="auth-label">Mot de passe</label>
@@ -417,13 +478,7 @@ tr:hover td { background:var(--bg); }
       <input class="form-input" id="adm-fb-url" value="https://neuf-immo-default-rtdb.europe-west1.firebasedatabase.app/homebase"></div>
     <button class="btn btn-outline btn-sm" onclick="saveFirebaseConfig()">💾 Enregistrer URL</button>
     <div style="margin-top:10px;font-size:.76rem;color:var(--text3)">
-      ⚠️ Renouvellement des règles Firebase (toutes les 4 semaines) :
-        1. Allez sur console.firebase.google.com
-        2. Sélectionnez votre projet <strong>neuf-immo</strong>
-        3. Dans le menu gauche → <strong>Realtime Database</strong> → <strong>Règles</strong>
-        4. Remplacez le contenu par : <code>{ "rules": { ".read": true, ".write": true } }</code>
-        5. Cliquez <strong>Publier</strong> — sans mettre de date d'expiration
-        ✅ Vos données resteront accessibles indéfiniment.
+      ⚠️ Rappel : renouvelez vos règles Firebase tous les 30 jours dans la console Firebase.
     </div>
   </div>
 </div></div>
@@ -490,23 +545,16 @@ tr:hover td { background:var(--bg); }
   </div>
   <div class="nav-section">
     <div class="nav-label">Finances</div>
+    <div class="nav-item" onclick="showPage('ressources')">
+      <span>💵</span><span>Ressources</span>
+    </div>
+    <div class="nav-item" onclick="showPage('creances')">
+      <span>🤝</span><span>Créances</span>
+      <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
+    </div>
     <div class="nav-item" onclick="showPage('dettes')">
       <span>💳</span><span>Dettes</span>
       <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('charges')">
-      <span>⚡</span><span>Charges externes</span>
-      <span class="nav-badge" id="badgeCharges" style="display:none">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('investissements')">
-      <span>📈</span><span>Investissements</span>
-    </div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label">Résidence</div>
-    <div class="nav-item" onclick="showPage('residence')">
-      <span>🏡</span><span>Ma Résidence</span>
-      <span class="nav-badge" id="badgeResidence" style="display:none">0</span>
     </div>
   </div>
   <div class="nav-section">
@@ -899,75 +947,53 @@ tr:hover td { background:var(--bg); }
   <div id="engagements-list"></div>
 </div>
 
-
-
-<!-- ═══════════════════ CHARGES EXTERNES ═══════════════════ -->
-<div id="page-charges" class="page">
+<!-- ═══════════════════ RESSOURCES ═══════════════════ -->
+<div id="page-ressources" class="page">
   <div class="page-header-row">
     <div class="page-header">
-      <div class="page-title">⚡ Charges Externes</div>
-      <div class="page-sub">Suivi des factures & abonnements récurrents</div>
+      <div class="page-title">💵 Ressources</div>
+      <div class="page-sub">Suivi de toutes les entrées d'argent</div>
     </div>
-    <button class="btn btn-primary" onclick="openModal('modal-charge')">+ Ajouter charge</button>
+    <button class="btn btn-primary" onclick="openModal('modal-ressource')">+ Ajouter ressource</button>
   </div>
+
   <div class="grid4" style="margin-bottom:20px">
-    <div class="kpi red"><div class="kpi-icon">⚡</div><div class="kpi-val" id="chg-total">0</div><div class="kpi-label">Charges actives</div></div>
-    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="chg-montant">0 XAF</div><div class="kpi-label">Total mensuel</div></div>
-    <div class="kpi red"><div class="kpi-icon">⏰</div><div class="kpi-val" id="chg-retard">0</div><div class="kpi-label">En retard</div></div>
-    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="chg-regle">0</div><div class="kpi-label">Réglées ce mois</div></div>
+    <div class="kpi green"><div class="kpi-icon">💵</div><div class="kpi-val" id="res-total">0</div><div class="kpi-label">Total mensuel (XAF)</div></div>
+    <div class="kpi gold"><div class="kpi-icon">🏠</div><div class="kpi-val" id="res-loyers">0</div><div class="kpi-label">Loyers (XAF)</div></div>
+    <div class="kpi blue"><div class="kpi-icon">🏢</div><div class="kpi-val" id="res-neuf">0</div><div class="kpi-label">Groupe Neuf (XAF)</div></div>
+    <div class="kpi purple"><div class="kpi-icon">📊</div><div class="kpi-val" id="res-nb">0</div><div class="kpi-label">Sources actives</div></div>
   </div>
-  <!-- Filtres catégorie -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="chg-filtres"></div>
-  <div id="charges-list"></div>
+
+  <!-- Filtre par source -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="res-filtres"></div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card-title" style="margin:0">📋 Détail des ressources</div>
+    </div>
+    <div id="ressources-list"></div>
+  </div>
 </div>
 
-<!-- ═══════════════════ INVESTISSEMENTS ═══════════════════ -->
-<div id="page-investissements" class="page">
+<!-- ═══════════════════ CRÉANCES ═══════════════════ -->
+<div id="page-creances" class="page">
   <div class="page-header-row">
     <div class="page-header">
-      <div class="page-title">📈 Investissements</div>
-      <div class="page-sub">Matériaux chantiers · Crypto · Amélioration résidence</div>
+      <div class="page-title">🤝 Créances</div>
+      <div class="page-sub">Ce que les autres vous doivent — rappels automatiques</div>
     </div>
-    <button class="btn btn-primary" onclick="openModal('modal-invest')">+ Ajouter</button>
+    <button class="btn btn-primary" onclick="openModal('modal-creance')">+ Ajouter créance</button>
   </div>
-  <div class="grid3" style="margin-bottom:20px">
-    <div class="kpi blue"><div class="kpi-icon">📈</div><div class="kpi-val" id="inv-total">0 XAF</div><div class="kpi-label">Total investi</div></div>
-    <div class="kpi gold"><div class="kpi-icon">🎯</div><div class="kpi-val" id="inv-prevu">0 XAF</div><div class="kpi-label">Budget prévu</div></div>
-    <div class="kpi purple"><div class="kpi-icon">📦</div><div class="kpi-val" id="inv-nb">0</div><div class="kpi-label">Opérations</div></div>
-  </div>
-  <!-- Tabs par sous-catégorie -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-    <button class="btn btn-outline btn-sm" onclick="filterInv('Tous')" id="inv-f-tous">📊 Tous</button>
-    <button class="btn btn-outline btn-sm" onclick="filterInv('materiaux')" id="inv-f-mat">🧱 Matériaux chantier</button>
-    <button class="btn btn-outline btn-sm" onclick="filterInv('crypto')" id="inv-f-cry">₿ Crypto</button>
-    <button class="btn btn-outline btn-sm" onclick="filterInv('residence')" id="inv-f-res">🏡 Résidence</button>
-  </div>
-  <div id="invest-list"></div>
-</div>
 
-<!-- ═══════════════════ MA RÉSIDENCE ═══════════════════ -->
-<div id="page-residence" class="page">
-  <div class="page-header-row">
-    <div class="page-header">
-      <div class="page-title">🏡 Ma Résidence</div>
-      <div class="page-sub">Objectifs d'acquisition & d'amélioration de votre résidence</div>
-    </div>
-    <button class="btn btn-primary" onclick="openModal('modal-residence')">+ Ajouter objectif</button>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi blue"><div class="kpi-icon">🤝</div><div class="kpi-val" id="cr-nb">0</div><div class="kpi-label">Total créances</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="cr-montant">0</div><div class="kpi-label">Montant total (XAF)</div></div>
+    <div class="kpi red"><div class="kpi-icon">⚠️</div><div class="kpi-val" id="cr-retard">0</div><div class="kpi-label">En retard</div></div>
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="cr-regle">0</div><div class="kpi-label">Réglées</div></div>
   </div>
-  <div class="grid3" style="margin-bottom:20px">
-    <div class="kpi blue"><div class="kpi-icon">🏡</div><div class="kpi-val" id="res-total">0</div><div class="kpi-label">Total objectifs</div></div>
-    <div class="kpi gold"><div class="kpi-icon">🔄</div><div class="kpi-val" id="res-encours">0</div><div class="kpi-label">En cours</div></div>
-    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="res-done">0</div><div class="kpi-label">Atteints</div></div>
-  </div>
-  <!-- Tabs Acquisition / Amélioration -->
-  <div style="display:flex;gap:8px;margin-bottom:20px">
-    <button class="btn btn-primary btn-sm" onclick="filterRes('tous')" id="res-f-tous">📋 Tous</button>
-    <button class="btn btn-outline btn-sm" onclick="filterRes('acquisition')" id="res-f-acq">🛍️ Acquisitions</button>
-    <button class="btn btn-outline btn-sm" onclick="filterRes('amelioration')" id="res-f-aml">🔧 Améliorations</button>
-    <button class="btn btn-outline btn-sm" onclick="filterRes('securite')" id="res-f-sec">🔒 Sécurité</button>
-    <button class="btn btn-outline btn-sm" onclick="filterRes('decoration')" id="res-f-dec">🎨 Décoration</button>
-  </div>
-  <div id="residence-list"></div>
+
+  <div id="creances-alerts" style="margin-bottom:12px"></div>
+  <div class="grid-auto" id="creances-grid"></div>
 </div>
 
 </main><!-- /main -->
@@ -1392,153 +1418,6 @@ tr:hover td { background:var(--bg); }
 </div></div>
 
 
-
-<!-- ═══ MODAL CHARGE EXTERNE ═══ -->
-<div id="modal-charge" class="modal-overlay" onclick="closeModalOut(event,'modal-charge')">
-<div class="modal">
-  <div class="modal-title"><span id="mchg-title">⚡ Nouvelle charge</span><span class="modal-close" onclick="closeModal('modal-charge');resetChargeModal()">✕</span></div>
-  <input type="hidden" id="chg-edit-id">
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Libellé</label><input class="form-input" id="chg-nom" placeholder="Ex: Facture SEEG Août"></div>
-    <div class="form-group"><label class="form-label">Catégorie</label>
-      <select class="form-select" id="chg-cat">
-        <option value="eau">💧 Eau (SEEG)</option>
-        <option value="electricite">⚡ Électricité (SEEG)</option>
-        <option value="canal">📺 Canal Box</option>
-        <option value="espaces_verts">🌿 Entretien espaces verts</option>
-        <option value="internet">🌐 Internet / Téléphone</option>
-        <option value="gardiennage">🛡️ Gardiennage</option>
-        <option value="autre">📦 Autre</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Montant (XAF)</label><input class="form-input" type="number" id="chg-montant" placeholder="25000"></div>
-    <div class="form-group"><label class="form-label">Fréquence</label>
-      <select class="form-select" id="chg-freq">
-        <option value="mensuel">🔁 Mensuel</option>
-        <option value="bimestriel">📅 Bimestriel (2 mois)</option>
-        <option value="trimestriel">📅 Trimestriel</option>
-        <option value="annuel">📆 Annuel</option>
-        <option value="unique">1️⃣ Unique</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Date d'échéance</label><input class="form-input" type="date" id="chg-date"></div>
-    <div class="form-group"><label class="form-label">Statut</label>
-      <select class="form-select" id="chg-statut">
-        <option value="impayé">❌ Impayé</option>
-        <option value="payé">✅ Payé</option>
-        <option value="en_attente">⏳ En attente de facture</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Rappel avant échéance</label>
-      <select class="form-select" id="chg-rappel">
-        <option value="0">Aucun</option>
-        <option value="3">3 jours avant</option>
-        <option value="7">1 semaine avant</option>
-        <option value="14">2 semaines avant</option>
-      </select>
-    </div>
-    <div class="form-group"><label class="form-label">Fournisseur / Contact</label><input class="form-input" id="chg-fournisseur" placeholder="Ex: SEEG, Canal+..."></div>
-  </div>
-  <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="chg-notes" placeholder="Référence facture, compteur..."></textarea></div>
-  <button class="btn btn-primary" style="width:100%" onclick="saveCharge()">✅ Enregistrer</button>
-</div></div>
-
-<!-- ═══ MODAL INVESTISSEMENT ═══ -->
-<div id="modal-invest" class="modal-overlay" onclick="closeModalOut(event,'modal-invest')">
-<div class="modal">
-  <div class="modal-title"><span id="minv-title">📈 Nouvel investissement</span><span class="modal-close" onclick="closeModal('modal-invest');resetInvestModal()">✕</span></div>
-  <input type="hidden" id="inv-edit-id">
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Libellé</label><input class="form-input" id="inv-nom" placeholder="Ex: Ciment Portland x50 sacs"></div>
-    <div class="form-group"><label class="form-label">Catégorie</label>
-      <select class="form-select" id="inv-cat">
-        <option value="materiaux">🧱 Matériaux — Bien en chantier</option>
-        <option value="crypto">₿ Crypto-monnaie</option>
-        <option value="residence">🏡 Amélioration résidence</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row" id="inv-chantier-row">
-    <div class="form-group"><label class="form-label">Bien / Chantier concerné</label>
-      <select class="form-select" id="inv-chantier">
-        <option value="">— Sélectionner —</option>
-      </select>
-    </div>
-    <div class="form-group"><label class="form-label">Fournisseur matériaux</label><input class="form-input" id="inv-fournisseur" placeholder="Ex: Quifoc, Ets Bâti..."></div>
-  </div>
-  <div class="form-row" id="inv-crypto-row" style="display:none">
-    <div class="form-group"><label class="form-label">Crypto-monnaie</label>
-      <select class="form-select" id="inv-crypto-type">
-        <option value="BTC">₿ Bitcoin (BTC)</option>
-        <option value="ETH">🔷 Ethereum (ETH)</option>
-        <option value="USDT">💵 USDT (Stablecoin)</option>
-        <option value="BNB">🟡 BNB</option>
-        <option value="autre">📦 Autre</option>
-      </select>
-    </div>
-    <div class="form-group"><label class="form-label">Plateforme</label><input class="form-input" id="inv-plateforme" placeholder="Ex: Binance, Coinbase..."></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Montant investi (XAF)</label><input class="form-input" type="number" id="inv-montant" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">Budget prévu (XAF)</label><input class="form-input" type="number" id="inv-prevu" placeholder="0"></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="inv-date"></div>
-    <div class="form-group"><label class="form-label">Statut</label>
-      <select class="form-select" id="inv-statut">
-        <option value="planifié">📋 Planifié</option>
-        <option value="en_cours">🔄 En cours</option>
-        <option value="réalisé">✅ Réalisé</option>
-        <option value="annulé">❌ Annulé</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-group"><label class="form-label">Notes / Justificatif</label><textarea class="form-textarea" id="inv-notes" placeholder="Détails, bon de livraison..."></textarea></div>
-  <button class="btn btn-primary" style="width:100%" onclick="saveInvest()">✅ Enregistrer</button>
-</div></div>
-
-<!-- ═══ MODAL MA RÉSIDENCE ═══ -->
-<div id="modal-residence" class="modal-overlay" onclick="closeModalOut(event,'modal-residence')">
-<div class="modal">
-  <div class="modal-title"><span id="mres-title">🏡 Nouvel objectif résidence</span><span class="modal-close" onclick="closeModal('modal-residence');resetResModal()">✕</span></div>
-  <input type="hidden" id="res-edit-id">
-  <div class="form-group"><label class="form-label">Titre de l'objectif</label><input class="form-input" id="res-titre" placeholder="Ex: Installer une clim dans le salon"></div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Catégorie</label>
-      <select class="form-select" id="res-cat">
-        <option value="acquisition">🛍️ Acquisition (achat nouveau)</option>
-        <option value="amelioration">🔧 Amélioration (travaux)</option>
-        <option value="securite">🔒 Sécurité</option>
-        <option value="decoration">🎨 Décoration</option>
-        <option value="exterieur">🌿 Extérieur / Jardin</option>
-      </select>
-    </div>
-    <div class="form-group"><label class="form-label">Priorité</label>
-      <select class="form-select" id="res-prio">
-        <option value="haute">🔴 Haute</option>
-        <option value="moyenne">🟡 Moyenne</option>
-        <option value="basse">🟢 Basse / Futur</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Coût estimé (XAF)</label><input class="form-input" type="number" id="res-cout" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">Coût réel (XAF)</label><input class="form-input" type="number" id="res-reel" placeholder="0"></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label">Date cible</label><input class="form-input" type="date" id="res-date"></div>
-    <div class="form-group"><label class="form-label">Avancement (%)</label><input class="form-input" type="number" id="res-pct" placeholder="0" min="0" max="100"></div>
-  </div>
-  <div class="form-group"><label class="form-label">Description / Pièces concernées</label><textarea class="form-textarea" id="res-desc" placeholder="Détails, dimensions, marque souhaitée..."></textarea></div>
-  <button class="btn btn-primary" style="width:100%" onclick="saveResidence()">✅ Enregistrer</button>
-</div></div>
-
 <!-- MODAL CHANGE PASSWORD -->
 <div id="modal-change-pass" class="modal-overlay" onclick="closeModalOut(event,'modal-change-pass')">
 <div class="modal" style="max-width:380px">
@@ -1551,6 +1430,92 @@ tr:hover td { background:var(--bg); }
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- MODAL RESSOURCE -->
+<div id="modal-ressource" class="modal-overlay" onclick="closeModalOut(event,'modal-ressource')">
+<div class="modal">
+  <div class="modal-title"><span id="mres-title">💵 Nouvelle ressource</span><span class="modal-close" onclick="closeModal('modal-ressource');resetRessourceModal()">✕</span></div>
+  <input type="hidden" id="res-edit-id">
+  <div class="form-group">
+    <label class="form-label">Source de revenu</label>
+    <select class="form-select" id="res-source">
+      <option value="Loyer 1">🏠 Loyer 1</option>
+      <option value="Loyer 2">🏠 Loyer 2</option>
+      <option value="Neuf SAT">📡 Neuf SAT</option>
+      <option value="Neuf Bat">🏗️ Neuf Bat</option>
+      <option value="Neuf Ébénisterie">🪚 Neuf Ébénisterie</option>
+      <option value="Neuf Clean">🧹 Neuf Clean</option>
+      <option value="Neuf Immo">🏢 Neuf Immo</option>
+      <option value="Neuf Soudure">🔩 Neuf Soudure</option>
+      <option value="Neuf Service">⚙️ Neuf Service</option>
+      <option value="Neuf Box">📦 Neuf Box</option>
+      <option value="Autre">📌 Autre</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Montant (XAF)</label><input class="form-input" type="number" id="res-montant" placeholder="Ex: 150000" min="0"></div>
+    <div class="form-group"><label class="form-label">Jour du mois</label><input class="form-input" type="number" id="res-jour" placeholder="1-31" min="1" max="31"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Mois / Période</label><input class="form-input" type="month" id="res-mois"></div>
+  <div class="form-group"><label class="form-label">Notes (optionnel)</label><textarea class="form-textarea" id="res-notes" placeholder="Détails, remarques..."></textarea></div>
+  <button class="btn btn-primary" style="width:100%" onclick="saveRessource()">✅ Enregistrer</button>
+</div></div>
+
+<!-- MODAL CRÉANCE -->
+<div id="modal-creance" class="modal-overlay" onclick="closeModalOut(event,'modal-creance')">
+<div class="modal">
+  <div class="modal-title"><span id="mcr-title">🤝 Nouvelle créance</span><span class="modal-close" onclick="closeModal('modal-creance');resetCreanceModal()">✕</span></div>
+  <input type="hidden" id="cr-edit-id">
+  <div class="form-group"><label class="form-label">Nom de la personne</label><input class="form-input" id="cr-nom" placeholder="Ex: Jean Dupont"></div>
+  <div class="form-group"><label class="form-label">Montant dû (XAF)</label><input class="form-input" type="number" id="cr-montant" placeholder="Ex: 50000" min="0"></div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Date de paiement prévue</label><input class="form-input" type="date" id="cr-date"></div>
+    <div class="form-group"><label class="form-label">Rappel avant (jours)</label>
+      <select class="form-select" id="cr-rappel">
+        <option value="0">Le jour J</option>
+        <option value="1">1 jour avant</option>
+        <option value="3" selected>3 jours avant</option>
+        <option value="7">1 semaine avant</option>
+        <option value="14">2 semaines avant</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Motif / Description</label><textarea class="form-textarea" id="cr-motif" placeholder="Ex: Prêt du 01/01/2025, loyer en retard..."></textarea></div>
+  <div class="form-group">
+    <label class="form-label">Statut</label>
+    <select class="form-select" id="cr-statut">
+      <option value="en_attente">⏳ En attente</option>
+      <option value="partiellement">🟡 Partiellement réglé</option>
+      <option value="regle">✅ Réglé</option>
+    </select>
+  </div>
+  <div class="form-group"><label class="form-label">Contact WhatsApp (optionnel)</label><input class="form-input" id="cr-contact" placeholder="Ex: +241 06 00 00 00"></div>
+  <button class="btn btn-primary" style="width:100%" onclick="saveCreance()">✅ Enregistrer</button>
+</div></div>
+
+<!-- BOTTOM NAV MOBILE -->
+<nav class="bottom-nav">
+  <div class="bn-more-menu" id="bn-more-menu">
+    <div class="bn-more-item" onclick="showPageMobile('stocks')">🛒<span>Stocks</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('locatifs')">🏢<span>Locatifs</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('chantiers')">🔨<span>Chantiers</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('taches')">✅<span>Tâches</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('budget')">💸<span>Budget</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('dettes')">💳<span>Dettes</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('maintenance')">🔧<span>Maint.</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('engagements')">🤝<span>Engag.</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('enfant')">👶<span>Enfant</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('objectifs')">🎯<span>Objectifs</span></div>
+    <div class="bn-more-item" onclick="showPageMobile('calendrier')">📅<span>Calendrier</span></div>
+  </div>
+  <div class="bottom-nav-items">
+    <div class="bn-item active" id="bn-dashboard" onclick="showPageMobile('dashboard')"><span>📊</span><span>Accueil</span></div>
+    <div class="bn-item" id="bn-ressources" onclick="showPageMobile('ressources')"><span>💵</span><span>Revenus</span></div>
+    <div class="bn-item" id="bn-creances" onclick="showPageMobile('creances')"><span>🤝</span><span>Créances</span></div>
+    <div class="bn-item" id="bn-locatifs-m" onclick="showPageMobile('locatifs')"><span>🏢</span><span>Locatifs</span></div>
+    <div class="bn-item" id="bn-more" onclick="toggleBnMore()"><span>⋯</span><span>Plus</span></div>
+  </div>
+</nav>
 
 <script>
 // ══ STATE ══
@@ -1628,7 +1593,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  charges: [], investissements: [], residence: []
+  ressources: [], creances: []
 };
 
 // ══ FIREBASE ══
@@ -1636,14 +1601,17 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','charges','investissements','residence'];
-  for (const k of keys) {
-    const d = await fbGet(k);
-    if (d !== null) {
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances'];
+  // Charger en parallèle pour performance mobile
+  const results = await Promise.allSettled(keys.map(k => fbGet(k)));
+  results.forEach((res, i) => {
+    const k = keys[i];
+    if (res.status === 'fulfilled' && res.value !== null) {
+      const d = res.value;
       if (Array.isArray(state[k])) state[k] = Array.isArray(d) ? d : Object.values(d);
       else state[k] = d;
     }
-  }
+  });
   // Charger les données Excel par défaut si stocks vides
   if (state.stocks.length === 0) loadDefaultStocks();
   renderAll();
@@ -1778,14 +1746,13 @@ function renderPage(id) {
   if (id==='dettes') renderDettes();
   if (id==='maintenance') renderMaintenance();
   if (id==='engagements') renderEngagements();
-  if (id==='charges') renderCharges();
-  if (id==='investissements') renderInvestissements();
-  if (id==='residence') renderResidence();
   if (id==='taches') renderTaches();
   if (id==='locatifs') renderLocatifs();
   if (id==='chantiers') renderChantiers();
   if (id==='enfant') renderEnfant();
   if (id==='objectifs') renderObjectifs();
+  if (id==='ressources') renderRessources();
+  if (id==='creances') renderCreances();
 }
 
 function renderAll() {
@@ -1800,9 +1767,8 @@ function renderAll() {
   renderDettes();
   renderMaintenance();
   renderEngagements();
-  renderCharges();
-  renderInvestissements();
-  renderResidence();
+  renderRessources();
+  renderCreances();
   updateBadges();
 }
 
@@ -1813,11 +1779,12 @@ function renderDashboard() {
 
   const budgetTotal = state.budget.reduce((a,b)=>a+(b.prev||0),0) || 331850; // Total Excel : 331 850 XAF
   const loyersTotal = state.locatifs.reduce((a,b)=>a+(b.statut==='occupé'?(b.loyer||0):0),0);
+  const ressourcesTotal = (state.ressources||[]).reduce((a,b)=>a+(+b.montant||0),0);
   const stocksBas = state.stocks.filter(s=>s.alerte==='critique'||s.alerte==='faible').length;
   const tachesEnCours = state.taches.filter(t=>!t.done).length;
 
   document.getElementById('kpi-budget').textContent = fmtXAF(budgetTotal);
-  document.getElementById('kpi-loyers').textContent = fmtXAF(loyersTotal);
+  document.getElementById('kpi-loyers').textContent = fmtXAF(loyersTotal + ressourcesTotal);
   document.getElementById('kpi-stocks-bas').textContent = stocksBas;
   document.getElementById('kpi-taches').textContent = tachesEnCours;
 
@@ -2264,20 +2231,267 @@ function addObjectif() {
 }
 
 // ══ BADGES ══
+// ══════════════════════════════════════════
+// RESSOURCES
+// ══════════════════════════════════════════
+const RES_SOURCES = ['Loyer 1','Loyer 2','Neuf SAT','Neuf Bat','Neuf Ébénisterie','Neuf Clean','Neuf Immo','Neuf Soudure','Neuf Service','Neuf Box','Autre'];
+const RES_ICONS = {'Loyer 1':'🏠','Loyer 2':'🏠','Neuf SAT':'📡','Neuf Bat':'🏗️','Neuf Ébénisterie':'🪚','Neuf Clean':'🧹','Neuf Immo':'🏢','Neuf Soudure':'🔩','Neuf Service':'⚙️','Neuf Box':'📦','Autre':'📌'};
+
+function renderRessources() {
+  const res = state.ressources || [];
+  const total = res.reduce((a,b)=>a+(+b.montant||0),0);
+  const loyers = res.filter(r=>r.source==='Loyer 1'||r.source==='Loyer 2').reduce((a,b)=>a+(+b.montant||0),0);
+  const neuf = res.filter(r=>r.source&&r.source.startsWith('Neuf')).reduce((a,b)=>a+(+b.montant||0),0);
+  const sources = [...new Set(res.map(r=>r.source))].filter(Boolean);
+
+  document.getElementById('res-total').textContent = fmtXAF(total);
+  document.getElementById('res-loyers').textContent = fmtXAF(loyers);
+  document.getElementById('res-neuf').textContent = fmtXAF(neuf);
+  document.getElementById('res-nb').textContent = sources.length;
+
+  // Filtres
+  let activeFilter = window._resFilter || 'all';
+  const filtresEl = document.getElementById('res-filtres');
+  if(filtresEl) {
+    filtresEl.innerHTML = `<button class="btn ${activeFilter==='all'?'btn-primary':'btn-outline'} btn-sm" onclick="setResFilter('all')">Toutes</button>`
+      + RES_SOURCES.filter(s=>res.some(r=>r.source===s)).map(s=>`
+        <button class="btn ${activeFilter===s?'btn-primary':'btn-outline'} btn-sm" onclick="setResFilter('${s}')">${RES_ICONS[s]||''} ${s}</button>`).join('');
+  }
+
+  const filtered = activeFilter==='all' ? res : res.filter(r=>r.source===activeFilter);
+  const listEl = document.getElementById('ressources-list');
+  if(!listEl) return;
+
+  if(!filtered.length){
+    listEl.innerHTML = `<div style="color:var(--text3);text-align:center;padding:32px">Aucune ressource enregistrée</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((r,i)=>{
+    const realIdx = res.findIndex(x=>x.id===r.id);
+    return `<div class="ressource-item">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span class="ressource-source-tag">${RES_ICONS[r.source]||'📌'} ${r.source}</span>
+          ${r.mois?`<span style="font-size:.72rem;color:var(--text3);font-family:var(--mono)">${r.mois}</span>`:''}
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <span class="ressource-montant">${fmtXAF(+r.montant||0)}</span>
+          ${r.jour?`<span class="ressource-jour">Jour ${r.jour}</span>`:''}
+        </div>
+        ${r.notes?`<div style="font-size:.74rem;color:var(--text3);margin-top:3px;font-style:italic">${r.notes}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-outline btn-icon btn-sm" onclick="editRessource(${realIdx})" title="Modifier">✏️</button>
+        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteRessource(${realIdx})" title="Supprimer">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setResFilter(f){ window._resFilter=f; renderRessources(); }
+
+function saveRessource() {
+  const source = v('res-source'); if(!source) return showToast('❌ Source requise');
+  const montant = +document.getElementById('res-montant').value||0;
+  if(!montant) return showToast('❌ Montant requis');
+  const editId = document.getElementById('res-edit-id').value;
+  const obj = {id: editId||Date.now(), source, montant, jour:v('res-jour'), mois:v('res-mois'), notes:v('res-notes')};
+  if(editId) {
+    const idx = (state.ressources||[]).findIndex(x=>String(x.id)===String(editId));
+    if(idx>=0) state.ressources[idx]=obj; else state.ressources.push(obj);
+  } else {
+    if(!state.ressources) state.ressources=[];
+    state.ressources.push(obj);
+  }
+  save('ressources'); closeModal('modal-ressource'); resetRessourceModal();
+  renderRessources(); renderDashboard();
+  showToast(editId?'✅ Ressource modifiée !':'✅ Ressource ajoutée !');
+}
+
+function editRessource(i) {
+  const r = (state.ressources||[])[i]; if(!r) return;
+  document.getElementById('mres-title').textContent = '✏️ Modifier ressource';
+  document.getElementById('res-edit-id').value = r.id;
+  sv('res-source',r.source); sv('res-montant',r.montant||0);
+  sv('res-jour',r.jour||''); sv('res-mois',r.mois||''); sv('res-notes',r.notes||'');
+  openModal('modal-ressource');
+}
+
+function deleteRessource(i) {
+  if(!confirm('Supprimer cette ressource ?')) return;
+  (state.ressources||[]).splice(i,1);
+  save('ressources'); renderRessources(); renderDashboard(); showToast('Ressource supprimée');
+}
+
+function resetRessourceModal() {
+  document.getElementById('res-edit-id').value='';
+  document.getElementById('mres-title').textContent='💵 Nouvelle ressource';
+  clearForm(['res-montant','res-jour','res-mois','res-notes']);
+}
+
+// ══════════════════════════════════════════
+// CRÉANCES
+// ══════════════════════════════════════════
+function renderCreances() {
+  const crs = state.creances || [];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const actives = crs.filter(c=>c.statut!=='regle');
+  const retard = crs.filter(c=>{
+    if(c.statut==='regle'||!c.date) return false;
+    return new Date(c.date) < today;
+  });
+
+  document.getElementById('cr-nb').textContent = actives.length;
+  document.getElementById('cr-montant').textContent = fmtXAF(actives.reduce((a,b)=>a+(+b.montant||0),0));
+  document.getElementById('cr-retard').textContent = retard.length;
+  document.getElementById('cr-regle').textContent = crs.filter(c=>c.statut==='regle').length;
+
+  // Alertes créances en retard
+  const alertsEl = document.getElementById('creances-alerts');
+  if(alertsEl) {
+    alertsEl.innerHTML = retard.map(c=>{
+      const diff = Math.abs(Math.round((new Date(c.date)-today)/(1000*60*60*24)));
+      return `<div class="alert alert-danger" style="margin-bottom:8px">
+        ⚠️ <strong>${c.nom}</strong> — ${fmtXAF(+c.montant||0)} — En retard de ${diff} jour(s) · Date prévue : ${c.date}
+        ${c.contact?`<button class="btn btn-outline btn-sm" style="margin-left:auto;font-size:.72rem" onclick="rappelCreanceWA('${c.contact}','${c.nom}',${c.montant},'${c.date}')">💬 WhatsApp</button>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  const sorted = [...crs].sort((a,b)=>{
+    const order={en_attente:0,partiellement:1,regle:2};
+    return (order[a.statut]||0)-(order[b.statut]||0);
+  });
+
+  document.getElementById('creances-grid').innerHTML = sorted.length ? sorted.map((c,i)=>{
+    const realIdx = crs.findIndex(x=>x.id===c.id);
+    const isRetard = c.statut!=='regle' && c.date && new Date(c.date)<today;
+    const diff = c.date ? Math.ceil((new Date(c.date)-today)/(1000*60*60*24)) : null;
+    let dateBadge='';
+    if(isRetard) dateBadge=`<span class="badge badge-red">⚠️ Retard ${Math.abs(diff)}j</span>`;
+    else if(diff!==null&&diff<=3&&c.statut!=='regle') dateBadge=`<span class="badge badge-red">🔴 < 3 jours</span>`;
+    else if(diff!==null&&diff<=7&&c.statut!=='regle') dateBadge=`<span class="badge badge-gold">⚠️ Cette semaine</span>`;
+
+    const statutColors={en_attente:'badge-gold',partiellement:'badge-blue',regle:'badge-green'};
+    const statutLabels={en_attente:'⏳ En attente',partiellement:'🟡 Partiel',regle:'✅ Réglé'};
+
+    return `<div class="creance-card ${isRetard?'retard':c.statut==='regle'?'ok':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="creance-nom">👤 ${c.nom}</div>
+          ${c.motif?`<div style="font-size:.78rem;color:var(--text2);margin-top:2px">${c.motif}</div>`:''}
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+          ${dateBadge}
+          <span class="badge ${statutColors[c.statut]||'badge-gray'}">${statutLabels[c.statut]||c.statut}</span>
+        </div>
+      </div>
+      <div class="creance-montant">${fmtXAF(+c.montant||0)}</div>
+      ${c.date?`<div class="creance-date">📅 Paiement prévu : ${c.date}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+        ${c.statut!=='regle'?`<button class="btn btn-primary btn-sm" onclick="marquerRegle(${realIdx})">✅ Marquer réglé</button>`:''}
+        ${c.contact?`<button class="btn btn-outline btn-sm" onclick="rappelCreanceWA('${c.contact}','${c.nom}',${c.montant},'${c.date||''}')">💬 Rappel WA</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="editCreance(${realIdx})">✏️</button>
+        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCreance(${realIdx})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('') : `<div style="color:var(--text3);text-align:center;padding:40px;grid-column:1/-1">Aucune créance enregistrée</div>`;
+}
+
+function saveCreance() {
+  const nom = v('cr-nom'); if(!nom) return showToast('❌ Nom requis');
+  const montant = +document.getElementById('cr-montant').value||0;
+  if(!montant) return showToast('❌ Montant requis');
+  const editId = document.getElementById('cr-edit-id').value;
+  const obj = {id:editId||Date.now(), nom, montant, date:v('cr-date'), rappel:v('cr-rappel'), motif:v('cr-motif'), statut:v('cr-statut')||'en_attente', contact:v('cr-contact')||''};
+  if(!state.creances) state.creances=[];
+  if(editId) {
+    const idx = state.creances.findIndex(x=>String(x.id)===String(editId));
+    if(idx>=0) state.creances[idx]=obj; else state.creances.push(obj);
+  } else {
+    state.creances.push(obj);
+  }
+  save('creances'); closeModal('modal-creance'); resetCreanceModal();
+  renderCreances(); updateBadges();
+  showToast(editId?'✅ Créance modifiée !':'✅ Créance ajoutée !');
+}
+
+function editCreance(i) {
+  const c = (state.creances||[])[i]; if(!c) return;
+  document.getElementById('mcr-title').textContent='✏️ Modifier créance';
+  document.getElementById('cr-edit-id').value=c.id;
+  sv('cr-nom',c.nom); sv('cr-montant',c.montant||0);
+  sv('cr-date',c.date||''); sv('cr-rappel',c.rappel||'3');
+  sv('cr-motif',c.motif||''); sv('cr-statut',c.statut||'en_attente');
+  openModal('modal-creance');
+}
+
+function marquerRegle(i) {
+  if(!(state.creances||[])[i]) return;
+  state.creances[i].statut='regle';
+  save('creances'); renderCreances(); updateBadges(); showToast('✅ Créance marquée réglée !');
+}
+
+function deleteCreance(i) {
+  if(!confirm('Supprimer cette créance ?')) return;
+  (state.creances||[]).splice(i,1);
+  save('creances'); renderCreances(); updateBadges(); showToast('Créance supprimée');
+}
+
+function resetCreanceModal() {
+  document.getElementById('cr-edit-id').value='';
+  document.getElementById('mcr-title').textContent='🤝 Nouvelle créance';
+  clearForm(['cr-nom','cr-montant','cr-date','cr-motif']);
+}
+
+function rappelCreanceWA(contact, nom, montant, date) {
+  const msg = `Bonjour ${nom}, je vous rappelle que vous avez un paiement de ${fmtXAF(+montant||0)} prévu${date?' pour le '+date:''}. Merci de régulariser. — Cordialement`;
+  rappelWA(contact, msg);
+}
+
+// Vérification rappels créances — intégrée dans checkRappels
+function checkCreancesRappels() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const alerts = [];
+  (state.creances||[]).filter(c=>c.statut!=='regle'&&c.date).forEach(c=>{
+    const diff = Math.ceil((new Date(c.date)-today)/(1000*60*60*24));
+    if(diff<0) alerts.push({type:'danger', msg:`🤝 Créance en retard : ${c.nom} — ${fmtXAF(+c.montant||0)}`});
+    else if(diff<=+c.rappel) alerts.push({type:'warning', msg:`🤝 Rappel créance : ${c.nom} — paiement dans ${diff} jour(s)`});
+  });
+  return alerts;
+}
+
+// ══ BOTTOM NAV MOBILE ══
+function showPageMobile(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page = document.getElementById('page-'+id);
+  if(page) page.classList.add('active');
+  document.getElementById('bn-more-menu').classList.remove('open');
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const bnMap={'dashboard':'bn-dashboard','ressources':'bn-ressources','creances':'bn-creances','locatifs':'bn-locatifs-m'};
+  const bnEl = bnMap[id]?document.getElementById(bnMap[id]):null;
+  if(bnEl) bnEl.classList.add('active');
+  renderPage(id);
+}
+function toggleBnMore(){
+  document.getElementById('bn-more-menu').classList.toggle('open');
+}
+
 function updateBadges() {
   const bas    = state.stocks.filter(s=>s.alerte!=='ok').length;
   const taches = state.taches.filter(t=>!t.done).length;
   const dettes = (state.dettes||[]).filter(d=>d.statut!=='réglé').length;
   const maint  = (state.maintenance||[]).filter(m=>!m.done&&m.urgence==='critique').length;
   const engs   = (state.engagements||[]).filter(e=>!e.done).length;
-  const charges   = (state.charges||[]).filter(ch=>{
-    if(ch.statut==='payé'||!ch.date) return false;
-    return new Date(ch.date)<new Date();
-  }).length;
-  const residence  = (state.residence||[]).filter(r=>!r.done&&r.prio==='haute').length;
+  const today  = new Date(); today.setHours(0,0,0,0);
+  const creancesRetard = (state.creances||[]).filter(c=>c.statut!=='regle'&&c.date&&new Date(c.date)<today).length;
   const setBadge = (id,n) => { const el=document.getElementById(id); if(!el) return; el.textContent=n||''; el.style.display=n?'':'none'; };
   setBadge('badgeStock', bas); setBadge('badgeTaches', taches);
   setBadge('badgeDettes', dettes); setBadge('badgeMaint', maint); setBadge('badgeEng', engs);
+  setBadge('badgeCreances', creancesRetard);
 }
 
 // ══ HELPERS ══
@@ -2831,6 +3045,9 @@ function checkRappels() {
     alerts.push({type:'danger',msg:`🔧 Maintenance critique : ${m.desc} (${m.bien||m.locatif||''})`});
   });
 
+  // Créances en retard ou à rappeler
+  alerts.push(...checkCreancesRappels());
+
   return alerts;
 }
 
@@ -2841,14 +3058,8 @@ function checkRappels() {
 let currentUser = null;
 
 // Comptes par défaut — stockés dans Firebase sous homebase/users
-function hashSimple(str) {
-  let hash = 0;
-  for(let i=0;i<str.length;i++){ hash=((hash<<5)-hash)+str.charCodeAt(i); hash|=0; }
-  return 'h'+Math.abs(hash).toString(36);
-}
-
 const DEFAULT_USERS = [
-  { id:'admin', username:'admin', nom:'Neuf Administrator', password: hashSimple('HomeBase2026!'),
+  { id:'admin', username:'admin', nom:'Administrateur', password: hashSimple('HomeBase2026!'),
     role:'admin', avatar:'👑', color:'#C9A84C', actif:true },
   { id:'papa',  username:'papa',  nom:'Papa',           password: hashSimple('papa2026'),
     role:'member', avatar:'👨', color:'#2D6A4F', actif:true },
@@ -2856,75 +3067,43 @@ const DEFAULT_USERS = [
     role:'member', avatar:'👩', color:'#6C3483', actif:true },
 ];
 
+function hashSimple(str) {
+  // Hash simple côté client (non cryptographique mais suffisant pour usage famille)
+  let hash = 0;
+  for(let i=0;i<str.length;i++){ hash=((hash<<5)-hash)+str.charCodeAt(i); hash|=0; }
+  return 'h'+Math.abs(hash).toString(36);
+}
+
 async function loadUsers() {
-  // Essayer Firebase d'abord
-  let users = null;
-  try { users = await fbGet('users'); } catch(e) {}
-
-  // Fallback localStorage si Firebase hors ligne
-  if(!users) {
-    try {
-      const local = localStorage.getItem('hb_users');
-      if(local) users = JSON.parse(local);
-    } catch(e) {}
-  }
-
-  // Première installation : créer les comptes par défaut
-  if(!users || (Array.isArray(users) && users.length === 0)) {
+  let users = await fbGet('users');
+  if(!users || (Array.isArray(users)&&users.length===0)) {
+    // Première installation — créer les comptes par défaut
     users = DEFAULT_USERS;
-    // Sauvegarder en local immédiatement (offline-first)
-    try { localStorage.setItem('hb_users', JSON.stringify(users)); } catch(e) {}
-    // Essayer Firebase sans bloquer
-    fbSet('users', users).catch(()=>{});
+    await fbSet('users', users);
   }
-
-  // Toujours mettre à jour le cache local
-  try { localStorage.setItem('hb_users', JSON.stringify(users)); } catch(e) {}
-
   if(Array.isArray(users)) return users;
-  try { return Object.values(users); } catch(e) { return DEFAULT_USERS; }
+  return Object.values(users);
 }
 
 async function doLogin() {
   const username = document.getElementById('auth-username').value.trim();
-  const password = document.getElementById('auth-password').value.trim();
+  const password = document.getElementById('auth-password').value;
   if(!username||!password) { showAuthError('Remplissez tous les champs'); return; }
 
-  // Afficher état chargement
-  const btn = document.querySelector('.auth-btn');
-  if(btn) { btn.textContent = '⏳ Connexion...'; btn.disabled = true; }
-
-  let users = [];
-  try {
-    users = await loadUsers();
-  } catch(e) {
-    if(btn) { btn.textContent = 'Entrer dans HomeBase →'; btn.disabled = false; }
-    showAuthError('Erreur réseau — vérifiez votre connexion');
-    return;
-  }
-
-  if(btn) { btn.textContent = 'Entrer dans HomeBase →'; btn.disabled = false; }
-
-  if(!Array.isArray(users) || users.length === 0) {
-    showAuthError('Erreur de chargement des comptes');
-    return;
-  }
-
-  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.actif !== false);
+  const users = await loadUsers();
+  const user  = users.find(u=>u.username===username && u.actif!==false);
   if(!user) { showAuthError('Compte introuvable ou désactivé'); return; }
 
   const hashed = hashSimple(password);
   if(user.password !== hashed) { showAuthError('Mot de passe incorrect'); return; }
 
-  // Connexion réussie ✅
-  currentUser = { id:user.id, username:user.username, nom:user.nom,
-                  role:user.role, avatar:user.avatar, color:user.color,
-                  password:user.password };
-  sessionStorage.setItem('hb_user', JSON.stringify(currentUser));
+  // Connexion réussie
+  currentUser = user;
+  sessionStorage.setItem('hb_user', JSON.stringify({id:user.id,username:user.username,nom:user.nom,role:user.role,avatar:user.avatar,color:user.color}));
   hideAuthScreen();
   updateTopbarUser();
   applyRolePermissions();
-  showToast('Bienvenue ' + user.nom + ' ! 👋');
+  showToast(`Bienvenue ${user.nom} ! 👋`);
 }
 
 function showAuthError(msg) {
@@ -3013,7 +3192,7 @@ function quickSelect(username) {
 
 // ── ADMIN : Gestion des comptes ──
 async function openAdminPanel() {
-  if(currentUser?.role!=='admin') return showToast("❌ Accès réservé à l'administrateur");
+  if(currentUser?.role!=='admin') return showToast('❌ Accès réservé à l'administrateur');
   document.getElementById('user-dropdown').classList.remove('open');
   await renderAdminUsers();
   openModal('modal-admin');
@@ -3055,10 +3234,9 @@ async function createUser() {
   if(users.find(u=>u.username===user)) return showToast('❌ Cet identifiant existe déjà');
   users.push({id:user+Date.now(),username:user,nom,password:hashSimple(pass),role,avatar,color,actif:true});
   await fbSet('users',users);
-  try { localStorage.setItem('hb_users', JSON.stringify(users)); } catch(e) {}
   await renderAdminUsers();
   clearForm(['nu-nom','nu-user','nu-pass']);
-  showToast('✅ Compte @'+user+' créé !');
+  showToast(`✅ Compte @${user} créé !`);
 }
 
 async function toggleUserActif(i) {
@@ -3093,7 +3271,6 @@ async function changePassword() {
   currentUser.password = hashSimple(newP);
   sessionStorage.setItem('hb_user', JSON.stringify(currentUser));
   await fbSet('users',users);
-  try { localStorage.setItem('hb_users', JSON.stringify(users)); } catch(e) {}
   closeModal('modal-change-pass');
   clearForm(['cp-old','cp-new','cp-conf']);
   showToast('✅ Mot de passe modifié !');
@@ -3108,11 +3285,6 @@ function saveFirebaseConfig() {
 
 // ── Vérifier session au démarrage ──
 function checkSession() {
-  // Reset cache users si première fois (assure hash correct)
-  if(!localStorage.getItem('hb_init_v3')) {
-    localStorage.removeItem('hb_users');
-    localStorage.setItem('hb_init_v3','1');
-  }
   // Override FB URL si personnalisé
   const customUrl = localStorage.getItem('hb_fb_url');
   if(customUrl) window.FB_URL = customUrl;
@@ -3121,372 +3293,13 @@ function checkSession() {
   if(saved) {
     try {
       currentUser = JSON.parse(saved);
-      // Vérifier que la session est valide
-      if(currentUser && currentUser.username) {
-        hideAuthScreen();
-        updateTopbarUser();
-        applyRolePermissions();
-      } else {
-        sessionStorage.removeItem('hb_user');
-        currentUser = null;
-      }
-    } catch(e) {
-      sessionStorage.removeItem('hb_user');
-      currentUser = null;
-    }
+      hideAuthScreen();
+      updateTopbarUser();
+      applyRolePermissions();
+    } catch{ sessionStorage.removeItem('hb_user'); }
   }
 }
 
-
-
-// ══════════════════════════════════════════════════════
-// CHARGES EXTERNES
-// ══════════════════════════════════════════════════════
-const CHG_ICONS = {eau:'💧',electricite:'⚡',canal:'📺',espaces_verts:'🌿',internet:'🌐',gardiennage:'🛡️',autre:'📦'};
-const CHG_LABEL = {eau:'Eau (SEEG)',electricite:'Électricité (SEEG)',canal:'Canal Box',espaces_verts:'Espaces verts',internet:'Internet',gardiennage:'Gardiennage',autre:'Autre'};
-let chgFilter = 'Tous';
-
-function renderCharges() {
-  const items = state.charges || [];
-  const today = new Date(); today.setHours(0,0,0,0);
-  const actives = items.filter(c=>c.statut!=='payé').length;
-  const montant = items.reduce((a,b)=>a+(+b.montant||0),0);
-  const retard  = items.filter(c=>{
-    if(c.statut==='payé'||!c.date) return false;
-    return new Date(c.date)<today;
-  }).length;
-  const regle = items.filter(c=>c.statut==='payé').length;
-
-  document.getElementById('chg-total').textContent   = actives;
-  document.getElementById('chg-montant').textContent = fmtXAF(montant);
-  document.getElementById('chg-retard').textContent  = retard;
-  document.getElementById('chg-regle').textContent   = regle;
-
-  // Filtres dynamiques
-  const cats = ['Tous', ...new Set(items.map(c=>c.cat))];
-  document.getElementById('chg-filtres').innerHTML = cats.map(cat=>`
-    <button class="btn btn-sm ${chgFilter===cat?'btn-primary':'btn-outline'}" onclick="filterChg('${cat}')">
-      ${cat==='Tous'?'📋 Tous':(CHG_ICONS[cat]||'📦')+' '+(CHG_LABEL[cat]||cat)}
-    </button>`).join('');
-
-  const filtered = chgFilter==='Tous' ? items : items.filter(c=>c.cat===chgFilter);
-  const sorted   = [...filtered].sort((a,b)=>{
-    if(a.statut==='payé'&&b.statut!=='payé') return 1;
-    if(a.statut!=='payé'&&b.statut==='payé') return -1;
-    return (a.date||'').localeCompare(b.date||'');
-  });
-
-  document.getElementById('charges-list').innerHTML = sorted.length ? sorted.map((ch,si)=>{
-    const realIdx = items.findIndex(x=>x.id===ch.id);
-    const today2  = new Date(); today2.setHours(0,0,0,0);
-    let tag='';
-    if(ch.statut!=='payé'&&ch.date){
-      const diff=(new Date(ch.date)-today2)/(86400000);
-      if(diff<0) tag='<span class="badge badge-red">⚠️ En retard '+Math.abs(Math.round(diff))+'j</span>';
-      else if(diff<=3) tag='<span class="badge badge-red">🔴 '+Math.round(diff)+'j</span>';
-      else if(diff<=7) tag='<span class="badge badge-gold">⚠️ '+Math.round(diff)+'j</span>';
-    }
-    const freqLabel={mensuel:'Mensuel',bimestriel:'Bimestriel',trimestriel:'Trimestriel',annuel:'Annuel',unique:'Unique'};
-    return `<div class="card" style="margin-bottom:12px;border-left:4px solid ${ch.statut==='payé'?'var(--accent)':ch.statut==='en_attente'?'var(--gold)':'var(--red)'}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-        <div>
-          <div style="font-weight:700;font-size:.95rem">${CHG_ICONS[ch.cat]||'📦'} ${ch.nom}</div>
-          <div style="font-size:.76rem;color:var(--text2);margin-top:2px">
-            ${CHG_LABEL[ch.cat]||ch.cat} · ${freqLabel[ch.freq]||ch.freq||''}
-            ${ch.fournisseur?' · '+ch.fournisseur:''}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          ${tag}
-          <span class="badge ${ch.statut==='payé'?'badge-green':ch.statut==='en_attente'?'badge-gold':'badge-red'}">${ch.statut||'?'}</span>
-        </div>
-      </div>
-      <div style="display:flex;gap:20px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-        <span style="font-family:var(--mono);font-size:1.15rem;font-weight:800;color:var(--gold)">${fmtXAF(+ch.montant||0)}</span>
-        ${ch.date?`<span style="font-size:.78rem;color:var(--text3)">📅 Échéance : ${ch.date}</span>`:''}
-      </div>
-      ${ch.notes?`<div style="font-size:.74rem;color:var(--text3);font-style:italic;margin-bottom:10px">${ch.notes}</div>`:''}
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-outline btn-sm" onclick="editCharge(${realIdx})">✏️ Modifier</button>
-        ${ch.statut!=='payé'?`<button class="btn btn-primary btn-sm" onclick="marquerChargePaye(${realIdx})">✅ Marquer payé</button>`:''}
-        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCharge(${realIdx})">🗑️</button>
-      </div>
-    </div>`;
-  }).join('') : `<div style="text-align:center;color:var(--text3);padding:40px">Aucune charge enregistrée</div>`;
-}
-
-function filterChg(cat) { chgFilter=cat; renderCharges(); }
-
-function saveCharge() {
-  const nom = v('chg-nom'); if(!nom) return showToast('❌ Libellé requis');
-  const idx = parseInt(document.getElementById('chg-edit-id').value);
-  const ch  = {
-    id: (!isNaN(idx)&&idx>=0) ? (state.charges[idx]?.id||Date.now()) : Date.now(),
-    nom, cat:v('chg-cat'), montant:+v('chg-montant')||0, freq:v('chg-freq'),
-    date:v('chg-date'), statut:v('chg-statut'), rappel:v('chg-rappel'),
-    fournisseur:v('chg-fournisseur'), notes:v('chg-notes')
-  };
-  if(!state.charges) state.charges=[];
-  if(!isNaN(idx)&&idx>=0) state.charges[idx]=ch; else state.charges.push(ch);
-  save('charges'); closeModal('modal-charge'); renderCharges(); updateBadges(); renderDashboard();
-  showToast('✅ Charge enregistrée'); resetChargeModal();
-}
-
-function editCharge(i) {
-  const ch=state.charges[i]; if(!ch) return;
-  document.getElementById('mchg-title').textContent='✏️ Modifier charge';
-  document.getElementById('chg-edit-id').value=i;
-  sv('chg-nom',ch.nom); sv('chg-cat',ch.cat||'eau'); sv('chg-montant',ch.montant||0);
-  sv('chg-freq',ch.freq||'mensuel'); sv('chg-date',ch.date||'');
-  sv('chg-statut',ch.statut||'impayé'); sv('chg-rappel',ch.rappel||'0');
-  sv('chg-fournisseur',ch.fournisseur||''); sv('chg-notes',ch.notes||'');
-  openModal('modal-charge');
-}
-
-function marquerChargePaye(i) {
-  state.charges[i].statut='payé';
-  save('charges'); renderCharges(); updateBadges(); showToast('✅ Charge marquée payée !');
-}
-function deleteCharge(i) { state.charges.splice(i,1); save('charges'); renderCharges(); updateBadges(); }
-function resetChargeModal() {
-  document.getElementById('chg-edit-id').value='';
-  document.getElementById('mchg-title').textContent='⚡ Nouvelle charge';
-  clearForm(['chg-nom','chg-montant','chg-date','chg-fournisseur','chg-notes']);
-}
-
-// ══════════════════════════════════════════════════════
-// INVESTISSEMENTS
-// ══════════════════════════════════════════════════════
-const INV_ICONS  = {materiaux:'🧱',crypto:'₿',residence:'🏡'};
-const INV_LABELS = {materiaux:'Matériaux chantier',crypto:'Crypto-monnaie',residence:'Amélioration résidence'};
-let invFilter = 'Tous';
-
-function renderInvestissements() {
-  const items = state.investissements||[];
-  // Remplir select chantiers
-  const sel=document.getElementById('inv-chantier');
-  if(sel){
-    sel.innerHTML='<option value="">— Sélectionner —</option>'+(state.chantiers||[]).map(ch=>`<option value="${ch.nom}">${ch.nom}</option>`).join('');
-  }
-  const totalInv  = items.reduce((a,b)=>a+(+b.montant||0),0);
-  const totalPrev = items.reduce((a,b)=>a+(+b.prevu||0),0);
-  document.getElementById('inv-total').textContent = fmtXAF(totalInv);
-  document.getElementById('inv-prevu').textContent = fmtXAF(totalPrev);
-  document.getElementById('inv-nb').textContent    = items.length;
-
-  // Highlight filtre actif
-  ['tous','mat','cry','res'].forEach(k=>{
-    const el=document.getElementById('inv-f-'+k);
-    if(el) el.className='btn btn-sm '+(
-      (k==='tous'&&invFilter==='Tous')||(k==='mat'&&invFilter==='materiaux')||
-      (k==='cry'&&invFilter==='crypto')||(k==='res'&&invFilter==='residence')
-      ?'btn-primary':'btn-outline');
-  });
-
-  const filtered = invFilter==='Tous' ? items : items.filter(x=>x.cat===invFilter);
-  const sorted   = [...filtered].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const statCol  = {planifié:'var(--text3)',en_cours:'var(--gold)',réalisé:'var(--accent)',annulé:'var(--red)'};
-
-  document.getElementById('invest-list').innerHTML = sorted.length ? sorted.map((inv,si)=>{
-    const realIdx = items.findIndex(x=>x.id===inv.id);
-    const pct     = inv.prevu>0 ? Math.round((inv.montant/inv.prevu)*100) : 0;
-    return `<div class="card" style="margin-bottom:12px;border-left:4px solid ${statCol[inv.statut]||'var(--text3)'}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <div>
-          <div style="font-weight:700;font-size:.95rem">${INV_ICONS[inv.cat]||'📦'} ${inv.nom}</div>
-          <div style="font-size:.75rem;color:var(--text2);margin-top:2px">
-            ${INV_LABELS[inv.cat]||inv.cat}
-            ${inv.chantier?' · 🏗️ '+inv.chantier:''}
-            ${inv.cryptoType?' · '+inv.cryptoType:''}
-            ${inv.plateforme?' via '+inv.plateforme:''}
-            ${inv.fournisseur?' · '+inv.fournisseur:''}
-          </div>
-        </div>
-        <span class="badge ${inv.statut==='réalisé'?'badge-green':inv.statut==='annulé'?'badge-red':inv.statut==='en_cours'?'badge-gold':'badge-gray'}">${inv.statut}</span>
-      </div>
-      <div style="display:flex;gap:20px;margin-bottom:8px;flex-wrap:wrap">
-        <span style="font-family:var(--mono);font-size:1.1rem;font-weight:800;color:var(--blue2)">${fmtXAF(+inv.montant||0)}</span>
-        ${inv.prevu?`<span style="font-size:.78rem;color:var(--text2)">Budget : <strong>${fmtXAF(+inv.prevu)}</strong></span>`:''}
-        ${inv.date?`<span style="font-size:.76rem;color:var(--text3)">📅 ${inv.date}</span>`:''}
-      </div>
-      ${inv.prevu>0?`<div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pct>100?'var(--red)':pct>=80?'var(--accent)':'var(--blue2)'}"></div></div>`:''}
-      ${inv.notes?`<div style="font-size:.74rem;color:var(--text3);font-style:italic;margin-bottom:8px">${inv.notes}</div>`:''}
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-outline btn-sm" onclick="editInvest(${realIdx})">✏️</button>
-        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteInvest(${realIdx})">🗑️</button>
-      </div>
-    </div>`;
-  }).join('') : `<div style="text-align:center;color:var(--text3);padding:40px">Aucun investissement enregistré</div>`;
-}
-
-function filterInv(cat) { invFilter=cat; renderInvestissements(); }
-
-document.addEventListener('change', function(e) {
-  if(e.target.id==='inv-cat') {
-    const isCrypto = e.target.value==='crypto';
-    const isMat    = e.target.value==='materiaux';
-    document.getElementById('inv-crypto-row').style.display  = isCrypto?'grid':'none';
-    document.getElementById('inv-chantier-row').style.display= (isMat||e.target.value==='residence')?'grid':'none';
-  }
-});
-
-function saveInvest() {
-  const nom=v('inv-nom'); if(!nom) return showToast('❌ Libellé requis');
-  const idx=parseInt(document.getElementById('inv-edit-id').value);
-  const inv={
-    id: (!isNaN(idx)&&idx>=0)?(state.investissements[idx]?.id||Date.now()):Date.now(),
-    nom, cat:v('inv-cat'), montant:+v('inv-montant')||0, prevu:+v('inv-prevu')||0,
-    date:v('inv-date'), statut:v('inv-statut'), notes:v('inv-notes'),
-    chantier:v('inv-chantier'), fournisseur:v('inv-fournisseur'),
-    cryptoType:v('inv-crypto-type'), plateforme:v('inv-plateforme')
-  };
-  if(!state.investissements) state.investissements=[];
-  if(!isNaN(idx)&&idx>=0) state.investissements[idx]=inv; else state.investissements.push(inv);
-  save('investissements'); closeModal('modal-invest'); renderInvestissements(); renderDashboard();
-  showToast('✅ Investissement enregistré'); resetInvestModal();
-}
-
-function editInvest(i) {
-  const inv=state.investissements[i]; if(!inv) return;
-  document.getElementById('minv-title').textContent='✏️ Modifier investissement';
-  document.getElementById('inv-edit-id').value=i;
-  sv('inv-nom',inv.nom); sv('inv-cat',inv.cat||'materiaux');
-  sv('inv-montant',inv.montant||0); sv('inv-prevu',inv.prevu||0);
-  sv('inv-date',inv.date||''); sv('inv-statut',inv.statut||'planifié');
-  sv('inv-notes',inv.notes||''); sv('inv-chantier',inv.chantier||'');
-  sv('inv-fournisseur',inv.fournisseur||'');
-  sv('inv-crypto-type',inv.cryptoType||'BTC'); sv('inv-plateforme',inv.plateforme||'');
-  const isCrypto=inv.cat==='crypto';
-  document.getElementById('inv-crypto-row').style.display  =isCrypto?'grid':'none';
-  document.getElementById('inv-chantier-row').style.display=!isCrypto?'grid':'none';
-  openModal('modal-invest');
-}
-function deleteInvest(i){state.investissements.splice(i,1);save('investissements');renderInvestissements();}
-function resetInvestModal(){
-  document.getElementById('inv-edit-id').value='';
-  document.getElementById('minv-title').textContent='📈 Nouvel investissement';
-  clearForm(['inv-nom','inv-montant','inv-prevu','inv-date','inv-notes','inv-fournisseur','inv-plateforme']);
-  document.getElementById('inv-crypto-row').style.display='none';
-  document.getElementById('inv-chantier-row').style.display='grid';
-}
-
-// ══════════════════════════════════════════════════════
-// MA RÉSIDENCE
-// ══════════════════════════════════════════════════════
-const RES_ICONS  = {acquisition:'🛍️',amelioration:'🔧',securite:'🔒',decoration:'🎨',exterieur:'🌿'};
-const RES_LABELS = {acquisition:'Acquisition',amelioration:'Amélioration',securite:'Sécurité',decoration:'Décoration',exterieur:'Extérieur'};
-let resFilter = 'tous';
-
-function renderResidence() {
-  const items = state.residence||[];
-  const total   = items.length;
-  const encours = items.filter(r=>!r.done&&(+r.pct||0)<100).length;
-  const done    = items.filter(r=>r.done||(+r.pct||0)>=100).length;
-  document.getElementById('res-total').textContent   = total;
-  document.getElementById('res-encours').textContent = encours;
-  document.getElementById('res-done').textContent    = done;
-
-  // Filtres
-  ['tous','acq','aml','sec','dec'].forEach(k=>{
-    const el=document.getElementById('res-f-'+k);
-    if(!el) return;
-    const mapFilter={tous:'tous',acq:'acquisition',aml:'amelioration',sec:'securite',dec:'decoration'};
-    el.className='btn btn-sm '+(resFilter===mapFilter[k]?'btn-primary':'btn-outline');
-  });
-
-  const mapCat={tous:null,acquisition:'acquisition',amelioration:'amelioration',securite:'securite',decoration:'decoration',exterieur:'exterieur'};
-  const filtered = resFilter==='tous' ? items : items.filter(r=>r.cat===resFilter);
-  const sorted   = [...filtered].sort((a,b)=>{
-    if(a.done!==b.done){return a.done?1:-1;}
-    const po={haute:0,moyenne:1,basse:2};
-    return (po[a.prio]||1)-(po[b.prio]||1);
-  });
-  const prioBg={haute:'var(--red)',moyenne:'var(--gold)',basse:'var(--accent2)'};
-
-  document.getElementById('residence-list').innerHTML = sorted.length ? sorted.map((r,si)=>{
-    const realIdx=items.findIndex(x=>x.id===r.id);
-    const pct=Math.min(100,+r.pct||0);
-    const isDone=r.done||pct>=100;
-    return `<div class="card" style="margin-bottom:14px;border-left:4px solid ${isDone?'var(--accent)':prioBg[r.prio]||'var(--text3)'}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <div style="flex:1">
-          <div style="font-weight:700;font-size:.95rem;${isDone?'text-decoration:line-through;opacity:.6':''}">${RES_ICONS[r.cat]||'🏡'} ${r.titre}</div>
-          <div style="font-size:.75rem;color:var(--text2);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
-            <span class="badge badge-gray" style="font-size:.68rem">${RES_LABELS[r.cat]||r.cat}</span>
-            <span class="badge ${r.prio==='haute'?'badge-red':r.prio==='moyenne'?'badge-gold':'badge-green'}" style="font-size:.68rem">${r.prio}</span>
-            ${r.date?`<span style="color:var(--text3)">🗓️ ${r.date}</span>`:''}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="font-family:var(--mono);font-weight:700;color:var(--gold)">${fmtXAF(+r.cout||0)}</span>
-          ${isDone?'<span class="badge badge-green">✅ Atteint</span>':''}
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div class="progress-bar" style="flex:1">
-          <div class="progress-fill" style="width:${pct}%;background:${pct>=100?'var(--accent)':pct>=50?'var(--accent2)':'var(--gold)'}"></div>
-        </div>
-        <span style="font-family:var(--mono);font-size:.78rem;color:var(--text2)">${pct}%</span>
-        <input type="range" min="0" max="100" value="${pct}"
-          oninput="updateResPct(${realIdx},this.value)"
-          style="width:80px;accent-color:var(--accent);cursor:pointer">
-      </div>
-      ${r.desc?`<div style="font-size:.74rem;color:var(--text3);font-style:italic;margin-bottom:8px">${r.desc}</div>`:''}
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-outline btn-sm" onclick="editResidence(${realIdx})">✏️ Modifier</button>
-        <button class="btn btn-outline btn-sm" onclick="toggleResDone(${realIdx})">${isDone?'↩️ Rouvrir':'✅ Marquer atteint'}</button>
-        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteResidence(${realIdx})">🗑️</button>
-      </div>
-    </div>`;
-  }).join('') : `<div style="text-align:center;color:var(--text3);padding:40px">Aucun objectif résidence — Ajoutez vos projets !</div>`;
-}
-
-function filterRes(f) { resFilter=f; renderResidence(); }
-
-function saveResidence() {
-  const titre=v('res-titre'); if(!titre) return showToast('❌ Titre requis');
-  const idx=parseInt(document.getElementById('res-edit-id').value);
-  const r={
-    id: (!isNaN(idx)&&idx>=0)?(state.residence[idx]?.id||Date.now()):Date.now(),
-    titre, cat:v('res-cat'), prio:v('res-prio'), cout:+v('res-cout')||0,
-    reel:+v('res-reel')||0, date:v('res-date'), pct:+v('res-pct')||0,
-    desc:v('res-desc'), done:false
-  };
-  if(!state.residence) state.residence=[];
-  if(!isNaN(idx)&&idx>=0) state.residence[idx]=r; else state.residence.push(r);
-  save('residence'); closeModal('modal-residence'); renderResidence(); updateBadges();
-  showToast('✅ Objectif résidence ajouté'); resetResModal();
-}
-
-function editResidence(i) {
-  const r=state.residence[i]; if(!r) return;
-  document.getElementById('mres-title').textContent='✏️ Modifier objectif';
-  document.getElementById('res-edit-id').value=i;
-  sv('res-titre',r.titre); sv('res-cat',r.cat||'acquisition'); sv('res-prio',r.prio||'moyenne');
-  sv('res-cout',r.cout||0); sv('res-reel',r.reel||0); sv('res-date',r.date||'');
-  sv('res-pct',r.pct||0); sv('res-desc',r.desc||'');
-  openModal('modal-residence');
-}
-
-function updateResPct(i,val) {
-  if(!state.residence[i]) return;
-  state.residence[i].pct=+val;
-  if(+val>=100) state.residence[i].done=true;
-  save('residence'); renderResidence(); updateBadges();
-}
-
-function toggleResDone(i) {
-  state.residence[i].done=!state.residence[i].done;
-  if(state.residence[i].done) state.residence[i].pct=100;
-  save('residence'); renderResidence(); updateBadges();
-  showToast(state.residence[i].done?'✅ Objectif atteint !':'↩️ Objectif réouvert');
-}
-function deleteResidence(i){state.residence.splice(i,1);save('residence');renderResidence();updateBadges();}
-function resetResModal(){
-  document.getElementById('res-edit-id').value='';
-  document.getElementById('mres-title').textContent='🏡 Nouvel objectif résidence';
-  clearForm(['res-titre','res-cout','res-reel','res-date','res-pct','res-desc']);
-}
 
 // ══ INIT ══
 checkSession();
