@@ -358,7 +358,7 @@ tr:hover td { background:var(--bg); }
       <div id="auth-error" class="auth-error">❌ Identifiants incorrects</div>
       <div class="auth-input-wrap">
         <label class="auth-label">Nom d'utilisateur</label>
-        <input class="auth-input" id="auth-username" placeholder="Votre identifiant" autocomplete="username">
+        <input class="auth-input" id="auth-username" placeholder="ex: papa, maman, admin" autocomplete="username">
       </div>
       <div class="auth-input-wrap">
         <label class="auth-label">Mot de passe</label>
@@ -2887,7 +2887,7 @@ async function loadUsers() {
 
 async function doLogin() {
   const username = document.getElementById('auth-username').value.trim();
-  const password = document.getElementById('auth-password').value;
+  const password = document.getElementById('auth-password').value.trim();
   if(!username||!password) { showAuthError('Remplissez tous les champs'); return; }
 
   // Afficher état chargement
@@ -2910,7 +2910,7 @@ async function doLogin() {
     return;
   }
 
-  const user = users.find(u => u.username === username && u.actif !== false);
+  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.actif !== false);
   if(!user) { showAuthError('Compte introuvable ou désactivé'); return; }
 
   const hashed = hashSimple(password);
@@ -3013,7 +3013,7 @@ function quickSelect(username) {
 
 // ── ADMIN : Gestion des comptes ──
 async function openAdminPanel() {
-  if(currentUser?.role!=='admin') return showToast('❌ Accès réservé à l'administrateur');
+  if(currentUser?.role!=='admin') return showToast("❌ Accès réservé à l'administrateur");
   document.getElementById('user-dropdown').classList.remove('open');
   await renderAdminUsers();
   openModal('modal-admin');
@@ -3108,6 +3108,11 @@ function saveFirebaseConfig() {
 
 // ── Vérifier session au démarrage ──
 function checkSession() {
+  // Reset cache users si première fois (assure hash correct)
+  if(!localStorage.getItem('hb_init_v3')) {
+    localStorage.removeItem('hb_users');
+    localStorage.setItem('hb_init_v3','1');
+  }
   // Override FB URL si personnalisé
   const customUrl = localStorage.getItem('hb_fb_url');
   if(customUrl) window.FB_URL = customUrl;
