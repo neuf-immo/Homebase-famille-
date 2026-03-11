@@ -56,6 +56,40 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
   display:flex; align-items:center; justify-content:space-between;
   padding:0 24px; height:60px; box-shadow:var(--shadow);
 }
+
+/* ── GLOBAL SEARCH ── */
+.search-wrap { position:relative; flex:1; max-width:340px; margin:0 16px; }
+.search-input {
+  width:100%; padding:8px 14px 8px 36px; border-radius:20px;
+  border:1px solid var(--border); background:var(--bg2); color:var(--text);
+  font-family:var(--font); font-size:.83rem; outline:none; transition:var(--transition);
+}
+.search-input:focus { border-color:var(--accent); background:var(--card); box-shadow:0 0 0 3px rgba(45,106,79,.1); }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:.88rem; pointer-events:none; }
+.search-results {
+  display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:2000;
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow2); max-height:400px; overflow-y:auto;
+}
+.search-results.open { display:block; }
+.search-result-item {
+  display:flex; align-items:center; gap:10px; padding:10px 14px;
+  cursor:pointer; transition:var(--transition); border-bottom:1px solid var(--border);
+}
+.search-result-item:last-child { border-bottom:none; }
+.search-result-item:hover { background:var(--bg2); }
+.sr-icon { font-size:1.1rem; flex-shrink:0; }
+.sr-body { flex:1; min-width:0; }
+.sr-title { font-size:.83rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sr-meta  { font-size:.7rem; color:var(--text3); font-family:var(--mono); }
+.sr-tag   { font-size:.65rem; font-weight:700; padding:2px 8px; border-radius:10px; background:var(--bg2); color:var(--text3); flex-shrink:0; }
+.search-empty { padding:16px; text-align:center; color:var(--text3); font-size:.82rem; }
+
+/* ── BACKUP MODAL ── */
+.backup-zone { border:2px dashed var(--border); border-radius:var(--radius2); padding:20px; text-align:center; cursor:pointer; transition:var(--transition); }
+.backup-zone:hover { border-color:var(--accent); background:rgba(45,106,79,.04); }
+.backup-zone.drag-over { border-color:var(--accent); background:rgba(45,106,79,.08); }
+@media(max-width:600px) { .search-wrap { max-width:160px; margin:0 8px; } .hide-mobile { display:none; } }
 .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.1rem; letter-spacing:-0.5px; }
 .logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
 .topbar-right { display:flex; align-items:center; gap:12px; }
@@ -227,27 +261,68 @@ tr:hover td { background:var(--bg); }
 .obj-date { font-size:0.72rem; color:var(--text3); font-family:var(--mono); margin-bottom:10px; }
 
 /* ── ENFANT PROFILE ── */
-.enfant-profile-card {
-  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
-  border-radius:var(--radius); padding:20px 24px;
-  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-  box-shadow:0 6px 24px rgba(45,106,79,.25);
+/* ══════════════════════════════════════
+   ENFANT — Hero redesign
+══════════════════════════════════════ */
+.enfant-hero {
   position:relative; overflow:hidden;
+  background:linear-gradient(135deg,#0D1B2A 0%,#1B4F72 45%,#2D6A4F 100%);
+  border-radius:20px; padding:24px 20px 20px;
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; flex-wrap:wrap;
+  box-shadow:0 8px 32px rgba(27,79,114,.35);
+  margin-bottom:18px;
 }
-.enfant-profile-card::before {
-  content:''; position:absolute; right:-20px; top:-20px;
-  width:120px; height:120px; border-radius:50%;
-  background:rgba(255,255,255,.08);
+.eh-bg-deco {
+  position:absolute; top:-40px; right:-40px;
+  width:180px; height:180px; border-radius:50%;
+  background:rgba(255,255,255,.05); pointer-events:none;
 }
-.ep-avatar { font-size:2.8rem; flex-shrink:0; }
-.ep-info { flex:1; min-width:0; }
-.ep-name { font-size:1.3rem; font-weight:800; color:#fff; letter-spacing:-.5px; }
-.ep-sub  { font-size:.8rem; color:rgba(255,255,255,.7); margin-top:4px; }
-.ep-kpis { display:flex; gap:10px; flex-wrap:wrap; }
-.ep-kpi  { background:rgba(255,255,255,.15); border-radius:10px; padding:8px 14px; text-align:center; min-width:60px; }
+.eh-bg-deco2 {
+  position:absolute; bottom:-30px; left:30%;
+  width:100px; height:100px; border-radius:50%;
+  background:rgba(82,183,136,.12); pointer-events:none;
+}
+.eh-left { display:flex; align-items:center; gap:14px; }
+.eh-avatar {
+  font-size:3.2rem; line-height:1;
+  background:rgba(255,255,255,.12); border-radius:18px;
+  width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+  border:2px solid rgba(255,255,255,.2);
+  flex-shrink:0;
+}
+.eh-name { font-size:1.4rem; font-weight:800; color:#fff; letter-spacing:-.5px; }
+.eh-sub  { font-size:.8rem; color:rgba(255,255,255,.6); margin-top:3px; }
+.eh-badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.eh-badge {
+  font-size:.62rem; font-weight:700; padding:3px 9px;
+  border-radius:20px; letter-spacing:.3px;
+  background:rgba(255,255,255,.15); color:rgba(255,255,255,.9);
+  border:1px solid rgba(255,255,255,.2);
+}
+.eh-badge.gold { background:rgba(201,168,76,.3); border-color:rgba(201,168,76,.5); color:#F4D58D; }
+.eh-badge.green { background:rgba(82,183,136,.3); border-color:rgba(82,183,136,.5); color:#52B788; }
+.eh-right { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+.eh-kpis { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.ep-kpi  { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:8px 14px; text-align:center; min-width:60px; }
 .ep-kpi .v { font-size:1.1rem; font-weight:800; color:#fff; font-family:var(--mono); }
-.ep-kpi .l { font-size:.6rem; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
-.ep-edit { background:rgba(255,255,255,.2) !important; border-color:rgba(255,255,255,.3) !important; color:#fff !important; }
+.ep-kpi .l { font-size:.58rem; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+.eh-edit-btn {
+  background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+  color:#fff; border-radius:10px; padding:7px 14px;
+  font-size:.75rem; font-weight:600; cursor:pointer;
+  transition:all .2s ease; font-family:var(--font);
+  white-space:nowrap;
+}
+.eh-edit-btn:hover { background:rgba(255,255,255,.25); }
+
+/* ── Progress banner ── */
+.enfant-progress-banner {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:14px 18px;
+  margin-bottom:18px; display:none;
+}
+.enfant-progress-banner.show { display:block; }
 
 /* ── ENFANT TABS ── */
 .enfant-tabs {
@@ -257,68 +332,104 @@ tr:hover td { background:var(--bg); }
 }
 .enfant-tabs::-webkit-scrollbar { display:none; }
 .etab {
-  padding:8px 16px; border-radius:10px; font-size:.78rem; font-weight:700;
+  padding:8px 14px; border-radius:10px; font-size:.76rem; font-weight:700;
   cursor:pointer; white-space:nowrap; color:var(--text2);
-  transition:all .2s ease; flex-shrink:0; user-select:none;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1); flex-shrink:0; user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
 .etab.active { background:var(--card); color:var(--accent); box-shadow:var(--shadow); }
 .etab-content { display:none; animation:fadeIn .25s ease; }
 .etab-content.active { display:block; }
+.etab-toolbar {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; flex-wrap:wrap; gap:10px;
+}
 
 /* ── CHILD TASK ITEM ── */
 .child-task-item {
   display:flex; align-items:center; gap:12px;
-  padding:12px 16px; background:var(--card);
-  border:1px solid var(--border); border-radius:12px;
+  padding:13px 16px; background:var(--card);
+  border:1px solid var(--border); border-radius:14px;
   margin-bottom:8px; transition:all .2s ease;
-  -webkit-tap-highlight-color:transparent;
+  -webkit-tap-highlight-color:transparent; cursor:pointer;
 }
-.child-task-item.done { opacity:.55; }
+.child-task-item:hover { border-color:var(--accent); box-shadow:0 2px 10px rgba(45,106,79,.1); }
+.child-task-item.done { opacity:.5; background:var(--bg2); }
 .child-task-item.done .ct-nom { text-decoration:line-through; color:var(--text3); }
 .ct-check {
-  width:24px; height:24px; border-radius:7px;
+  width:26px; height:26px; border-radius:8px;
   border:2px solid var(--border); flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  cursor:pointer; background:var(--bg); font-size:.9rem;
+  cursor:pointer; background:var(--bg); font-size:.95rem;
 }
 .child-task-item.done .ct-check { background:var(--accent); border-color:var(--accent); color:#fff; }
 .ct-info { flex:1; min-width:0; }
-.ct-nom  { font-size:.88rem; font-weight:600; }
-.ct-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:2px; }
-.ct-prio { width:4px; height:36px; border-radius:4px; flex-shrink:0; }
+.ct-nom  { font-size:.9rem; font-weight:600; }
+.ct-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:3px; display:flex; gap:8px; flex-wrap:wrap; }
+.ct-prio { width:4px; height:40px; border-radius:4px; flex-shrink:0; }
+.ct-cat-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:.6rem; font-weight:700; padding:2px 8px;
+  border-radius:8px; background:var(--bg2); color:var(--text2);
+  font-family:var(--mono);
+}
 
 /* ── CHILD OBJECTIF CARD ── */
 .child-obj-card {
   background:var(--card); border:1px solid var(--border);
-  border-radius:14px; padding:16px; margin-bottom:12px;
+  border-radius:16px; padding:18px; margin-bottom:12px;
   border-left:4px solid var(--accent);
+  transition:var(--transition);
+  box-shadow:var(--shadow);
 }
+.child-obj-card:hover { box-shadow:var(--shadow2); transform:translateY(-1px); }
 .child-obj-card.done-obj { border-left-color:var(--text3); opacity:.65; }
+.co-reward-chip {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:20px;
+  background:rgba(201,168,76,.15); color:var(--gold);
+  border:1px solid rgba(201,168,76,.3); margin-top:6px;
+}
 
 /* ── CHILD BESOIN ITEM ── */
 .child-besoin-item {
   display:flex; align-items:center; gap:12px;
-  padding:12px 16px; background:var(--card);
-  border:1px solid var(--border); border-radius:12px;
+  padding:13px 16px; background:var(--card);
+  border:1px solid var(--border); border-radius:14px;
   margin-bottom:8px; transition:all .18s ease;
 }
-.child-besoin-item.done-b { opacity:.5; }
+.child-besoin-item.done-b { opacity:.45; background:var(--bg2); }
 .child-besoin-item.done-b .cb-nom { text-decoration:line-through; color:var(--text3); }
 .cb-check {
-  width:24px; height:24px; border-radius:7px;
+  width:26px; height:26px; border-radius:8px;
   border:2px solid var(--border); flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  background:var(--bg); font-size:.9rem;
+  background:var(--bg); font-size:.95rem;
 }
 .child-besoin-item.done-b .cb-check { background:var(--gold); border-color:var(--gold); color:#fff; }
 .cb-info { flex:1; min-width:0; }
-.cb-nom  { font-size:.88rem; font-weight:600; }
-.cb-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:2px; }
+.cb-nom  { font-size:.9rem; font-weight:600; }
+.cb-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:3px; }
 
-/* ── ENFANT ── */
+/* ── CONSEIL CARD ── */
+.conseil-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:18px; margin-bottom:12px;
+  border-left:4px solid var(--blue);
+  transition:var(--transition);
+}
+.conseil-card.vert { border-left-color:var(--accent); }
+.conseil-card.gold { border-left-color:var(--gold); }
+.conseil-card.rouge { border-left-color:var(--red); }
+.conseil-card.violet { border-left-color:var(--purple); }
+.conseil-icon { font-size:1.6rem; margin-bottom:8px; }
+.conseil-titre { font-weight:700; font-size:.92rem; margin-bottom:6px; }
+.conseil-texte { font-size:.8rem; color:var(--text2); line-height:1.6; }
+.conseil-tag { display:inline-block; font-size:.6rem; font-weight:700; padding:2px 8px; border-radius:8px; background:var(--bg2); color:var(--text3); margin-top:8px; text-transform:uppercase; letter-spacing:.5px; }
+
+/* ── NOTE CIRCLE ── */
 .note-circle { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; font-family:var(--mono); }
 
 /* ── TOAST ── */
@@ -770,7 +881,16 @@ tr:hover td { background:var(--bg); }
     <div class="logo-icon">🏠</div>
     <span>HomeBase</span>
   </div>
+  <!-- BARRE DE RECHERCHE GLOBALE -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="global-search" placeholder="Rechercher tâche, locataire, dette..." autocomplete="off"
+      oninput="globalSearch(this.value)" onfocus="if(this.value) showSearchResults()" onblur="setTimeout(hideSearchResults,200)">
+    <div class="search-results" id="search-results"></div>
+  </div>
+
   <div class="topbar-right">
+    <button class="btn btn-outline btn-sm" onclick="openModal('modal-backup')" title="Sauvegarde / Import" style="gap:5px">💾 <span class="hide-mobile">Backup</span></button>
     <span id="sync-indicator" style="font-size:.72rem;font-family:var(--mono);color:var(--text3)">🟡 Chargement...</span>
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">FR → EN</button>
     <button class="theme-btn" onclick="toggleTheme()" title="Mode sombre">🌙</button>
@@ -1154,25 +1274,49 @@ tr:hover td { background:var(--bg); }
     <button class="btn btn-primary" onclick="openModal('modal-tache')">+ <span data-fr="Nouvelle tâche" data-en="New task">Nouvelle tâche</span></button>
   </div>
 
+  <!-- FILTRES TÂCHES -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <div style="position:relative;flex:1;min-width:200px;max-width:320px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.82rem;pointer-events:none">🔍</span>
+      <input class="form-input" id="tache-search" placeholder="Filtrer les tâches..." style="padding-left:30px;height:36px;font-size:.82rem"
+        oninput="filterTaches()">
+    </div>
+    <select class="form-select" id="tache-filter-prio" onchange="filterTaches()" style="height:36px;font-size:.82rem;width:auto">
+      <option value="">Toutes priorités</option>
+      <option value="haute">🔴 Haute</option>
+      <option value="moyenne">🟡 Moyenne</option>
+      <option value="basse">🟢 Basse</option>
+    </select>
+    <select class="form-select" id="tache-filter-statut" onchange="filterTaches()" style="height:36px;font-size:.82rem;width:auto">
+      <option value="">Tous statuts</option>
+      <option value="todo">À faire</option>
+      <option value="done">Terminées</option>
+    </select>
+    <select class="form-select" id="tache-filter-qui" onchange="filterTaches()" style="height:36px;font-size:.82rem;width:auto">
+      <option value="">Tous membres</option>
+    </select>
+  </div>
+
   <div class="grid3" style="margin-bottom:20px">
     <div class="kpi blue"><div class="kpi-icon">📋</div><div class="kpi-val" id="t-total">0</div><div class="kpi-label" data-fr="Total tâches" data-en="Total tasks">Total tâches</div></div>
     <div class="kpi red"><div class="kpi-icon">🔴</div><div class="kpi-val" id="t-todo">0</div><div class="kpi-label" data-fr="À faire" data-en="To do">À faire</div></div>
     <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="t-done">0</div><div class="kpi-label" data-fr="Terminées" data-en="Done">Terminées</div></div>
   </div>
 
-  <div class="grid2">
-    <div>
-      <div style="font-weight:700;margin-bottom:12px;font-size:0.9rem" data-fr="🔴 Haute priorité" data-en="🔴 High priority">🔴 Haute priorité</div>
-      <div id="tasks-high"></div>
-      <div style="font-weight:700;margin:16px 0 12px;font-size:0.9rem" data-fr="🟡 Moyenne priorité" data-en="🟡 Medium priority">🟡 Moyenne priorité</div>
-      <div id="tasks-med"></div>
-    </div>
-    <div>
-      <div style="font-weight:700;margin-bottom:12px;font-size:0.9rem" data-fr="🟢 Basse priorité" data-en="🟢 Low priority">🟢 Basse priorité</div>
-      <div id="tasks-low"></div>
-      <div style="font-weight:700;margin:16px 0 12px;font-size:0.9rem" data-fr="✅ Terminées" data-en="✅ Completed">✅ Terminées</div>
-      <div id="tasks-done"></div>
-    </div>
+  <div id="taches-filtered-view">
+    <div class="grid2">
+      <div>
+        <div style="font-weight:700;margin-bottom:12px;font-size:0.9rem" data-fr="🔴 Haute priorité" data-en="🔴 High priority">🔴 Haute priorité</div>
+        <div id="tasks-high"></div>
+        <div style="font-weight:700;margin:16px 0 12px;font-size:0.9rem" data-fr="🟡 Moyenne priorité" data-en="🟡 Medium priority">🟡 Moyenne priorité</div>
+        <div id="tasks-med"></div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:12px;font-size:0.9rem" data-fr="🟢 Basse priorité" data-en="🟢 Low priority">🟢 Basse priorité</div>
+        <div id="tasks-low"></div>
+        <div style="font-weight:700;margin:16px 0 12px;font-size:0.9rem" data-fr="✅ Terminées" data-en="✅ Completed">✅ Terminées</div>
+        <div id="tasks-done"></div>
+      </div>
   </div>
 </div>
 
@@ -1193,6 +1337,27 @@ tr:hover td { background:var(--bg); }
     <div class="kpi blue"><div class="kpi-icon">💰</div><div class="kpi-val" id="loc-total">0</div><div class="kpi-label" data-fr="CA mensuel (XAF)" data-en="Monthly rev. (XAF)">CA mensuel (XAF)</div></div>
   </div>
 
+  <!-- FILTRES LOCATIFS -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <div style="position:relative;flex:1;min-width:200px;max-width:300px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.82rem;pointer-events:none">🔍</span>
+      <input class="form-input" id="loc-search" placeholder="Nom bien ou locataire..." style="padding-left:30px;height:36px;font-size:.82rem"
+        oninput="filterLocatifs()">
+    </div>
+    <select class="form-select" id="loc-filter-statut" onchange="filterLocatifs()" style="height:36px;font-size:.82rem;width:auto">
+      <option value="">Tous statuts</option>
+      <option value="occupé">✅ Occupé</option>
+      <option value="libre">⬜ Libre</option>
+      <option value="travaux">🔨 Travaux</option>
+    </select>
+    <select class="form-select" id="loc-filter-paiement" onchange="filterLocatifs()" style="height:36px;font-size:.82rem;width:auto">
+      <option value="">Tous paiements</option>
+      <option value="payé">✅ Payé</option>
+      <option value="impayé">❌ Impayé</option>
+      <option value="partiel">🟡 Partiel</option>
+    </select>
+  </div>
+
   <div class="grid-auto" id="locatifs-grid"></div>
 </div>
 
@@ -1211,37 +1376,92 @@ tr:hover td { background:var(--bg); }
 <!-- ═══════════════════ ENFANT ═══════════════════ -->
 <div id="page-enfant" class="page">
 
-  <!-- ── Header enfant ── -->
-  <div class="page-header-row" style="margin-bottom:20px">
-    <div class="page-header">
-      <div class="page-title">👶 Mon Enfant</div>
-      <div class="page-sub">Santé, école, objectifs et tâches personnelles</div>
+  <!-- ── HERO CARD ENFANT ── -->
+  <div class="enfant-hero" id="enfant-hero">
+    <div class="eh-bg-deco"></div>
+    <div class="eh-bg-deco2"></div>
+    <div class="eh-left">
+      <div class="eh-avatar" id="ep-avatar">🧒</div>
+      <div class="eh-info">
+        <div class="eh-name" id="child-name">Mon enfant</div>
+        <div class="eh-sub" id="child-age">— ans</div>
+        <div class="eh-badges" id="eh-badges"></div>
+      </div>
+    </div>
+    <div class="eh-right">
+      <div class="eh-kpis" id="ep-kpis"></div>
+      <button class="eh-edit-btn" onclick="openModal('modal-child-info')">✏️ Modifier le profil</button>
     </div>
   </div>
 
-  <!-- ── Profil + KPIs ── -->
-  <div class="enfant-profile-card" style="margin-bottom:20px">
-    <div class="ep-avatar" id="ep-avatar">👦</div>
-    <div class="ep-info">
-      <div class="ep-name" id="child-name">Mon enfant</div>
-      <div class="ep-sub" id="child-age">— ans · —</div>
-    </div>
-    <div class="ep-kpis" id="ep-kpis"></div>
-    <button class="btn btn-outline btn-sm ep-edit" onclick="openModal('modal-child-info')">✏️ Modifier</button>
-  </div>
+  <!-- ── BARRE DE PROGRESSION GLOBALE ── -->
+  <div class="enfant-progress-banner" id="enfant-progress-banner"></div>
 
-  <!-- ── Onglets ── -->
+  <!-- ── ONGLETS ── -->
   <div class="enfant-tabs" id="enfant-tabs">
-    <div class="etab active" onclick="switchEnfantTab('sante',this)">💊 Santé</div>
-    <div class="etab" onclick="switchEnfantTab('ecole',this)">📚 École</div>
+    <div class="etab active" onclick="switchEnfantTab('taches',this)">✅ Tâches</div>
     <div class="etab" onclick="switchEnfantTab('objectifs',this)">🎯 Objectifs</div>
-    <div class="etab" onclick="switchEnfantTab('taches',this)">✅ Tâches</div>
-    <div class="etab" onclick="switchEnfantTab('activites',this)">🎮 Activités</div>
     <div class="etab" onclick="switchEnfantTab('besoins',this)">🛍️ Besoins</div>
+    <div class="etab" onclick="switchEnfantTab('sante',this)">💊 Santé</div>
+    <div class="etab" onclick="switchEnfantTab('ecole',this)">📚 École</div>
+    <div class="etab" onclick="switchEnfantTab('activites',this)">🎮 Activités</div>
+    <div class="etab" onclick="switchEnfantTab('conseils',this)">💡 Conseils</div>
   </div>
 
-  <!-- ── TAB: SANTÉ ── -->
-  <div class="etab-content active" id="etab-sante">
+  <!-- ══ TAB: TÂCHES ══ -->
+  <div class="etab-content active" id="etab-taches">
+    <div class="etab-toolbar">
+      <div>
+        <div style="font-weight:700;font-size:.95rem">Liste de tâches</div>
+        <div id="child-tasks-progress" style="font-size:.75rem;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="resetChildTasks()">🔄</button>
+        <button class="btn btn-primary btn-sm" onclick="openChildTaskModal()">+ Tâche</button>
+      </div>
+    </div>
+    <div class="progress-bar" style="height:7px;margin-bottom:16px">
+      <div class="progress-fill" id="child-tasks-prog-fill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%"></div>
+    </div>
+    <!-- Filtres rapides -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="child-tasks-filters">
+      <button class="courses-filter-btn active" onclick="filterChildTasks('tous',this)">Toutes</button>
+      <button class="courses-filter-btn" onclick="filterChildTasks('École',this)">📚 École</button>
+      <button class="courses-filter-btn" onclick="filterChildTasks('Maison',this)">🏠 Maison</button>
+      <button class="courses-filter-btn" onclick="filterChildTasks('Sport',this)">⚽ Sport</button>
+      <button class="courses-filter-btn" onclick="filterChildTasks('Perso',this)">⭐ Perso</button>
+    </div>
+    <div id="child-tasks-list"></div>
+  </div>
+
+  <!-- ══ TAB: OBJECTIFS ══ -->
+  <div class="etab-content" id="etab-objectifs">
+    <div class="etab-toolbar">
+      <div>
+        <div style="font-weight:700;font-size:.95rem">Objectifs de <span id="obj-child-name">l'enfant</span></div>
+        <div style="font-size:.75rem;color:var(--text3);margin-top:2px">Fixez des objectifs motivants avec récompenses</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openChildObjModal()">+ Objectif</button>
+    </div>
+    <!-- KPIs objectifs -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px" id="child-obj-kpis"></div>
+    <div id="child-objectifs-list"></div>
+  </div>
+
+  <!-- ══ TAB: BESOINS ══ -->
+  <div class="etab-content" id="etab-besoins">
+    <div class="etab-toolbar">
+      <div>
+        <div style="font-weight:700;font-size:.95rem">🛍️ Liste de besoins</div>
+        <div style="font-size:.75rem;color:var(--text3);margin-top:2px">Articles à acheter pour l'enfant</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openChildBesoinModal()">+ Besoin</button>
+    </div>
+    <div id="child-besoins-list"></div>
+  </div>
+
+  <!-- ══ TAB: SANTÉ ══ -->
+  <div class="etab-content" id="etab-sante">
     <div class="grid2">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -1260,7 +1480,7 @@ tr:hover td { background:var(--bg); }
     </div>
   </div>
 
-  <!-- ── TAB: ÉCOLE ── -->
+  <!-- ══ TAB: ÉCOLE ══ -->
   <div class="etab-content" id="etab-ecole">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -1271,34 +1491,7 @@ tr:hover td { background:var(--bg); }
     </div>
   </div>
 
-  <!-- ── TAB: OBJECTIFS ENFANT ── -->
-  <div class="etab-content" id="etab-objectifs">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div style="font-weight:700;font-size:.95rem;color:var(--text2)">Objectifs personnels de <span id="obj-child-name">l'enfant</span></div>
-      <button class="btn btn-primary btn-sm" onclick="openChildObjModal()">+ Objectif</button>
-    </div>
-    <div id="child-objectifs-list"></div>
-  </div>
-
-  <!-- ── TAB: TÂCHES ENFANT ── -->
-  <div class="etab-content" id="etab-taches">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-weight:700;font-size:.95rem">Liste de tâches personnelles</div>
-        <div id="child-tasks-progress" style="font-size:.78rem;color:var(--text3);margin-top:3px"></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-outline btn-sm" onclick="resetChildTasks()">🔄 Reset</button>
-        <button class="btn btn-primary btn-sm" onclick="openChildTaskModal()">+ Tâche</button>
-      </div>
-    </div>
-    <div class="progress-bar" style="margin-bottom:16px;height:8px" id="child-tasks-prog-bar-wrap">
-      <div class="progress-fill" id="child-tasks-prog-fill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%"></div>
-    </div>
-    <div id="child-tasks-list"></div>
-  </div>
-
-  <!-- ── TAB: ACTIVITÉS ── -->
+  <!-- ══ TAB: ACTIVITÉS ══ -->
   <div class="etab-content" id="etab-activites">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div class="card-title" style="margin:0">🎮 Planning des activités</div>
@@ -1307,16 +1500,9 @@ tr:hover td { background:var(--bg); }
     <div id="child-activities"></div>
   </div>
 
-  <!-- ── TAB: BESOINS ── -->
-  <div class="etab-content" id="etab-besoins">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-weight:700;font-size:.95rem">🛍️ Liste de besoins</div>
-        <div style="font-size:.78rem;color:var(--text3);margin-top:3px">Articles à acheter pour l'enfant</div>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="openChildBesoinModal()">+ Besoin</button>
-    </div>
-    <div id="child-besoins-list"></div>
+  <!-- ══ TAB: CONSEILS ══ -->
+  <div class="etab-content" id="etab-conseils">
+    <div id="child-conseils-content"></div>
   </div>
 
 </div>
@@ -1993,6 +2179,55 @@ tr:hover td { background:var(--bg); }
   <button class="btn btn-primary" style="width:100%" onclick="changePassword()">✅ Enregistrer</button>
 </div></div>
 
+<!-- ══ MODAL BACKUP / EXPORT / IMPORT ══ -->
+<div id="modal-backup" class="modal-overlay" onclick="closeModalOut(event,'modal-backup')">
+<div class="modal" style="max-width:540px">
+  <div class="modal-title">💾 Sauvegarde & Restauration <span class="modal-close" onclick="closeModal('modal-backup')">✕</span></div>
+
+  <!-- EXPORT -->
+  <div class="card" style="margin-bottom:16px;padding:16px">
+    <div class="card-title" style="margin-bottom:12px">📤 Exporter les données</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:12px">
+      Télécharge toutes vos données HomeBase en un fichier JSON. Vous pouvez l'utiliser pour une sauvegarde ou migrer vers un autre appareil.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="exportBackup('full')">⬇️ Export complet</button>
+      <button class="btn btn-outline" onclick="exportBackup('finances')">💰 Finances uniquement</button>
+      <button class="btn btn-outline" onclick="exportBackup('maison')">🏠 Maison uniquement</button>
+    </div>
+    <div id="export-info" style="margin-top:10px;font-size:.75rem;color:var(--text3);font-family:var(--mono)"></div>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="card" style="padding:16px">
+    <div class="card-title" style="margin-bottom:12px">📥 Importer / Restaurer</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:12px">
+      ⚠️ L'import <strong>remplace</strong> les données actuelles. Faites d'abord un export complet.
+    </div>
+    <div class="backup-zone" id="backup-drop-zone"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleBackupDrop(event)"
+      onclick="document.getElementById('backup-file-input').click()">
+      <div style="font-size:2rem;margin-bottom:6px">📂</div>
+      <div style="font-weight:600;font-size:.88rem">Glissez votre fichier JSON ici</div>
+      <div style="font-size:.76rem;color:var(--text3);margin-top:4px">ou cliquez pour choisir</div>
+    </div>
+    <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="handleBackupFile(this)">
+    <div id="import-preview" style="margin-top:12px;display:none">
+      <div class="alert alert-warning" id="import-info"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" id="import-confirm-btn" onclick="confirmImport()">✅ Confirmer l'import</button>
+        <button class="btn btn-outline" onclick="cancelImport()">Annuler</button>
+      </div>
+    </div>
+    <div id="import-success" style="display:none">
+      <div class="alert alert-success">✅ Import réussi ! Données restaurées.</div>
+    </div>
+  </div>
+</div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -2390,11 +2625,20 @@ function renderCharts(ressourcesTotal, loyersTotal, budgetTotal) {
     });
   }
 
-  // ── BARRES : Revenus vs Dépenses ──
+  // ── BARRES : Revenus vs Dépenses (données réelles par mois) ──
   const moisLabels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
   const moisActuel = new Date().getMonth();
-  const revData = moisLabels.map((_,i)=> i<=moisActuel ? Math.round(ressourcesTotal*(0.85+Math.random()*0.3)) : null);
-  const depData = moisLabels.map((_,i)=> i<=moisActuel ? Math.round(budgetTotal*(0.8+Math.random()*0.4)) : null);
+  const annee = new Date().getFullYear();
+  // Agréger les ressources réelles par mois
+  const revByMonth = new Array(12).fill(0);
+  const depByMonth = new Array(12).fill(0);
+  (state.ressources||[]).forEach(r => {
+    if(r.date){ const m=new Date(r.date).getMonth(); const y=new Date(r.date).getFullYear();
+      if(y===annee && m>=0 && m<12) revByMonth[m]+=(r.montant||0); }
+  });
+  (state.budget||[]).forEach(b => { depByMonth[moisActuel]+=(b.reel||b.prev||0); });
+  const revData = moisLabels.map((_,i)=> i<=moisActuel ? (revByMonth[i]||null) : null);
+  const depData = moisLabels.map((_,i)=> i<=moisActuel ? (depByMonth[i]||null) : null);
   _destroyChart('balance');
   const ctxB = document.getElementById('chart-balance');
   if(ctxB){
@@ -2582,6 +2826,7 @@ function renderTaches() {
   document.getElementById('tasks-med').innerHTML = renderList(state.taches.filter(t=>!t.done&&t.priorite==='moyenne'));
   document.getElementById('tasks-low').innerHTML = renderList(state.taches.filter(t=>!t.done&&t.priorite==='basse'));
   document.getElementById('tasks-done').innerHTML = renderList(state.taches.filter(t=>t.done));
+  updateTacheFilterMembers && updateTacheFilterMembers();
 }
 function toggleTache(id) {
   const t = state.taches.find(x=>x.id===id); if (!t) return;
@@ -2713,32 +2958,69 @@ function switchEnfantTab(tab, el) {
   renderEnfant();
 }
 
+let _childTaskFilter = 'tous';
+
 function renderEnfant() {
   const ch = state.child;
-  // Profile
   const nom = ch.nom || 'Mon enfant';
-  const nameEl = document.getElementById('child-name'); if(nameEl) nameEl.textContent = nom;
-  const ageEl  = document.getElementById('child-age');  if(ageEl) ageEl.textContent  = ch.age ? `${ch.age} ans${ch.classe?' · '+ch.classe:''}` : '';
-  const objNEl = document.getElementById('obj-child-name'); if(objNEl) objNEl.textContent = nom;
-  // Avatar emoji based on age
+  const age = +ch.age || 9;
+
+  // Avatar by age
   const avEl = document.getElementById('ep-avatar');
-  if(avEl) avEl.textContent = (+ch.age||9) < 6 ? '👶' : (+ch.age||9) < 13 ? '🧒' : '👦';
-  // KPIs profile
-  const notes = state.childNotes||[];
-  const moy = notes.length ? (notes.reduce((a,n)=>a+(+n.note||0),0)/notes.length).toFixed(1) : '—';
-  const tasks = state.childTasks||[];
+  if(avEl) avEl.textContent = age < 4 ? '👶' : age < 8 ? '🧒' : age < 13 ? '👦' : age < 17 ? '🧑' : '👨';
+
+  // Name & age
+  const nameEl = document.getElementById('child-name'); if(nameEl) nameEl.textContent = nom;
+  const ageEl  = document.getElementById('child-age');  if(ageEl) ageEl.textContent = ch.age ? `${age} ans${ch.classe?' · '+ch.classe:''}` : '';
+  const objNEl = document.getElementById('obj-child-name'); if(objNEl) objNEl.textContent = nom;
+
+  // Badges dynamiques
+  const tasks   = state.childTasks||[];
+  const objs    = state.childObjectifs||[];
+  const besoins = state.childBesoins||[];
+  const notes   = state.childNotes||[];
   const tasksDone = tasks.filter(t=>t.done).length;
-  const objs = state.childObjectifs||[];
-  const objsDone = objs.filter(o=>+o.pct>=100).length;
+  const objsDone  = objs.filter(o=>+o.pct>=100).length;
+  const moy = notes.length ? (notes.reduce((a,n)=>a+(+n.note||0),0)/notes.length).toFixed(1) : null;
+  const tasksPct = tasks.length ? Math.round(tasksDone/tasks.length*100) : 0;
+
+  const badgesEl = document.getElementById('eh-badges');
+  if(badgesEl) {
+    const badges = [];
+    if(tasksPct===100 && tasks.length) badges.push('<span class="eh-badge gold">🏆 Tout accompli</span>');
+    else if(tasksPct>=75) badges.push('<span class="eh-badge green">⭐ Bon rythme</span>');
+    if(objsDone>0) badges.push(`<span class="eh-badge green">🎯 ${objsDone} objectif${objsDone>1?'s':''} atteint${objsDone>1?'s':''}</span>`);
+    if(moy && moy>=14) badges.push('<span class="eh-badge gold">📚 Excellent élève</span>');
+    else if(moy && moy>=10) badges.push('<span class="eh-badge">📚 Bon niveau</span>');
+    badgesEl.innerHTML = badges.join('') || '<span class="eh-badge">🌱 En progression</span>';
+  }
+
+  // KPIs hero
   const kpiEl = document.getElementById('ep-kpis');
   if(kpiEl) kpiEl.innerHTML = `
-    <div class="ep-kpi"><div class="v">${moy}</div><div class="l">Moy. scolaire</div></div>
-    <div class="ep-kpi"><div class="v">${tasksDone}/${tasks.length}</div><div class="l">Tâches</div></div>
+    <div class="ep-kpi"><div class="v" style="color:${tasksDone===tasks.length&&tasks.length?'#52B788':'#fff'}">${tasksDone}/${tasks.length}</div><div class="l">Tâches</div></div>
     <div class="ep-kpi"><div class="v">${objsDone}/${objs.length}</div><div class="l">Objectifs</div></div>
-    <div class="ep-kpi"><div class="v">${(state.childBesoins||[]).filter(b=>!b.done).length}</div><div class="l">Besoins</div></div>
+    <div class="ep-kpi"><div class="v" style="color:${moy&&moy>=14?'#52B788':moy&&moy<10?'#F4A261':'#fff'}">${moy||'—'}</div><div class="l">Moyenne</div></div>
+    <div class="ep-kpi"><div class="v" style="color:${besoins.filter(b=>!b.done).length>0?'#F4D58D':'#fff'}">${besoins.filter(b=>!b.done).length}</div><div class="l">Besoins</div></div>
   `;
 
-  // Fill form fields
+  // Progress banner global
+  const pbEl = document.getElementById('enfant-progress-banner');
+  if(pbEl && tasks.length) {
+    pbEl.classList.add('show');
+    pbEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:.82rem;font-weight:700">Progression globale de ${nom}</span>
+        <span style="font-family:var(--mono);font-size:.82rem;color:var(--accent);font-weight:800">${tasksPct}%</span>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="width:${tasksPct}%;background:${tasksPct===100?'linear-gradient(90deg,#52B788,#2D6A4F)':'linear-gradient(90deg,var(--accent),var(--accent2))'}"></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--text3);margin-top:6px">${tasksDone} tâche${tasksDone>1?'s':''} accomplie${tasksDone>1?'s':''} · ${objs.filter(o=>+o.pct>=100).length}/${objs.length} objectif${objs.length>1?'s':''} atteint${objs.filter(o=>+o.pct>=100).length>1?'s':''}</div>
+    `;
+  } else if(pbEl) pbEl.classList.remove('show');
+
+  // Fill modal info fields
   const ciNom = document.getElementById('ci-nom'); if(ciNom) ciNom.value=ch.nom||'';
   const ciAge = document.getElementById('ci-age'); if(ciAge) ciAge.value=ch.age||9;
   const ciCl  = document.getElementById('ci-classe'); if(ciCl) ciCl.value=ch.classe||'';
@@ -2749,8 +3031,8 @@ function renderEnfant() {
     <div class="stock-item">
       <div class="stock-dot" style="background:var(--blue2)"></div>
       <div style="flex:1"><div class="stock-name">${h.desc}</div><div class="stock-qty">${h.type}${h.date?' · '+h.date:''}</div></div>
-      <button class="ci-act-btn" onclick="editChildHealth(${i})" title="Modifier">✏️</button>
-      <button class="ci-act-btn" onclick="deleteChildHealth(${i})" title="Supprimer">🗑</button>
+      <button class="ci-act-btn" onclick="editChildHealth(${i})">✏️</button>
+      <button class="ci-act-btn" onclick="deleteChildHealth(${i})">🗑</button>
     </div>`).join('') || '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucun événement santé</div>';
 
   // ── Médicaments
@@ -2766,14 +3048,14 @@ function renderEnfant() {
 
   // ── Notes
   const notesEl = document.getElementById('child-notes');
-  if(notesEl) notesEl.innerHTML = (state.childNotes||[]).length ? `
+  if(notesEl) notesEl.innerHTML = notes.length ? `
     <div style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:10px">
         <span style="font-size:1.4rem">📊</span>
         <div><div style="font-weight:700;font-size:.9rem">Moyenne générale</div><div style="font-family:var(--mono);font-size:1.2rem;font-weight:800;color:${moy>=14?'var(--accent)':moy>=10?'var(--gold)':'var(--red)'}">${moy}/20</div></div>
       </div>
     </div>` +
-    (state.childNotes||[]).map((n,i)=>{
+    notes.map((n,i)=>{
       const col=n.note>=14?'var(--accent)':n.note>=10?'var(--gold)':'var(--red)';
       return `<div class="stock-item">
         <div class="note-circle" style="background:${col}15;color:${col};min-width:44px;font-size:.9rem">${n.note}/20</div>
@@ -2786,7 +3068,6 @@ function renderEnfant() {
 
   // ── Activités
   const actEl = document.getElementById('child-activities');
-  const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   if(actEl) actEl.innerHTML = (state.childActivites||[]).length ?
     `<div style="display:grid;gap:8px">`+
     (state.childActivites||[]).map((a,i)=>`
@@ -2798,51 +3079,204 @@ function renderEnfant() {
       </div>`).join('')+`</div>`
     : '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucune activité planifiée</div>';
 
-  // ── Objectifs enfant
   renderChildObjectifs();
   renderChildTasks();
   renderChildBesoins();
+  renderChildConseils();
+}
+
+let _childTaskFilterActive = 'tous';
+function filterChildTasks(cat, btn) {
+  _childTaskFilterActive = cat;
+  document.querySelectorAll('#child-tasks-filters .courses-filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderChildTasks();
+}
+
+// ── CHILD TASKS ──
+function renderChildTasks() {
+  const el = document.getElementById('child-tasks-list'); if(!el) return;
+  const allTasks = state.childTasks||[];
+  const filtered = _childTaskFilterActive==='tous' ? allTasks : allTasks.filter(t=>t.cat===_childTaskFilterActive);
+  const done = allTasks.filter(t=>t.done).length;
+  const pct  = allTasks.length ? Math.round(done/allTasks.length*100) : 0;
+
+  const progEl = document.getElementById('child-tasks-progress');
+  if(progEl) progEl.textContent = `${done}/${allTasks.length} accompli${done>1?'s':''} · ${pct}%`;
+  const fillEl = document.getElementById('child-tasks-prog-fill');
+  if(fillEl) { fillEl.style.width=pct+'%'; fillEl.style.background = pct===100?'linear-gradient(90deg,#52B788,#2D6A4F)':'linear-gradient(90deg,var(--accent),var(--accent2))'; }
+
+  if(!filtered.length) { el.innerHTML='<div style="text-align:center;padding:36px;color:var(--text3)">Aucune tâche pour cette catégorie<br><small style="font-size:.75rem">Cliquez sur + Tâche pour commencer</small></div>'; return; }
+
+  const PRIO_COLORS = {haute:'var(--red)',normal:'var(--gold)',basse:'var(--text3)'};
+  const CAT_ICONS   = {École:'📚',Maison:'🏠',Sport:'⚽',Perso:'⭐',Santé:'💊',Autre:'📌'};
+  const sorted = [...filtered].sort((a,b)=>a.done-b.done || (PRIO_COLORS[b.prio]==='var(--red)')-(PRIO_COLORS[a.prio]==='var(--red)'));
+
+  el.innerHTML = sorted.map(t=>`
+    <div class="child-task-item ${t.done?'done':''}" id="cti-${t.id}">
+      <div class="ct-prio" style="background:${PRIO_COLORS[t.prio]||'var(--gold)'}"></div>
+      <div class="ct-check" onclick="toggleChildTask(${t.id})">${t.done?'✓':''}</div>
+      <div class="ct-info" onclick="toggleChildTask(${t.id})">
+        <div class="ct-nom">${t.nom}</div>
+        <div class="ct-meta">
+          ${t.cat?`<span class="ct-cat-badge">${CAT_ICONS[t.cat]||'📌'} ${t.cat}</span>`:''}
+          ${t.date?`<span>📅 ${t.date}</span>`:''}
+          ${t.note?`<span>${t.note}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="ci-act-btn" onclick="editChildTask(${t.id})">✏️</button>
+        <button class="ci-act-btn" onclick="deleteChildTask(${t.id})">🗑</button>
+      </div>
+    </div>`).join('');
 }
 
 // ── CHILD OBJECTIFS ──
 function renderChildObjectifs() {
-  const el = document.getElementById('child-objectifs-list');
-  if(!el) return;
+  const el = document.getElementById('child-objectifs-list'); if(!el) return;
   const list = state.childObjectifs||[];
-  if(!list.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun objectif pour le moment<br><small>Cliquez sur + Objectif pour commencer</small></div>'; return; }
+
+  // KPIs objectifs
+  const kpiEl = document.getElementById('child-obj-kpis');
+  if(kpiEl && list.length) {
+    const done = list.filter(o=>+o.pct>=100).length;
+    const inProg = list.filter(o=>+o.pct>0&&+o.pct<100).length;
+    kpiEl.innerHTML = `
+      <div class="c-kpi"><div class="c-kv" style="color:var(--accent)">${done}</div><div class="c-kl">Atteint${done>1?'s':''}</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--gold)">${inProg}</div><div class="c-kl">En cours</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--text2)">${list.filter(o=>+o.pct===0).length}</div><div class="c-kl">Non démarré${list.filter(o=>+o.pct===0).length>1?'s':''}</div></div>
+    `;
+  } else if(kpiEl) kpiEl.innerHTML='';
+
+  if(!list.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun objectif pour le moment<br><small>Fixez des objectifs motivants pour votre enfant !</small></div>'; return; }
+
   const CAT_COLORS = {'École':'blue','Sport':'green','Comportement':'gold','Lecture':'purple','Santé':'red','Autre':'gray'};
+  const CAT_ICONS2 = {'École':'📚','Sport':'⚽','Comportement':'😊','Lecture':'📖','Santé':'💊','Autre':'🎯'};
   el.innerHTML = list.map((o,i)=>{
     const pct = +o.pct||0;
     const done = pct>=100;
-    const col = done?'var(--text3)':pct>=50?'var(--accent)':'var(--gold)';
+    const barColor = done?'var(--text3)':pct>=75?'linear-gradient(90deg,var(--accent),var(--accent2))':pct>=50?'linear-gradient(90deg,var(--gold),#f4d58d)':'linear-gradient(90deg,var(--red),#F4A261)';
     return `<div class="child-obj-card ${done?'done-obj':''}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px">
         <div style="flex:1">
-          <span class="badge badge-${CAT_COLORS[o.cat]||'gray'}" style="margin-bottom:6px">${o.cat||'Autre'}</span>
-          <div style="font-weight:700;font-size:.92rem;margin-top:4px">${o.nom}</div>
-          ${o.desc?`<div style="font-size:.75rem;color:var(--text2);margin-top:3px">${o.desc}</div>`:''}
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <span class="badge badge-${CAT_COLORS[o.cat]||'gray'}">${CAT_ICONS2[o.cat]||'🎯'} ${o.cat||'Autre'}</span>
+            ${done?'<span style="font-size:.68rem;font-weight:800;color:var(--accent);background:rgba(45,106,79,.1);padding:2px 8px;border-radius:8px">✅ Atteint !</span>':''}
+          </div>
+          <div style="font-weight:700;font-size:.95rem">${o.nom}</div>
+          ${o.desc?`<div style="font-size:.76rem;color:var(--text2);margin-top:4px;line-height:1.4">${o.desc}</div>`:''}
+          ${o.reward?`<div class="co-reward-chip">🎁 Récompense : ${o.reward}</div>`:''}
         </div>
-        <div style="display:flex;gap:4px;flex-shrink:0">
-          <button class="ci-act-btn" onclick="editChildObj(${i})">✏️</button>
-          <button class="ci-act-btn" onclick="deleteChildObj(${i})">🗑</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
+          <div style="font-family:var(--mono);font-size:1.2rem;font-weight:800;color:${done?'var(--text3)':pct>=50?'var(--accent)':'var(--gold)'}">${pct}%</div>
+          <div style="display:flex;gap:4px">
+            <button class="ci-act-btn" onclick="editChildObj(${i})">✏️</button>
+            <button class="ci-act-btn" onclick="deleteChildObj(${i})">🗑</button>
+          </div>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:.72rem;color:var(--text3)">
-          ${o.date?'📅 '+o.date:''}
-          ${o.reward?'  🎁 '+o.reward:''}
-        </div>
-        <div style="font-family:var(--mono);font-size:.9rem;font-weight:800;color:${col}">${pct}%</div>
+      ${o.date?`<div style="font-size:.7rem;color:var(--text3);margin-bottom:6px">📅 Échéance : ${o.date}</div>`:''}
+      <div class="progress-bar" style="height:10px;margin-bottom:10px">
+        <div class="progress-fill" style="width:${pct}%;background:${barColor};transition:width 1s ease"></div>
       </div>
-      <div class="progress-bar" style="height:8px">
-        <div class="progress-fill" style="width:${pct}%;background:${done?'var(--text3)':pct>=50?'linear-gradient(90deg,var(--accent),var(--accent2))':'linear-gradient(90deg,var(--gold),#f4d58d)'}"></div>
-      </div>
-      ${done?'<div style="margin-top:8px;font-size:.75rem;color:var(--accent);font-weight:700">✅ Objectif atteint !</div>':''}
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-        ${[0,25,50,75,100].map(p=>`<button class="btn btn-outline btn-sm" style="padding:3px 10px;font-size:.68rem;${pct===p?'background:var(--accent);color:#fff;border-color:var(--accent)':''}" onclick="setChildObjPct(${i},${p})">${p}%</button>`).join('')}
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${[0,25,50,75,100].map(p=>`<button onclick="setChildObjPct(${i},${p})" style="flex:1;min-width:36px;padding:5px 4px;font-size:.68rem;font-weight:700;border-radius:8px;border:1px solid ${pct===p?'var(--accent)':'var(--border)'};background:${pct===p?'var(--accent)':'var(--card)'};color:${pct===p?'#fff':'var(--text2)'};cursor:pointer;transition:var(--transition)">${p}%</button>`).join('')}
       </div>
     </div>`;
   }).join('');
+}
+
+// ── CHILD BESOINS ──
+function renderChildBesoins() {
+  const el=document.getElementById('child-besoins-list'); if(!el) return;
+  const list=state.childBesoins||[];
+  const totalBudget=list.reduce((a,b)=>a+(b.prix||0),0);
+  const restant=list.filter(b=>!b.done).reduce((a,b)=>a+(b.prix||0),0);
+  const sorted=[...list].sort((a,b)=>a.done-b.done||(b.urgence==='urgent')-(a.urgence==='urgent'));
+
+  el.innerHTML = list.length ? `
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="c-kpi"><div class="c-kv" style="color:var(--gold)">${fmtXAF(restant)}</div><div class="c-kl">Reste à acheter</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--text2)">${fmtXAF(totalBudget)}</div><div class="c-kl">Budget total</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--red)">${list.filter(b=>b.urgence==='urgent'&&!b.done).length}</div><div class="c-kl">Urgents</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--accent)">${list.filter(b=>b.done).length}</div><div class="c-kl">Achetés</div></div>
+    </div>` +
+    sorted.map(b=>`
+      <div class="child-besoin-item ${b.done?'done-b':''}">
+        <div class="cb-check" onclick="toggleChildBesoin(${b.id})">${b.done?'✓':''}</div>
+        <div class="cb-info">
+          <div class="cb-nom">${b.nom}</div>
+          <div class="cb-meta">${b.cat||''}${b.note?' · '+b.note:''}</div>
+        </div>
+        ${b.prix?`<div style="font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--gold);flex-shrink:0">${fmtXAF(b.prix)}</div>`:''}
+        ${b.urgence==='urgent'&&!b.done?`<span style="font-size:.6rem;font-weight:800;color:var(--red);background:rgba(193,68,14,.1);padding:2px 7px;border-radius:8px;flex-shrink:0;white-space:nowrap">URGENT</span>`:''}
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="ci-act-btn" onclick="editChildBesoin(${b.id})">✏️</button>
+          <button class="ci-act-btn" onclick="deleteChildBesoin(${b.id})">🗑</button>
+        </div>
+      </div>`)
+    .join('')
+  : '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun besoin enregistré<br><small>Ajoutez les articles dont votre enfant a besoin</small></div>';
+}
+
+// ── CONSEILS ──
+function renderChildConseils() {
+  const el = document.getElementById('child-conseils-content'); if(!el) return;
+  const ch = state.child;
+  const age = +ch.age || 9;
+  const tasks = state.childTasks||[];
+  const objs  = state.childObjectifs||[];
+  const notes = state.childNotes||[];
+  const moy   = notes.length ? notes.reduce((a,n)=>a+(+n.note||0),0)/notes.length : null;
+  const tasksPct = tasks.length ? Math.round(tasks.filter(t=>t.done).length/tasks.length*100) : 0;
+
+  const conseils = [];
+
+  // Analyse tâches
+  if(!tasks.length) conseils.push({type:'violet',icon:'✅',titre:'Créer une routine de tâches',texte:`Établir une liste de tâches hebdomadaires pour ${ch.nom||'votre enfant'} développe la responsabilité et l'autonomie. Commencez par 3-5 tâches simples : ranger sa chambre, préparer son cartable, faire ses devoirs.`,tag:'Conseils pratiques'});
+  else if(tasksPct<50) conseils.push({type:'gold',icon:'💪',titre:'Encourager la constance',texte:`Seulement ${tasksPct}% des tâches sont accomplies. Essayez un système de récompenses : une petite récompense quand 80% des tâches sont faites dans la semaine. La régularité se construit pas à pas !`,tag:'Motivation'});
+  else if(tasksPct===100) conseils.push({type:'vert',icon:'🏆',titre:'Bravo ! Toutes les tâches accomplies !',texte:`Excellente performance ! Pensez à augmenter légèrement la difficulté pour continuer à progresser. Un enfant qui réussit ses tâches constamment est prêt pour de nouveaux défis.`,tag:'Félicitations'});
+
+  // Analyse scolaire
+  if(moy!==null && moy<10) conseils.push({type:'rouge',icon:'📚',titre:'Soutien scolaire recommandé',texte:`La moyenne actuelle (${moy}/20) mérite attention. Identifiez les matières en difficulté, organisez 30 min de révision quotidienne, et consultez les professeurs. Un soutien scolaire peut faire une vraie différence.`,tag:'École'});
+  else if(moy!==null && moy>=14) conseils.push({type:'vert',icon:'🌟',titre:'Excellent niveau scolaire !',texte:`Félicitations pour la moyenne de ${moy}/20 ! Pour maintenir ce niveau : encouragez la curiosité intellectuelle, proposez des lectures variées et valorisez les efforts autant que les résultats.`,tag:'École'});
+
+  // Conseils selon l'âge
+  if(age<=7) {
+    conseils.push({type:'gold',icon:'🎨',titre:'Stimuler la créativité',texte:'À cet âge, le jeu est le meilleur apprentissage. Proposez des activités créatives : dessin, peinture, construction. Limitez les écrans à 1h/jour et préférez les jeux éducatifs.',tag:'Développement'});
+    conseils.push({type:'violet',icon:'📖',titre:'Lire chaque soir ensemble',texte:'10-15 minutes de lecture à voix haute chaque soir avant de dormir développe le vocabulaire, la concentration et crée un moment de complicité précieux. Laissez-le choisir l\'histoire !',tag:'Éducation'});
+  } else if(age<=12) {
+    conseils.push({type:'gold',icon:'⏰',titre:'Instaurer une routine après l\'école',texte:'Goûter → Devoirs → Activité libre → Dîner. Une routine stable aide l\'enfant à se sentir en sécurité et améliore les performances scolaires. Gardez les horaires réguliers même le week-end.',tag:'Organisation'});
+    conseils.push({type:'vert',icon:'🏃',titre:'Sport : au moins 3x par semaine',texte:'L\'activité physique régulière améliore la concentration, réduit le stress et favorise un bon sommeil. Trouvez une activité sportive qu\'il/elle apprécie vraiment plutôt que d\'imposer.',tag:'Santé'});
+  } else {
+    conseils.push({type:'violet',icon:'🗣️',titre:'Maintenir le dialogue',texte:'À l\'adolescence, les conversations régulières sont essentielles. Posez des questions ouvertes (pas juste "comment s\'est passée ta journée ?"), partagez des repas sans écrans, respectez son espace tout en restant disponible.',tag:'Relation'});
+    conseils.push({type:'gold',icon:'💰',titre:'Initier à la gestion de l\'argent',texte:'C\'est l\'âge idéal pour donner une allocation et apprendre à gérer un budget. Encouragez l\'épargne pour un objectif précis. Ces bases financières serviront toute la vie.',tag:'Éducation financière'});
+  }
+
+  // Sommeil
+  const sommeils = {6:'10-11h',7:'10-11h',8:'10h',9:'10h',10:'9-10h',11:'9-10h',12:'9h',13:'9h',14:'8-9h',15:'8-9h',16:'8h',17:'8h'};
+  const somHeure = sommeils[Math.min(17,Math.max(6,age))]||'8-10h';
+  conseils.push({type:'vert',icon:'😴',titre:`Sommeil : ${somHeure} recommandé`,texte:`À ${age} ans, ${ch.nom||'votre enfant'} a besoin de ${somHeure} de sommeil par nuit. Un coucher régulier (même heure chaque soir), sans écrans 1h avant, améliore l\'humeur, la concentration et les résultats scolaires.`,tag:'Santé'});
+
+  // Si pas d'objectifs
+  if(!objs.length) conseils.push({type:'violet',icon:'🎯',titre:'Fixer des objectifs motivants',texte:'Les objectifs donnent de la direction et de la motivation. Fixez ensemble 1 objectif à court terme (1 mois), 1 à moyen terme (3 mois). Attachez-y une récompense symbolique. L\'enfant doit être impliqué dans la définition de SES objectifs.',tag:'Motivation'});
+
+  el.innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-weight:800;font-size:1rem;margin-bottom:4px">💡 Conseils personnalisés pour ${ch.nom||'votre enfant'}</div>
+      <div style="font-size:.78rem;color:var(--text3)">Basés sur l'âge (${age} ans) et le suivi dans HomeBase</div>
+    </div>
+    ${conseils.map(c=>`
+      <div class="conseil-card ${c.type}">
+        <div class="conseil-icon">${c.icon}</div>
+        <div class="conseil-titre">${c.titre}</div>
+        <div class="conseil-texte">${c.texte}</div>
+        <div class="conseil-tag">${c.tag}</div>
+      </div>`).join('')}
+    <div style="margin-top:20px;padding:14px;background:var(--bg2);border-radius:14px;font-size:.78rem;color:var(--text3);line-height:1.6">
+      💬 <strong>Note :</strong> Ces conseils sont généraux et basés sur les données saisies dans HomeBase. Chaque enfant est unique — faites confiance à votre instinct de parent et consultez un professionnel si vous avez des préoccupations spécifiques.
+    </div>
+  `;
 }
 
 function openChildObjModal() {
@@ -4774,6 +5208,297 @@ function checkSession() {
       applyRolePermissions();
     } catch{ sessionStorage.removeItem('hb_user'); }
   }
+}
+
+
+// ════════════════════════════════════════
+// ══ BACKUP / EXPORT / IMPORT ══
+// ════════════════════════════════════════
+
+const BACKUP_SETS = {
+  full: ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth',
+         'childMeds','childNotes','childActivites','objectifs','dettes','maintenance',
+         'engagements','ressources','creances','courses','childObjectifs','childTasks','childBesoins'],
+  finances: ['budget','dettes','ressources','creances','objectifs'],
+  maison:   ['stocks','taches','courses','maintenance','chantiers']
+};
+
+function exportBackup(type='full') {
+  const keys = BACKUP_SETS[type] || BACKUP_SETS.full;
+  const data = { _meta:{ type, date: new Date().toISOString(), version:'homebase-v1', keys } };
+  let total = 0;
+  keys.forEach(k => {
+    data[k] = state[k];
+    if(Array.isArray(state[k])) total += state[k].length;
+  });
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `homebase-${type}-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const info = document.getElementById('export-info');
+  if(info) info.textContent = `✅ Export réussi — ${total} entrées dans ${keys.length} catégories`;
+  showToast(`✅ Export ${type} téléchargé !`);
+}
+
+let _pendingImport = null;
+
+function handleBackupFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  readBackupFile(file);
+}
+
+function handleBackupDrop(e) {
+  e.preventDefault();
+  document.getElementById('backup-drop-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(file && file.name.endsWith('.json')) readBackupFile(file);
+  else showToast('❌ Fichier JSON requis');
+}
+
+function readBackupFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!data._meta) { showToast('❌ Format invalide'); return; }
+      _pendingImport = data;
+      const meta = data._meta;
+      const total = (meta.keys||[]).reduce((a,k)=> a+(Array.isArray(data[k])?data[k].length:1), 0);
+      document.getElementById('import-info').innerHTML =
+        `📦 <strong>Backup ${meta.type}</strong> du ${meta.date?.split('T')[0]||'?'}<br>
+         ${meta.keys?.length||0} catégories · ${total} entrées<br>
+         ⚠️ Cette action remplacera vos données actuelles.`;
+      document.getElementById('import-preview').style.display = 'block';
+      document.getElementById('import-success').style.display = 'none';
+    } catch(err) {
+      showToast('❌ Fichier JSON invalide');
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function confirmImport() {
+  if(!_pendingImport) return;
+  const data = _pendingImport;
+  const keys = data._meta?.keys || Object.keys(data).filter(k=>k!=='_meta');
+  for(const k of keys) {
+    if(data[k] !== undefined && state.hasOwnProperty(k)) {
+      state[k] = data[k];
+      await save(k);
+    }
+  }
+  _pendingImport = null;
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-success').style.display = 'block';
+  document.getElementById('backup-file-input').value = '';
+  renderAll();
+  showToast('✅ Import réussi ! Données restaurées.');
+}
+
+function cancelImport() {
+  _pendingImport = null;
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('backup-file-input').value = '';
+}
+
+
+// ════════════════════════════════════════
+// ══ RECHERCHE GLOBALE ══
+// ════════════════════════════════════════
+
+const SEARCH_SOURCES = [
+  { key:'taches',     icon:'✅', label:'Tâche',      fields:['nom','qui'],          page:'taches' },
+  { key:'locatifs',   icon:'🏢', label:'Locatif',    fields:['nom','locataire','contact'], page:'locatifs' },
+  { key:'dettes',     icon:'💳', label:'Dette',      fields:['nom','qui'],          page:'dettes' },
+  { key:'stocks',     icon:'📦', label:'Stock',      fields:['nom','cat','qty'],    page:'stocks' },
+  { key:'objectifs',  icon:'🎯', label:'Objectif',   fields:['nom','cat','desc'],   page:'objectifs' },
+  { key:'chantiers',  icon:'🔨', label:'Chantier',   fields:['nom','desc','statut'],page:'chantiers' },
+  { key:'events',     icon:'📅', label:'Événement',  fields:['nom','notes'],        page:'calendrier' },
+  { key:'engagements',icon:'🤝', label:'Engagement', fields:['nom','qui'],          page:'engagements' },
+  { key:'maintenance',icon:'🔧', label:'Maintenance',fields:['nom','bien','desc'],  page:'maintenance' },
+  { key:'ressources', icon:'💰', label:'Ressource',  fields:['desc','source'],      page:'ressources' },
+  { key:'creances',   icon:'📋', label:'Créance',    fields:['nom','notes'],        page:'creances' },
+  { key:'courses',    icon:'🛒', label:'Course',     fields:['nom','cat'],          page:'courses' },
+];
+
+let _searchTimer = null;
+
+function globalSearch(q) {
+  clearTimeout(_searchTimer);
+  if(!q || q.trim().length < 2) { hideSearchResults(); return; }
+  _searchTimer = setTimeout(() => _doSearch(q.trim().toLowerCase()), 180);
+}
+
+function _doSearch(q) {
+  const results = [];
+  for(const src of SEARCH_SOURCES) {
+    const items = state[src.key] || [];
+    if(!Array.isArray(items)) continue;
+    for(const item of items) {
+      const text = src.fields.map(f => (item[f]||'').toString().toLowerCase()).join(' ');
+      if(text.includes(q)) {
+        const main = item[src.fields[0]] || item.nom || item.desc || '?';
+        const sub  = src.fields.slice(1).map(f=>item[f]).filter(Boolean).join(' · ');
+        results.push({ icon:src.icon, label:src.label, title:main, meta:sub, page:src.page });
+      }
+      if(results.length >= 12) break;
+    }
+    if(results.length >= 12) break;
+  }
+  renderSearchResults(results, q);
+}
+
+function renderSearchResults(results, q) {
+  const el = document.getElementById('search-results');
+  if(!el) return;
+  if(results.length === 0) {
+    el.innerHTML = `<div class="search-empty">Aucun résultat pour "<strong>${q}</strong>"</div>`;
+  } else {
+    el.innerHTML = results.map(r => `
+      <div class="search-result-item" onclick="navigateToSearch('${r.page}')">
+        <span class="sr-icon">${r.icon}</span>
+        <div class="sr-body">
+          <div class="sr-title">${highlight(r.title, q)}</div>
+          ${r.meta ? `<div class="sr-meta">${r.meta}</div>` : ''}
+        </div>
+        <span class="sr-tag">${r.label}</span>
+      </div>`).join('');
+  }
+  showSearchResults();
+}
+
+function highlight(text, q) {
+  if(!text) return '';
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if(idx < 0) return text;
+  return text.slice(0,idx) + `<mark style="background:rgba(201,168,76,.3);border-radius:2px">${text.slice(idx,idx+q.length)}</mark>` + text.slice(idx+q.length);
+}
+
+function showSearchResults() {
+  const el = document.getElementById('search-results');
+  if(el) el.classList.add('open');
+}
+
+function hideSearchResults() {
+  const el = document.getElementById('search-results');
+  if(el) el.classList.remove('open');
+}
+
+function navigateToSearch(page) {
+  hideSearchResults();
+  document.getElementById('global-search').value = '';
+  // Simulate click on nav item
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  // Activate nav item
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
+  });
+  renderPage(page);
+}
+
+
+// ════════════════════════════════════════
+// ══ FILTRES TÂCHES ══
+// ════════════════════════════════════════
+
+function filterTaches() {
+  const q     = (document.getElementById('tache-search')?.value||'').toLowerCase().trim();
+  const prio  = document.getElementById('tache-filter-prio')?.value||'';
+  const statut= document.getElementById('tache-filter-statut')?.value||'';
+  const qui   = document.getElementById('tache-filter-qui')?.value||'';
+
+  let items = state.taches || [];
+  if(q)       items = items.filter(t=>(t.nom||'').toLowerCase().includes(q)||(t.qui||'').toLowerCase().includes(q));
+  if(prio)    items = items.filter(t=>t.priorite===prio);
+  if(statut==='todo')  items = items.filter(t=>!t.done);
+  if(statut==='done')  items = items.filter(t=>t.done);
+  if(qui)     items = items.filter(t=>(t.qui||'')=== qui);
+
+  const pColors = {haute:'var(--red)',moyenne:'var(--gold)',basse:'var(--accent2)'};
+  const renderList = (arr) => arr.map(t=>`
+    <div class="task-item ${t.done?'done':''}">
+      <div class="task-priority" style="background:${pColors[t.priorite]||'var(--text3)'}"></div>
+      <div class="task-check ${t.done?'checked':''}" onclick="toggleTache(${t.id})">${t.done?'✓':''}</div>
+      <div>
+        <div class="task-text">${t.nom}</div>
+        <div class="task-meta">${t.qui||''} ${t.date?'· '+t.date:''}</div>
+      </div>
+      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteTache(${t.id})">🗑️</button>
+    </div>`).join('') || `<div style="color:var(--text3);font-size:.8rem;padding:8px">Aucun résultat</div>`;
+
+  if(q || prio || statut || qui) {
+    // Mode filtré : liste unique
+    document.getElementById('tasks-high').innerHTML = '';
+    document.getElementById('tasks-med').innerHTML  = '';
+    document.getElementById('tasks-low').innerHTML  = '';
+    document.getElementById('tasks-done').innerHTML = '';
+    // Afficher dans high comme conteneur unique temporaire
+    document.getElementById('tasks-high').innerHTML = `
+      <div style="color:var(--text3);font-size:.75rem;margin-bottom:8px;font-family:var(--mono)">${items.length} résultat(s)</div>
+      ${renderList(items)}`;
+  } else {
+    renderTaches(); // reset normal
+  }
+}
+
+function updateTacheFilterMembers() {
+  const sel = document.getElementById('tache-filter-qui');
+  if(!sel) return;
+  const members = [...new Set((state.taches||[]).map(t=>t.qui).filter(Boolean))];
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tous membres</option>' +
+    members.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+}
+
+
+// ════════════════════════════════════════
+// ══ FILTRES LOCATIFS ══
+// ════════════════════════════════════════
+
+function filterLocatifs() {
+  const q       = (document.getElementById('loc-search')?.value||'').toLowerCase().trim();
+  const statut  = document.getElementById('loc-filter-statut')?.value||'';
+  const paiement= document.getElementById('loc-filter-paiement')?.value||'';
+
+  let items = state.locatifs || [];
+  if(q)       items = items.filter(l=>(l.nom||'').toLowerCase().includes(q)||(l.locataire||'').toLowerCase().includes(q));
+  if(statut)  items = items.filter(l=>l.statut===statut);
+  if(paiement)items = items.filter(l=>l.paiement===paiement);
+
+  const statColors = {occupé:'badge-green',libre:'badge-gray',travaux:'badge-orange'};
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  document.getElementById('locatifs-grid').innerHTML = items.map((l,i)=>{
+    let retardTag='';
+    if(l.paiement==='impayé'&&l.datebutoir){
+      const diff=(new Date(l.datebutoir)-today)/(1000*60*60*24);
+      if(diff<0) retardTag=`<span class="badge badge-red" style="margin-left:6px">⚠️ Retard ${Math.abs(Math.round(diff))}j</span>`;
+    }
+    const origIdx = state.locatifs.indexOf(l);
+    return `<div class="card" style="border-top:3px solid ${l.statut==='occupé'?'var(--accent)':l.statut==='libre'?'var(--text3)':'var(--orange)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-weight:700;font-size:1rem">${l.nom}</div>
+          <div style="color:var(--text2);font-size:.78rem;margin-top:2px">${l.type||''}</div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+          <span class="badge ${statColors[l.statut]||'badge-gray'}">${l.statut||'?'}</span>${retardTag}
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:8px">${fmtXAF(l.loyer)}<span style="font-size:.7rem;font-weight:400;color:var(--text3)">/mois</span></div>
+      ${l.locataire?`<div style="font-size:.82rem;margin-bottom:4px">👤 ${l.locataire}</div>`:''}
+      ${l.contact?`<div style="font-size:.8rem;color:var(--text2)">📞 ${l.contact}</div>`:''}
+    </div>`;
+  }).join('') || `<div style="color:var(--text3);text-align:center;padding:40px;grid-column:1/-1">Aucun bien correspondant</div>`;
 }
 
 
