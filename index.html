@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HomeBase — Gestion Familiale</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -79,9 +80,10 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
   font-size:0.85rem; font-weight:500; color:var(--text2); position:relative;
   margin-bottom:2px;
 }
+.nav-item i { font-size:.95rem; width:16px; flex-shrink:0; }
 .nav-item:hover { background:var(--bg2); color:var(--text); }
 .nav-item.active { background:var(--accent); color:#fff; }
-.nav-item.active .nav-icon { filter:brightness(0) invert(1); }
+.nav-item.active i { color:#fff; }
 .nav-badge { margin-left:auto; background:var(--red); color:#fff; font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:10px; font-family:var(--mono); }
 .nav-item.active .nav-badge { background:rgba(255,255,255,0.3); }
 
@@ -278,6 +280,7 @@ tr:hover td { background:var(--bg); }
 @media(max-width:900px){
   .sidebar { width:60px; }
   .nav-item span:not(.nav-badge) { display:none; }
+  .nav-item i { margin:0 auto; }
   .nav-label { display:none; }
   .main { margin-left:60px; }
   .grid4 { grid-template-columns:1fr 1fr; }
@@ -481,9 +484,8 @@ tr:hover td { background:var(--bg); }
         oninput="globalSearch(this.value)" onfocus="globalSearchFocus()" onblur="setTimeout(()=>closeSearchResults(),200)">
       <div class="search-results" id="search-results"></div>
     </div>
-    <!-- EXPORT/IMPORT -->
-    <button class="btn btn-outline btn-sm" onclick="exportJSON()" title="Exporter toutes les données en JSON" style="gap:6px">⬇️ Export</button>
-    <label class="btn btn-outline btn-sm" style="cursor:pointer;gap:6px" title="Importer des données JSON">⬆️ Import<input type="file" accept=".json" style="display:none" onchange="importJSON(event)"></label>
+    <!-- BACKUP -->
+    <button class="btn btn-outline btn-sm" onclick="openModal('modal-backup')" title="Sauvegarde & Import" style="gap:6px"><i class="fa-solid fa-floppy-disk"></i> <span class="hide-mobile">Backup</span></button>
     <span id="sync-indicator" style="font-size:.72rem;font-family:var(--mono);color:var(--text3)">🟡 Chargement...</span>
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">FR → EN</button>
     <button class="theme-btn" onclick="toggleTheme()" title="Mode sombre">🌙</button>
@@ -494,10 +496,10 @@ tr:hover td { background:var(--bg); }
           <div style="font-weight:700;font-size:.88rem" id="dd-username">—</div>
           <div id="dd-role-badge" style="margin-top:4px"></div>
         </div>
-        <div class="user-dd-item" onclick="openAdminPanel()" id="btn-admin" style="display:none">⚙️ Administration</div>
-        <div class="user-dd-item" onclick="openModal('modal-change-pass')">🔑 Changer mot de passe</div>
+        <div class="user-dd-item" onclick="openAdminPanel()" id="btn-admin" style="display:none"><i class="fa-solid fa-gear fa-fw"></i> Administration</div>
+        <div class="user-dd-item" onclick="openModal('modal-change-pass')"><i class="fa-solid fa-key fa-fw"></i> Changer mot de passe</div>
         <hr class="user-dd-sep">
-        <div class="user-dd-item" onclick="doLogout()" style="color:var(--red)">🚪 Déconnexion</div>
+        <div class="user-dd-item" onclick="doLogout()" style="color:var(--red)"><i class="fa-solid fa-right-from-bracket fa-fw"></i> Déconnexion</div>
       </div>
     </div>
   </div>
@@ -508,70 +510,70 @@ tr:hover td { background:var(--bg); }
   <div class="nav-section">
     <div class="nav-label" data-fr="Principal" data-en="Main">Principal</div>
     <div class="nav-item active" onclick="showPage('dashboard')">
-      <span>📊</span><span data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
+      <i class="fa-solid fa-chart-pie fa-fw"></i><span data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
     </div>
     <div class="nitem" onclick="showPage('calendrier')">
-      <span>📅</span><span>Calendrier</span><span class="nav-badge" id="bdgCal" style="display:none">0</span>
+      <i class="fa-solid fa-calendar-days fa-fw"></i><span>Calendrier</span><span class="nav-badge" id="bdgCal" style="display:none">0</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label" data-fr="Maison" data-en="Home">Maison</div>
     <div class="nav-item" onclick="showPage('stocks')">
-      <span>🛒</span><span data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
+      <i class="fa-solid fa-box fa-fw"></i><span data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
       <span class="nav-badge" id="badgeStock">0</span>
     </div>
     <div class="nav-item" onclick="showPage('courses')">
-      <span>🧺</span><span>Liste de Courses</span>
+      <i class="fa-solid fa-basket-shopping fa-fw"></i><span>Liste de Courses</span>
       <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('budget')">
-      <span>💰</span><span data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
+      <i class="fa-solid fa-wallet fa-fw"></i><span data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
     </div>
     <div class="nav-item" onclick="showPage('taches')">
-      <span>✅</span><span data-fr="Tâches" data-en="Tasks">Tâches</span>
+      <i class="fa-solid fa-list-check fa-fw"></i><span data-fr="Tâches" data-en="Tasks">Tâches</span>
       <span class="nav-badge" id="badgeTaches">0</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label" data-fr="Immobilier" data-en="Real Estate">Immobilier</div>
     <div class="nav-item" onclick="showPage('locatifs')">
-      <span>🏢</span><span data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
+      <i class="fa-solid fa-building fa-fw"></i><span data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
     </div>
     <div class="nav-item" onclick="showPage('chantiers')">
-      <span>🔨</span><span data-fr="Chantiers" data-en="Projects">Chantiers</span>
+      <i class="fa-solid fa-helmet-safety fa-fw"></i><span data-fr="Chantiers" data-en="Projects">Chantiers</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Finances</div>
     <div class="nav-item" onclick="showPage('ressources')">
-      <span>💰</span><span>Ressources</span>
+      <i class="fa-solid fa-sack-dollar fa-fw"></i><span>Ressources</span>
     </div>
     <div class="nav-item" onclick="showPage('creances')">
-      <span>📋</span><span>Créances</span>
+      <i class="fa-solid fa-file-invoice-dollar fa-fw"></i><span>Créances</span>
       <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('dettes')">
-      <span>💳</span><span>Dettes</span>
+      <i class="fa-solid fa-credit-card fa-fw"></i><span>Dettes</span>
       <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Immobilier+</div>
     <div class="nav-item" onclick="showPage('maintenance')">
-      <span>🔧</span><span>Maintenance</span>
+      <i class="fa-solid fa-screwdriver-wrench fa-fw"></i><span>Maintenance</span>
       <span class="nav-badge" id="badgeMaint" style="display:none">0</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label" data-fr="Famille" data-en="Family">Famille</div>
     <div class="nav-item" onclick="showPage('enfant')">
-      <span>👶</span><span data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
+      <i class="fa-solid fa-child fa-fw"></i><span data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
     </div>
     <div class="nav-item" onclick="showPage('objectifs')">
-      <span>🎯</span><span data-fr="Objectifs" data-en="Goals">Objectifs</span>
+      <i class="fa-solid fa-bullseye fa-fw"></i><span data-fr="Objectifs" data-en="Goals">Objectifs</span>
     </div>
     <div class="nav-item" onclick="showPage('engagements')">
-      <span>🤝</span><span>Engagements</span>
+      <i class="fa-solid fa-handshake fa-fw"></i><span>Engagements</span>
       <span class="nav-badge" id="badgeEng" style="display:none">0</span>
     </div>
   </div>
@@ -952,9 +954,9 @@ tr:hover td { background:var(--bg); }
   </div>
   <div class="grid4" style="margin-bottom:20px">
     <div class="kpi red"><div class="kpi-icon">💳</div><div class="kpi-val" id="det-nb">0</div><div class="kpi-label">Total dettes</div></div>
-    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="det-montant">0</div><div class="kpi-label">Montant total (XAF)</div></div>
-    <div class="kpi purple"><div class="kpi-icon">⏰</div><div class="kpi-val" id="det-urgent">0</div><div class="kpi-label">Échéances < 7 jours</div></div>
-    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="det-regle">0</div><div class="kpi-label">Réglées ce mois</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="det-montant-kpi">0</div><div class="kpi-label">Montant total (XAF)</div></div>
+    <div class="kpi purple"><div class="kpi-icon">⏰</div><div class="kpi-val" id="det-urgent">0</div><div class="kpi-label">Échéances &lt; 7 jours</div></div>
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="det-regle-kpi">0</div><div class="kpi-label">Réglées ce mois</div></div>
   </div>
   <div id="dettes-list"></div>
 </div>
@@ -1040,7 +1042,7 @@ tr:hover td { background:var(--bg); }
   </div>
   <div class="grid3" style="margin-bottom:20px">
     <div class="kpi red"><div class="kpi-icon">⏳</div><div class="kpi-val" id="cre-attente">0</div><div class="kpi-label">En attente</div></div>
-    <div class="kpi gold"><div class="kpi-icon">💸</div><div class="kpi-val" id="cre-montant">0</div><div class="kpi-label">Montant total (XAF)</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💸</div><div class="kpi-val" id="cre-montant-kpi">0</div><div class="kpi-label">Montant total (XAF)</div></div>
     <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="cre-regle">0</div><div class="kpi-label">Réglées</div></div>
   </div>
   <div class="filter-row">
@@ -2525,10 +2527,10 @@ function renderDettes() {
     return diff>=0&&diff<=7;
   }).length;
 
-  document.getElementById('det-nb').textContent      = nb;
-  document.getElementById('det-montant').textContent = fmtXAF(montant);
-  document.getElementById('det-urgent').textContent  = urgent;
-  document.getElementById('det-regle').textContent   = regle;
+  document.getElementById('det-nb').textContent          = nb;
+  document.getElementById('det-montant-kpi').textContent = fmtXAF(montant);
+  document.getElementById('det-urgent').textContent      = urgent;
+  document.getElementById('det-regle-kpi').textContent   = regle;
 
   const profilIcon = {fournisseur:'🏪',particulier:'👤',banque:'🏦',autre:'📦'};
   const moyenIcon  = {airtel:'📱',moov:'📱',especes:'💵',virement:'🏦',autre:'📦'};
@@ -2577,16 +2579,20 @@ function renderDettes() {
 }
 
 function saveDette() {
-  const nom = v('det-nom'); if(!nom) return showToast('❌ Nom requis');
-  const idx = parseInt(document.getElementById('det-edit-id').value);
+  const modal = document.getElementById('modal-dette');
+  const mq = id => modal.querySelector('#'+id)?.value?.trim()||'';
+  const nom = mq('det-nom'); if(!nom) return showToast('❌ Nom requis');
+  const idx = parseInt(modal.querySelector('#det-edit-id').value);
+  const montantVal = +mq('det-montant')||0;
+  const regleVal   = +mq('det-regle')||0;
   const d = {
     id: (!isNaN(idx)&&idx>=0) ? (state.dettes[idx]?.id||Date.now()) : Date.now(),
-    nom, profil:v('det-profil'), creancier:v('det-creancier'),
-    montant:+v('det-montant')||0, regle:+v('det-regle')||0,
-    moyen:v('det-moyen'), delai:v('det-delai'),
-    date:v('det-date'), rappel:v('det-rappel'),
-    contact:v('det-contact'), notes:v('det-notes'),
-    statut: (+v('det-regle')||0) >= (+v('det-montant')||0) && (+v('det-montant')||0)>0 ? 'réglé' : 'en cours'
+    nom, profil:mq('det-profil'), creancier:mq('det-creancier'),
+    montant:montantVal, regle:regleVal,
+    moyen:mq('det-moyen'), delai:mq('det-delai'),
+    date:mq('det-date'), rappel:mq('det-rappel'),
+    contact:mq('det-contact'), notes:mq('det-notes'),
+    statut: regleVal >= montantVal && montantVal > 0 ? 'réglé' : 'en cours'
   };
   if(!state.dettes) state.dettes=[];
   if(!isNaN(idx)&&idx>=0) state.dettes[idx]=d; else state.dettes.push(d);
@@ -3630,7 +3636,7 @@ function renderCreances() {
   const q = (document.getElementById('cre-search')?.value||'').toLowerCase();
   const today = new Date(); today.setHours(0,0,0,0);
   let items = state.creances || [];
-  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(c.notes||''.toLowerCase(),q));
+  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q));
   if(crFilter==='attente') items = items.filter(c=>!c.regle && (!c.date || new Date(c.date)>=today));
   if(crFilter==='retard')  items = items.filter(c=>!c.regle && c.date && new Date(c.date)<today);
   if(crFilter==='regle')   items = items.filter(c=>c.regle);
@@ -3639,7 +3645,7 @@ function renderCreances() {
   const montantTotal = (state.creances||[]).filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
   const regle = (state.creances||[]).filter(c=>c.regle).length;
   document.getElementById('cre-attente') && (document.getElementById('cre-attente').textContent = attente);
-  document.getElementById('cre-montant') && (document.getElementById('cre-montant').textContent = fmtXAF(montantTotal));
+  document.getElementById('cre-montant-kpi') && (document.getElementById('cre-montant-kpi').textContent = fmtXAF(montantTotal));
   document.getElementById('cre-regle')   && (document.getElementById('cre-regle').textContent   = regle);
 
   const el = document.getElementById('creances-list');
@@ -3669,14 +3675,25 @@ function renderCreances() {
 }
 
 function saveCreance() {
-  const nom     = document.getElementById('cre-nom').value.trim();
-  const montant = parseFloat(document.getElementById('cre-montant').value)||0;
-  const date    = document.getElementById('cre-date').value;
-  const notes   = document.getElementById('cre-notes').value.trim();
-  if(!nom||!montant) { showToast('❌ Nom et montant requis'); return; }
-  state.creances.push({id:Date.now(),nom,montant,date,notes,regle:false});
-  save('creances'); closeModal('modal-creance'); renderCreances(); updateBadges();
-  clearForm(['cre-nom','cre-montant','cre-date','cre-notes']); showToast('✅ Créance ajoutée');
+  const modal   = document.getElementById('modal-creance');
+  const nom     = modal.querySelector('#cre-nom').value.trim();
+  const montant = parseFloat(modal.querySelector('#cre-montant').value)||0;
+  const date    = modal.querySelector('#cre-date').value;
+  const notes   = modal.querySelector('#cre-notes').value.trim();
+  if(!nom)     { showToast('❌ Nom du débiteur requis'); return; }
+  if(!montant) { showToast('❌ Montant requis'); return; }
+  if(!state.creances) state.creances = [];
+  state.creances.push({id:Date.now(), nom, montant, date, notes, regle:false});
+  save('creances');
+  closeModal('modal-creance');
+  renderCreances();
+  updateBadges();
+  // Reset les champs du modal
+  modal.querySelector('#cre-nom').value    = '';
+  modal.querySelector('#cre-montant').value= '';
+  modal.querySelector('#cre-date').value   = '';
+  modal.querySelector('#cre-notes').value  = '';
+  showToast('✅ Créance ajoutée');
 }
 
 function reglerCreance(i) {
@@ -3776,6 +3793,272 @@ function resetCourses() {
   save('courses'); renderCourses(); showToast('🔄 Liste réinitialisée');
 }
 
+
+// ════════════════════════════════════════
+// ══ BACKUP / EXPORT / IMPORT ══
+// ════════════════════════════════════════
+
+const BACKUP_SETS = {
+  full:     ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth',
+             'childMeds','childNotes','childActivites','objectifs','dettes','maintenance',
+             'engagements','ressources','creances','courses','childObjectifs','childTasks','childBesoins'],
+  finances: ['budget','dettes','ressources','creances','objectifs'],
+  maison:   ['stocks','taches','courses','maintenance','chantiers']
+};
+
+function exportBackup(type='full') {
+  const keys = BACKUP_SETS[type] || BACKUP_SETS.full;
+  const data = { _meta:{ type, date: new Date().toISOString(), version:'homebase-v1', keys } };
+  let total = 0;
+  keys.forEach(k => { data[k] = state[k]; if(Array.isArray(state[k])) total += state[k].length; });
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `homebase-${type}-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  const info = document.getElementById('export-info');
+  if(info) info.textContent = `✅ ${total} entrées · ${keys.length} catégories exportées`;
+  showToast(`✅ Export ${type} téléchargé !`);
+}
+
+let _pendingImport = null;
+
+function handleBackupFile(input) {
+  const file = input.files[0]; if(!file) return;
+  readBackupFile(file);
+}
+
+function handleBackupDrop(e) {
+  e.preventDefault();
+  document.getElementById('backup-drop-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(file && file.name.endsWith('.json')) readBackupFile(file);
+  else showToast('❌ Fichier JSON requis');
+}
+
+function readBackupFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!data._meta && !data._app) { showToast('❌ Format invalide'); return; }
+      _pendingImport = data;
+      const meta = data._meta || { type:'legacy', date:data._date||'?', keys:Object.keys(data).filter(k=>!k.startsWith('_')) };
+      const total = (meta.keys||[]).reduce((a,k)=>a+(Array.isArray(data[k])?data[k].length:typeof data[k]==='object'?1:0),0);
+      document.getElementById('import-info').innerHTML =
+        `<i class="fa-solid fa-box-archive"></i> <strong>Backup ${meta.type||'complet'}</strong> du ${(meta.date||'').split('T')[0]||'?'}<br>
+         ${meta.keys?.length||0} catégories · ~${total} entrées<br>
+         <strong>⚠️ Cette action remplace vos données actuelles.</strong>`;
+      document.getElementById('import-preview').style.display = 'block';
+      document.getElementById('import-success').style.display = 'none';
+    } catch(err) { showToast('❌ Fichier JSON invalide'); }
+  };
+  reader.readAsText(file);
+}
+
+async function confirmImport() {
+  if(!_pendingImport) return;
+  const data = _pendingImport;
+  const keys = data._meta?.keys || Object.keys(data).filter(k=>!k.startsWith('_'));
+  for(const k of keys) {
+    if(data[k] !== undefined && state.hasOwnProperty(k)) {
+      state[k] = data[k]; await save(k);
+    }
+  }
+  _pendingImport = null;
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-success').style.display = 'block';
+  document.getElementById('backup-file-input').value = '';
+  renderAll(); updateBadges();
+  showToast('✅ Import réussi ! Données restaurées.');
+}
+
+function cancelImport() {
+  _pendingImport = null;
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('backup-file-input').value = '';
+}
+
+// ════════════════════════════════════════
+// ══ RECHERCHE GLOBALE ══
+// ════════════════════════════════════════
+
+const SEARCH_SOURCES = [
+  { key:'taches',     icon:'fa-list-check',          label:'Tâche',      fields:['nom','qui'],           page:'taches' },
+  { key:'locatifs',   icon:'fa-building',             label:'Locatif',    fields:['nom','locataire'],     page:'locatifs' },
+  { key:'dettes',     icon:'fa-credit-card',          label:'Dette',      fields:['nom','creancier'],     page:'dettes' },
+  { key:'stocks',     icon:'fa-box',                  label:'Stock',      fields:['nom','cat'],           page:'stocks' },
+  { key:'objectifs',  icon:'fa-bullseye',             label:'Objectif',   fields:['nom','desc'],          page:'objectifs' },
+  { key:'chantiers',  icon:'fa-helmet-safety',        label:'Chantier',   fields:['nom','statut'],        page:'chantiers' },
+  { key:'events',     icon:'fa-calendar-days',        label:'Événement',  fields:['nom','notes'],         page:'calendrier' },
+  { key:'engagements',icon:'fa-handshake',            label:'Engagement', fields:['nom','qui'],           page:'engagements' },
+  { key:'maintenance',icon:'fa-screwdriver-wrench',   label:'Maintenance',fields:['nom','bien'],          page:'maintenance' },
+  { key:'ressources', icon:'fa-sack-dollar',          label:'Ressource',  fields:['desc','source'],       page:'ressources' },
+  { key:'creances',   icon:'fa-file-invoice-dollar',  label:'Créance',    fields:['nom','notes'],         page:'creances' },
+  { key:'courses',    icon:'fa-basket-shopping',      label:'Course',     fields:['nom','cat'],           page:'courses' },
+];
+
+let _searchTimer = null;
+
+function globalSearch(q) {
+  clearTimeout(_searchTimer);
+  if(!q || q.trim().length < 2) { hideSearchResults(); return; }
+  _searchTimer = setTimeout(() => _doSearch(q.trim().toLowerCase()), 180);
+}
+
+function globalSearchFocus() {
+  const q = document.getElementById('global-search')?.value||'';
+  if(q.trim().length >= 2) showSearchResults();
+}
+
+function _doSearch(q) {
+  const results = [];
+  for(const src of SEARCH_SOURCES) {
+    const items = state[src.key]||[];
+    if(!Array.isArray(items)) continue;
+    for(const item of items) {
+      const text = src.fields.map(f=>(item[f]||'').toString().toLowerCase()).join(' ');
+      if(text.includes(q)) {
+        const main = item[src.fields[0]]||item.nom||item.desc||'?';
+        const sub  = src.fields.slice(1).map(f=>item[f]).filter(Boolean).join(' · ');
+        results.push({ icon:src.icon, label:src.label, title:main, meta:sub, page:src.page });
+      }
+      if(results.length >= 12) break;
+    }
+    if(results.length >= 12) break;
+  }
+  renderSearchResults(results, q);
+}
+
+function renderSearchResults(results, q) {
+  const el = document.getElementById('search-results'); if(!el) return;
+  if(results.length === 0) {
+    el.innerHTML = `<div class="search-empty">Aucun résultat pour "<strong>${q}</strong>"</div>`;
+  } else {
+    el.innerHTML = results.map(r => `
+      <div class="search-result-item" onclick="navigateToSearch('${r.page}')">
+        <i class="fa-solid ${r.icon} sr-icon"></i>
+        <div class="sr-body">
+          <div class="sr-title">${_highlight(r.title, q)}</div>
+          ${r.meta ? `<div class="sr-meta">${r.meta}</div>` : ''}
+        </div>
+        <span class="sr-tag">${r.label}</span>
+      </div>`).join('');
+  }
+  showSearchResults();
+}
+
+function _highlight(text, q) {
+  if(!text) return '';
+  const idx = text.toLowerCase().indexOf(q);
+  if(idx < 0) return text;
+  return text.slice(0,idx)+`<mark style="background:rgba(201,168,76,.3);border-radius:2px">${text.slice(idx,idx+q.length)}</mark>`+text.slice(idx+q.length);
+}
+
+function showSearchResults() { document.getElementById('search-results')?.classList.add('open'); }
+function hideSearchResults()  { document.getElementById('search-results')?.classList.remove('open'); }
+function closeSearchResults() { hideSearchResults(); }
+
+function navigateToSearch(page) {
+  hideSearchResults();
+  const inp = document.getElementById('global-search'); if(inp) inp.value='';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick')?.includes("'"+page+"'")) n.classList.add('active');
+  });
+  renderPage(page);
+}
+
+// ════════════════════════════════════════
+// ══ FILTRES TÂCHES ══
+// ════════════════════════════════════════
+
+function filterTaches() {
+  const q      = (document.getElementById('tache-search')?.value||'').toLowerCase().trim();
+  const prio   = document.getElementById('tache-filter-prio')?.value||'';
+  const statut = document.getElementById('tache-filter-statut')?.value||'';
+  const qui    = document.getElementById('tache-filter-qui')?.value||'';
+  const isFiltered = q || prio || statut || qui;
+
+  if(!isFiltered) { renderTaches(); return; }
+
+  let items = state.taches||[];
+  if(q)     items = items.filter(t=>(t.nom||'').toLowerCase().includes(q)||(t.qui||'').toLowerCase().includes(q));
+  if(prio)  items = items.filter(t=>t.priorite===prio);
+  if(statut==='todo') items = items.filter(t=>!t.done);
+  if(statut==='done') items = items.filter(t=>t.done);
+  if(qui)   items = items.filter(t=>(t.qui||'')===qui);
+
+  const pColors = {haute:'var(--red)',moyenne:'var(--gold)',basse:'var(--accent2)'};
+  const renderList = arr => arr.map(t=>`
+    <div class="task-item ${t.done?'done':''}">
+      <div class="task-priority" style="background:${pColors[t.priorite]||'var(--text3)'}"></div>
+      <div class="task-check ${t.done?'checked':''}" onclick="toggleTache(${t.id})">${t.done?'✓':''}</div>
+      <div>
+        <div class="task-text">${t.nom}</div>
+        <div class="task-meta">${t.qui||''} ${t.date?'· '+t.date:''}</div>
+      </div>
+      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteTache(${t.id})"><i class="fa-solid fa-trash"></i></button>
+    </div>`).join('')||`<div style="color:var(--text3);font-size:.8rem;padding:8px">Aucun résultat</div>`;
+
+  document.getElementById('tasks-high').innerHTML = `<div style="color:var(--text3);font-size:.75rem;margin-bottom:8px;font-family:var(--mono)">${items.length} résultat(s) filtrés</div>${renderList(items)}`;
+  document.getElementById('tasks-med').innerHTML = '';
+  document.getElementById('tasks-low').innerHTML = '';
+  document.getElementById('tasks-done').innerHTML = '';
+}
+
+function updateTacheFilterMembers() {
+  const sel = document.getElementById('tache-filter-qui'); if(!sel) return;
+  const members = [...new Set((state.taches||[]).map(t=>t.qui).filter(Boolean))];
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tous membres</option>' +
+    members.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+}
+
+// ════════════════════════════════════════
+// ══ FILTRES LOCATIFS ══
+// ════════════════════════════════════════
+
+function filterLocatifs() {
+  const q        = (document.getElementById('loc-search')?.value||'').toLowerCase().trim();
+  const statut   = document.getElementById('loc-filter-statut')?.value||'';
+  const paiement = document.getElementById('loc-filter-paiement')?.value||'';
+  const isFiltered = q || statut || paiement;
+
+  if(!isFiltered) { renderLocatifs(); return; }
+
+  let items = state.locatifs||[];
+  if(q)       items = items.filter(l=>(l.nom||'').toLowerCase().includes(q)||(l.locataire||'').toLowerCase().includes(q));
+  if(statut)  items = items.filter(l=>l.statut===statut);
+  if(paiement)items = items.filter(l=>l.paiement===paiement);
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  document.getElementById('locatifs-grid').innerHTML = items.length ? items.map(l => {
+    const reste = (+l.loyer||0) - (+l.loyer_recu||0);
+    const statColors = {occupé:'var(--accent)',libre:'var(--text3)',travaux:'var(--orange)'};
+    let retardTag = '';
+    if(l.paiement==='impayé'&&l.datebutoir){
+      const diff=(new Date(l.datebutoir)-today)/(86400000);
+      if(diff<0) retardTag=`<span class="badge badge-red"><i class="fa-solid fa-triangle-exclamation"></i> Retard ${Math.abs(Math.round(diff))}j</span>`;
+    }
+    return `<div class="card" style="border-top:3px solid ${statColors[l.statut]||'var(--text3)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div><div style="font-weight:700;font-size:1rem">${l.nom}</div>
+          <div style="color:var(--text2);font-size:.78rem">${l.type||''}</div></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+          <span class="badge ${l.statut==='occupé'?'badge-green':l.statut==='libre'?'badge-gray':'badge-orange'}">${l.statut||'?'}</span>${retardTag}
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:8px">${fmtXAF(l.loyer)}<span style="font-size:.7rem;font-weight:400;color:var(--text3)">/mois</span></div>
+      ${l.locataire?`<div style="font-size:.82rem"><i class="fa-solid fa-user fa-fw" style="color:var(--text3)"></i> ${l.locataire}</div>`:''}
+      ${l.contact?`<div style="font-size:.8rem;color:var(--text2)"><i class="fa-solid fa-phone fa-fw" style="color:var(--text3)"></i> ${l.contact}</div>`:''}
+    </div>`;
+  }).join('') : `<div style="color:var(--text3);text-align:center;padding:40px;grid-column:1/-1"><i class="fa-solid fa-magnifying-glass" style="font-size:2rem;margin-bottom:8px"></i><br>Aucun bien correspondant</div>`;
+}
 
 // ══ INIT ══
 checkSession();
