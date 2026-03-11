@@ -226,6 +226,98 @@ tr:hover td { background:var(--bg); }
 .obj-title { font-size:1rem; font-weight:700; margin-bottom:6px; }
 .obj-date { font-size:0.72rem; color:var(--text3); font-family:var(--mono); margin-bottom:10px; }
 
+/* ── ENFANT PROFILE ── */
+.enfant-profile-card {
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+  border-radius:var(--radius); padding:20px 24px;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  box-shadow:0 6px 24px rgba(45,106,79,.25);
+  position:relative; overflow:hidden;
+}
+.enfant-profile-card::before {
+  content:''; position:absolute; right:-20px; top:-20px;
+  width:120px; height:120px; border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+.ep-avatar { font-size:2.8rem; flex-shrink:0; }
+.ep-info { flex:1; min-width:0; }
+.ep-name { font-size:1.3rem; font-weight:800; color:#fff; letter-spacing:-.5px; }
+.ep-sub  { font-size:.8rem; color:rgba(255,255,255,.7); margin-top:4px; }
+.ep-kpis { display:flex; gap:10px; flex-wrap:wrap; }
+.ep-kpi  { background:rgba(255,255,255,.15); border-radius:10px; padding:8px 14px; text-align:center; min-width:60px; }
+.ep-kpi .v { font-size:1.1rem; font-weight:800; color:#fff; font-family:var(--mono); }
+.ep-kpi .l { font-size:.6rem; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+.ep-edit { background:rgba(255,255,255,.2) !important; border-color:rgba(255,255,255,.3) !important; color:#fff !important; }
+
+/* ── ENFANT TABS ── */
+.enfant-tabs {
+  display:flex; gap:4px; margin-bottom:18px;
+  background:var(--bg2); border-radius:14px; padding:4px;
+  overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.enfant-tabs::-webkit-scrollbar { display:none; }
+.etab {
+  padding:8px 16px; border-radius:10px; font-size:.78rem; font-weight:700;
+  cursor:pointer; white-space:nowrap; color:var(--text2);
+  transition:all .2s ease; flex-shrink:0; user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.etab.active { background:var(--card); color:var(--accent); box-shadow:var(--shadow); }
+.etab-content { display:none; animation:fadeIn .25s ease; }
+.etab-content.active { display:block; }
+
+/* ── CHILD TASK ITEM ── */
+.child-task-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--card);
+  border:1px solid var(--border); border-radius:12px;
+  margin-bottom:8px; transition:all .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.child-task-item.done { opacity:.55; }
+.child-task-item.done .ct-nom { text-decoration:line-through; color:var(--text3); }
+.ct-check {
+  width:24px; height:24px; border-radius:7px;
+  border:2px solid var(--border); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer; background:var(--bg); font-size:.9rem;
+}
+.child-task-item.done .ct-check { background:var(--accent); border-color:var(--accent); color:#fff; }
+.ct-info { flex:1; min-width:0; }
+.ct-nom  { font-size:.88rem; font-weight:600; }
+.ct-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:2px; }
+.ct-prio { width:4px; height:36px; border-radius:4px; flex-shrink:0; }
+
+/* ── CHILD OBJECTIF CARD ── */
+.child-obj-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:16px; margin-bottom:12px;
+  border-left:4px solid var(--accent);
+}
+.child-obj-card.done-obj { border-left-color:var(--text3); opacity:.65; }
+
+/* ── CHILD BESOIN ITEM ── */
+.child-besoin-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--card);
+  border:1px solid var(--border); border-radius:12px;
+  margin-bottom:8px; transition:all .18s ease;
+}
+.child-besoin-item.done-b { opacity:.5; }
+.child-besoin-item.done-b .cb-nom { text-decoration:line-through; color:var(--text3); }
+.cb-check {
+  width:24px; height:24px; border-radius:7px;
+  border:2px solid var(--border); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  background:var(--bg); font-size:.9rem;
+}
+.child-besoin-item.done-b .cb-check { background:var(--gold); border-color:var(--gold); color:#fff; }
+.cb-info { flex:1; min-width:0; }
+.cb-nom  { font-size:.88rem; font-weight:600; }
+.cb-meta { font-size:.7rem; color:var(--text3); font-family:var(--mono); margin-top:2px; }
+
 /* ── ENFANT ── */
 .note-circle { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; font-family:var(--mono); }
 
@@ -440,6 +532,59 @@ tr:hover td { background:var(--bg); }
 }
 .mob-drawer-item.active .mob-d-badge { background:rgba(255,255,255,0.3); }
 .mob-drawer-sep { height:1px; background:var(--border); margin:8px 14px; }
+
+/* ── COURSES ── */
+.course-section { margin-bottom:20px; }
+.course-section-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-radius:12px 12px 0 0;
+  font-size:.78rem; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+  font-family:var(--mono); cursor:pointer; user-select:none;
+}
+.course-section-header .cs-badge {
+  background:rgba(255,255,255,.25); color:inherit; font-size:.68rem;
+  padding:2px 8px; border-radius:10px; font-weight:800;
+}
+.course-section-body { border:1px solid var(--border); border-top:none; border-radius:0 0 12px 12px; overflow:hidden; }
+.course-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-bottom:1px solid var(--border);
+  transition:all .2s ease; background:var(--card); cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.course-item:last-child { border-bottom:none; }
+.course-item.done { background:rgba(82,183,136,.04); }
+.course-item.done .ci-nom { text-decoration:line-through; color:var(--text3); }
+.course-item.done .ci-qty { color:var(--text3); }
+.course-item:active { transform:scale(.99); }
+.course-check {
+  width:26px; height:26px; border-radius:8px;
+  border:2px solid var(--border); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1); font-size:1rem;
+  background:var(--bg);
+}
+.course-item.done .course-check { background:var(--accent); border-color:var(--accent); color:#fff; }
+.ci-info { flex:1; min-width:0; }
+.ci-nom { font-size:.88rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ci-qty { font-size:.72rem; color:var(--text2); font-family:var(--mono); margin-top:2px; }
+.ci-note { font-size:.68rem; color:var(--text3); font-style:italic; }
+.ci-prix { text-align:right; flex-shrink:0; }
+.ci-prev { font-size:.72rem; color:var(--text3); font-family:var(--mono); }
+.ci-reel { font-size:.82rem; font-weight:700; color:var(--accent); font-family:var(--mono); }
+.ci-actions { display:flex; gap:4px; flex-shrink:0; }
+.ci-act-btn { width:28px; height:28px; border-radius:7px; background:var(--bg2); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.78rem; transition:var(--transition); color:var(--text2); }
+.ci-act-btn:hover { background:var(--accent); color:#fff; }
+.courses-filter-btn { padding:6px 14px; border-radius:20px; font-size:.75rem; font-weight:700; cursor:pointer; border:1px solid var(--border); background:var(--card); color:var(--text2); transition:var(--transition); white-space:nowrap; }
+.courses-filter-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* ── COURS KPIS ── */
+.c-kpi { display:flex; flex-direction:column; align-items:center; padding:8px 16px; border-radius:10px; background:var(--bg2); min-width:80px; }
+.c-kpi .c-kv { font-family:var(--mono); font-size:1rem; font-weight:800; }
+.c-kpi .c-kl { font-size:.62rem; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
+/* ── PRINT COURSES ── */
+@media print { #mobile-nav,#mobile-menu-overlay,.topbar,.sidebar { display:none!important; } .main { margin:0!important; } }
 
 /* ── CALENDRIER ── */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px;}
@@ -662,6 +807,10 @@ tr:hover td { background:var(--bg); }
       <span>🛒</span><span data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
       <span class="nav-badge" id="badgeStock">0</span>
     </div>
+    <div class="nav-item" onclick="showPage('courses')">
+      <span>🧺</span><span>Liste de Courses</span>
+      <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
+    </div>
     <div class="nav-item" onclick="showPage('budget')">
       <span>💰</span><span data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
     </div>
@@ -866,6 +1015,89 @@ tr:hover td { background:var(--bg); }
   <div class="grid3" id="stock-sections"></div>
 </div>
 
+<!-- ═══════════════════ COURSES ═══════════════════ -->
+<div id="page-courses" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🧺 Liste de Courses</div>
+      <div class="page-sub">Cochez les articles au fur et à mesure de vos achats</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-outline btn-sm" onclick="resetCourses()" title="Tout décocher">🔄 Nouvelle course</button>
+      <button class="btn btn-primary" onclick="openCoursesModal()">+ Ajouter article</button>
+    </div>
+  </div>
+
+  <!-- Barre de progression globale -->
+  <div class="card" style="margin-bottom:20px;padding:16px 20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="font-weight:700;font-size:.95rem">Progression des courses</div>
+      <div id="courses-progress-label" style="font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--accent)">0 / 0 articles</div>
+    </div>
+    <div class="progress-bar" style="height:10px">
+      <div class="progress-fill" id="courses-progress-fill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px" id="courses-kpis-row"></div>
+  </div>
+
+  <!-- Filtre catégories -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="courses-filters"></div>
+
+  <!-- Sections de courses -->
+  <div id="courses-sections"></div>
+</div>
+
+<!-- MODAL COURSES -->
+<div class="modal-overlay" id="modal-courses">
+  <div class="modal">
+    <div class="modal-title">🧺 <span id="mcours-title">Nouvel article</span> <span class="modal-close" onclick="closeModal('modal-courses')">✕</span></div>
+    <input type="hidden" id="cour-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Article *</label>
+        <input class="form-input" id="cour-nom" placeholder="ex: Riz, Savon...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <select class="form-select" id="cour-cat">
+          <option value="Élément de base">🍚 Élément de base</option>
+          <option value="Petit déjeuner">☕ Petit déjeuner</option>
+          <option value="Repas">🍽️ Repas</option>
+          <option value="Assaisonnement">🧂 Assaisonnement</option>
+          <option value="Autre de cuisine">🥘 Autre de cuisine</option>
+          <option value="Hygiène">🧴 Hygiène</option>
+          <option value="Santé">💊 Santé</option>
+          <option value="Projet maison">🏠 Projet maison</option>
+          <option value="Gaz">🔥 Gaz</option>
+          <option value="Autre">📦 Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Quantité</label>
+        <input class="form-input" id="cour-qty" placeholder="ex: 10kg, 2, 1L">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prix prévu (XAF)</label>
+        <input class="form-input" id="cour-prix" type="number" placeholder="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prix réel (XAF) — remplir après achat</label>
+      <input class="form-input" id="cour-prixreel" type="number" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note / Marque</label>
+      <input class="form-input" id="cour-note" placeholder="ex: marque X, magasin Y...">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveCourse()">💾 Enregistrer</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-courses')">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════ BUDGET ═══════════════════ -->
 <div id="page-budget" class="page">
   <div class="page-header-row">
@@ -978,45 +1210,117 @@ tr:hover td { background:var(--bg); }
 
 <!-- ═══════════════════ ENFANT ═══════════════════ -->
 <div id="page-enfant" class="page">
-  <div class="page-header-row">
+
+  <!-- ── Header enfant ── -->
+  <div class="page-header-row" style="margin-bottom:20px">
     <div class="page-header">
-      <div class="page-title" data-fr="Mon Enfant" data-en="My Child">Mon Enfant</div>
-      <div class="page-sub" data-fr="Santé, école et activités" data-en="Health, school and activities">Santé, école et activités</div>
+      <div class="page-title">👶 Mon Enfant</div>
+      <div class="page-sub">Santé, école, objectifs et tâches personnelles</div>
     </div>
   </div>
 
-  <div class="grid3" style="margin-bottom:20px">
-    <div class="card" style="text-align:center">
-      <div style="font-size:3rem;margin-bottom:8px">👦</div>
-      <div style="font-weight:800;font-size:1.1rem" id="child-name">—</div>
-      <div style="color:var(--text2);font-size:0.8rem;margin-top:4px" id="child-age"></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="openModal('modal-child-info')">✏️ <span data-fr="Modifier" data-en="Edit">Modifier</span></button>
+  <!-- ── Profil + KPIs ── -->
+  <div class="enfant-profile-card" style="margin-bottom:20px">
+    <div class="ep-avatar" id="ep-avatar">👦</div>
+    <div class="ep-info">
+      <div class="ep-name" id="child-name">Mon enfant</div>
+      <div class="ep-sub" id="child-age">— ans · —</div>
     </div>
-    <div class="card">
-      <div class="card-title" data-fr="Santé" data-en="Health">Santé</div>
-      <div id="child-health"></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="openModal('modal-child-sante')">+ <span data-fr="Ajouter" data-en="Add">Ajouter</span></button>
-    </div>
-    <div class="card">
-      <div class="card-title" data-fr="Médicaments en stock" data-en="Medicines in stock">Médicaments en stock</div>
-      <div id="child-meds"></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="openModal('modal-child-med')">+ <span data-fr="Ajouter" data-en="Add">Ajouter</span></button>
+    <div class="ep-kpis" id="ep-kpis"></div>
+    <button class="btn btn-outline btn-sm ep-edit" onclick="openModal('modal-child-info')">✏️ Modifier</button>
+  </div>
+
+  <!-- ── Onglets ── -->
+  <div class="enfant-tabs" id="enfant-tabs">
+    <div class="etab active" onclick="switchEnfantTab('sante',this)">💊 Santé</div>
+    <div class="etab" onclick="switchEnfantTab('ecole',this)">📚 École</div>
+    <div class="etab" onclick="switchEnfantTab('objectifs',this)">🎯 Objectifs</div>
+    <div class="etab" onclick="switchEnfantTab('taches',this)">✅ Tâches</div>
+    <div class="etab" onclick="switchEnfantTab('activites',this)">🎮 Activités</div>
+    <div class="etab" onclick="switchEnfantTab('besoins',this)">🛍️ Besoins</div>
+  </div>
+
+  <!-- ── TAB: SANTÉ ── -->
+  <div class="etab-content active" id="etab-sante">
+    <div class="grid2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title" style="margin:0">💊 Médicaments</div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('modal-child-med')">+ Ajouter</button>
+        </div>
+        <div id="child-meds"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title" style="margin:0">🩺 Événements santé</div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('modal-child-sante')">+ Ajouter</button>
+        </div>
+        <div id="child-health"></div>
+      </div>
     </div>
   </div>
 
-  <div class="grid2">
+  <!-- ── TAB: ÉCOLE ── -->
+  <div class="etab-content" id="etab-ecole">
     <div class="card">
-      <div class="card-title" data-fr="📚 Notes scolaires" data-en="📚 School grades">📚 Notes scolaires</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="card-title" style="margin:0">📚 Notes scolaires</div>
+        <button class="btn btn-outline btn-sm" onclick="openModal('modal-child-note')">+ Note</button>
+      </div>
       <div id="child-notes"></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openModal('modal-child-note')">+ <span data-fr="Ajouter note" data-en="Add grade">Ajouter note</span></button>
-    </div>
-    <div class="card">
-      <div class="card-title" data-fr="🎮 Activités" data-en="🎮 Activities">🎮 Activités</div>
-      <div id="child-activities"></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openModal('modal-child-activite')">+ <span data-fr="Ajouter activité" data-en="Add activity">Ajouter activité</span></button>
     </div>
   </div>
+
+  <!-- ── TAB: OBJECTIFS ENFANT ── -->
+  <div class="etab-content" id="etab-objectifs">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="font-weight:700;font-size:.95rem;color:var(--text2)">Objectifs personnels de <span id="obj-child-name">l'enfant</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openChildObjModal()">+ Objectif</button>
+    </div>
+    <div id="child-objectifs-list"></div>
+  </div>
+
+  <!-- ── TAB: TÂCHES ENFANT ── -->
+  <div class="etab-content" id="etab-taches">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:700;font-size:.95rem">Liste de tâches personnelles</div>
+        <div id="child-tasks-progress" style="font-size:.78rem;color:var(--text3);margin-top:3px"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="resetChildTasks()">🔄 Reset</button>
+        <button class="btn btn-primary btn-sm" onclick="openChildTaskModal()">+ Tâche</button>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-bottom:16px;height:8px" id="child-tasks-prog-bar-wrap">
+      <div class="progress-fill" id="child-tasks-prog-fill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%"></div>
+    </div>
+    <div id="child-tasks-list"></div>
+  </div>
+
+  <!-- ── TAB: ACTIVITÉS ── -->
+  <div class="etab-content" id="etab-activites">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div class="card-title" style="margin:0">🎮 Planning des activités</div>
+      <button class="btn btn-outline btn-sm" onclick="openModal('modal-child-activite')">+ Activité</button>
+    </div>
+    <div id="child-activities"></div>
+  </div>
+
+  <!-- ── TAB: BESOINS ── -->
+  <div class="etab-content" id="etab-besoins">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:700;font-size:.95rem">🛍️ Liste de besoins</div>
+        <div style="font-size:.78rem;color:var(--text3);margin-top:3px">Articles à acheter pour l'enfant</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openChildBesoinModal()">+ Besoin</button>
+    </div>
+    <div id="child-besoins-list"></div>
+  </div>
+
 </div>
+
 
 <!-- ═══════════════════ OBJECTIFS ═══════════════════ -->
 <div id="page-objectifs" class="page">
@@ -1768,7 +2072,8 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: []
+  ressources: [], creances: [], courses: [],
+  childObjectifs: [], childTasks: [], childBesoins: []
 };
 
 // ══ FIREBASE ══
@@ -1776,7 +2081,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','childObjectifs','childTasks','childBesoins'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -1786,6 +2091,7 @@ async function loadAll() {
   }
   // Charger les données Excel par défaut si stocks vides
   if (state.stocks.length === 0) loadDefaultStocks();
+  if (state.courses.length === 0) loadDefaultCourses();
   renderAll();
 }
 
@@ -1914,6 +2220,7 @@ function renderPage(id) {
   if (id==='dashboard') renderDashboard();
   if (id==='calendrier') { renderCal(); renderAllEvents(); }
   if (id==='stocks') renderStocks();
+  if (id==='courses') renderCourses();
   if (id==='budget') renderBudget();
   if (id==='dettes') renderDettes();
   if (id==='ressources') renderRessources();
@@ -1930,6 +2237,7 @@ function renderPage(id) {
 function renderAll() {
   renderDashboard();
   renderStocks();
+  renderCourses();
   renderBudget();
   renderTaches();
   renderLocatifs();
@@ -2391,82 +2699,444 @@ function addChantier() {
 }
 
 // ══ ENFANT ══
+// ══ ENFANT ══
+
+let _enfantTab = 'sante';
+
+function switchEnfantTab(tab, el) {
+  _enfantTab = tab;
+  document.querySelectorAll('.etab').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.etab-content').forEach(e=>e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const content = document.getElementById('etab-'+tab);
+  if(content) content.classList.add('active');
+  renderEnfant();
+}
+
 function renderEnfant() {
   const ch = state.child;
-  document.getElementById('child-name').textContent = ch.nom || (lang==='fr'?'Mon enfant':'My child');
-  document.getElementById('child-age').textContent = ch.age ? `${ch.age} ${lang==='fr'?'ans':'years'} — ${ch.classe||''}` : '';
-  document.getElementById('ci-nom').value = ch.nom||'';
-  document.getElementById('ci-age').value = ch.age||9;
-  document.getElementById('ci-classe').value = ch.classe||'';
+  // Profile
+  const nom = ch.nom || 'Mon enfant';
+  const nameEl = document.getElementById('child-name'); if(nameEl) nameEl.textContent = nom;
+  const ageEl  = document.getElementById('child-age');  if(ageEl) ageEl.textContent  = ch.age ? `${ch.age} ans${ch.classe?' · '+ch.classe:''}` : '';
+  const objNEl = document.getElementById('obj-child-name'); if(objNEl) objNEl.textContent = nom;
+  // Avatar emoji based on age
+  const avEl = document.getElementById('ep-avatar');
+  if(avEl) avEl.textContent = (+ch.age||9) < 6 ? '👶' : (+ch.age||9) < 13 ? '🧒' : '👦';
+  // KPIs profile
+  const notes = state.childNotes||[];
+  const moy = notes.length ? (notes.reduce((a,n)=>a+(+n.note||0),0)/notes.length).toFixed(1) : '—';
+  const tasks = state.childTasks||[];
+  const tasksDone = tasks.filter(t=>t.done).length;
+  const objs = state.childObjectifs||[];
+  const objsDone = objs.filter(o=>+o.pct>=100).length;
+  const kpiEl = document.getElementById('ep-kpis');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="ep-kpi"><div class="v">${moy}</div><div class="l">Moy. scolaire</div></div>
+    <div class="ep-kpi"><div class="v">${tasksDone}/${tasks.length}</div><div class="l">Tâches</div></div>
+    <div class="ep-kpi"><div class="v">${objsDone}/${objs.length}</div><div class="l">Objectifs</div></div>
+    <div class="ep-kpi"><div class="v">${(state.childBesoins||[]).filter(b=>!b.done).length}</div><div class="l">Besoins</div></div>
+  `;
 
-  // Santé
-  document.getElementById('child-health').innerHTML = state.childHealth.map((h,i)=>`
+  // Fill form fields
+  const ciNom = document.getElementById('ci-nom'); if(ciNom) ciNom.value=ch.nom||'';
+  const ciAge = document.getElementById('ci-age'); if(ciAge) ciAge.value=ch.age||9;
+  const ciCl  = document.getElementById('ci-classe'); if(ciCl) ciCl.value=ch.classe||'';
+
+  // ── Santé
+  const healthEl = document.getElementById('child-health');
+  if(healthEl) healthEl.innerHTML = (state.childHealth||[]).map((h,i)=>`
     <div class="stock-item">
       <div class="stock-dot" style="background:var(--blue2)"></div>
-      <div><div class="stock-name">${h.desc}</div><div class="stock-qty">${h.type} · ${h.date||''}</div></div>
-      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteChildHealth(${i})">🗑️</button>
-    </div>`).join('') || `<div style="color:var(--text3);font-size:0.8rem">Aucun événement santé</div>`;
+      <div style="flex:1"><div class="stock-name">${h.desc}</div><div class="stock-qty">${h.type}${h.date?' · '+h.date:''}</div></div>
+      <button class="ci-act-btn" onclick="editChildHealth(${i})" title="Modifier">✏️</button>
+      <button class="ci-act-btn" onclick="deleteChildHealth(${i})" title="Supprimer">🗑</button>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucun événement santé</div>';
 
-  // Médicaments
-  document.getElementById('child-meds').innerHTML = state.childMeds.map((m,i)=>`
+  // ── Médicaments
+  const medsEl = document.getElementById('child-meds');
+  if(medsEl) medsEl.innerHTML = (state.childMeds||[]).map((m,i)=>`
     <div class="stock-item">
       <div class="stock-dot" style="background:${m.statut==='ok'?'var(--accent2)':m.statut==='faible'?'var(--gold)':'var(--red)'}"></div>
-      <div class="stock-name">${m.nom}</div>
+      <div class="stock-name" style="flex:1">${m.nom}</div>
       <span class="badge ${m.statut==='ok'?'badge-green':m.statut==='faible'?'badge-gold':'badge-red'}">${m.qty||''}</span>
-      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteChildMed(${i})">🗑️</button>
-    </div>`).join('') || `<div style="color:var(--text3);font-size:0.8rem">Aucun médicament</div>`;
+      <button class="ci-act-btn" onclick="editChildMed(${i})">✏️</button>
+      <button class="ci-act-btn" onclick="deleteChildMed(${i})">🗑</button>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucun médicament</div>';
 
-  // Notes scolaires
-  document.getElementById('child-notes').innerHTML = state.childNotes.map((n,i)=>{
-    const col = n.note>=14?'var(--accent)':n.note>=10?'var(--gold)':'var(--red)';
-    return `<div class="stock-item">
-      <div class="note-circle" style="background:${col}15;color:${col};min-width:40px">${n.note}/20</div>
-      <div><div class="stock-name">${n.mat}</div><div class="stock-qty">${n.date||''}</div></div>
-      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteChildNote(${i})">🗑️</button>
-    </div>`;
-  }).join('') || `<div style="color:var(--text3);font-size:0.8rem">Aucune note enregistrée</div>`;
+  // ── Notes
+  const notesEl = document.getElementById('child-notes');
+  if(notesEl) notesEl.innerHTML = (state.childNotes||[]).length ? `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:10px">
+        <span style="font-size:1.4rem">📊</span>
+        <div><div style="font-weight:700;font-size:.9rem">Moyenne générale</div><div style="font-family:var(--mono);font-size:1.2rem;font-weight:800;color:${moy>=14?'var(--accent)':moy>=10?'var(--gold)':'var(--red)'}">${moy}/20</div></div>
+      </div>
+    </div>` +
+    (state.childNotes||[]).map((n,i)=>{
+      const col=n.note>=14?'var(--accent)':n.note>=10?'var(--gold)':'var(--red)';
+      return `<div class="stock-item">
+        <div class="note-circle" style="background:${col}15;color:${col};min-width:44px;font-size:.9rem">${n.note}/20</div>
+        <div style="flex:1"><div class="stock-name">${n.mat}</div><div class="stock-qty">${n.date||''}</div></div>
+        <button class="ci-act-btn" onclick="editChildNote(${i})">✏️</button>
+        <button class="ci-act-btn" onclick="deleteChildNote(${i})">🗑</button>
+      </div>`;
+    }).join('')
+    : '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucune note enregistrée</div>';
 
-  // Activités
-  document.getElementById('child-activities').innerHTML = state.childActivites.map((a,i)=>`
-    <div class="stock-item">
-      <div class="stock-dot" style="background:var(--purple2)"></div>
-      <div><div class="stock-name">${a.nom}</div><div class="stock-qty">${a.jour||''} ${a.heure?'· '+a.heure:''}</div></div>
-      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteChildActivite(${i})">🗑️</button>
-    </div>`).join('') || `<div style="color:var(--text3);font-size:0.8rem">Aucune activité</div>`;
+  // ── Activités
+  const actEl = document.getElementById('child-activities');
+  const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  if(actEl) actEl.innerHTML = (state.childActivites||[]).length ?
+    `<div style="display:grid;gap:8px">`+
+    (state.childActivites||[]).map((a,i)=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border-radius:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🎮</div>
+        <div style="flex:1"><div class="stock-name">${a.nom}</div><div class="stock-qty">${a.jour||''}${a.heure?' · '+a.heure:''}</div></div>
+        <button class="ci-act-btn" onclick="editChildActivite(${i})">✏️</button>
+        <button class="ci-act-btn" onclick="deleteChildActivite(${i})">🗑</button>
+      </div>`).join('')+`</div>`
+    : '<div style="color:var(--text3);font-size:.8rem;padding:8px 0">Aucune activité planifiée</div>';
+
+  // ── Objectifs enfant
+  renderChildObjectifs();
+  renderChildTasks();
+  renderChildBesoins();
 }
+
+// ── CHILD OBJECTIFS ──
+function renderChildObjectifs() {
+  const el = document.getElementById('child-objectifs-list');
+  if(!el) return;
+  const list = state.childObjectifs||[];
+  if(!list.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun objectif pour le moment<br><small>Cliquez sur + Objectif pour commencer</small></div>'; return; }
+  const CAT_COLORS = {'École':'blue','Sport':'green','Comportement':'gold','Lecture':'purple','Santé':'red','Autre':'gray'};
+  el.innerHTML = list.map((o,i)=>{
+    const pct = +o.pct||0;
+    const done = pct>=100;
+    const col = done?'var(--text3)':pct>=50?'var(--accent)':'var(--gold)';
+    return `<div class="child-obj-card ${done?'done-obj':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px">
+        <div style="flex:1">
+          <span class="badge badge-${CAT_COLORS[o.cat]||'gray'}" style="margin-bottom:6px">${o.cat||'Autre'}</span>
+          <div style="font-weight:700;font-size:.92rem;margin-top:4px">${o.nom}</div>
+          ${o.desc?`<div style="font-size:.75rem;color:var(--text2);margin-top:3px">${o.desc}</div>`:''}
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="ci-act-btn" onclick="editChildObj(${i})">✏️</button>
+          <button class="ci-act-btn" onclick="deleteChildObj(${i})">🗑</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:.72rem;color:var(--text3)">
+          ${o.date?'📅 '+o.date:''}
+          ${o.reward?'  🎁 '+o.reward:''}
+        </div>
+        <div style="font-family:var(--mono);font-size:.9rem;font-weight:800;color:${col}">${pct}%</div>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="width:${pct}%;background:${done?'var(--text3)':pct>=50?'linear-gradient(90deg,var(--accent),var(--accent2))':'linear-gradient(90deg,var(--gold),#f4d58d)'}"></div>
+      </div>
+      ${done?'<div style="margin-top:8px;font-size:.75rem;color:var(--accent);font-weight:700">✅ Objectif atteint !</div>':''}
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${[0,25,50,75,100].map(p=>`<button class="btn btn-outline btn-sm" style="padding:3px 10px;font-size:.68rem;${pct===p?'background:var(--accent);color:#fff;border-color:var(--accent)':''}" onclick="setChildObjPct(${i},${p})">${p}%</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openChildObjModal() {
+  document.getElementById('mco-title').textContent='Nouvel objectif';
+  document.getElementById('co-edit-id').value='';
+  clearForm(['co-nom','co-desc','co-reward','co-date']);
+  document.getElementById('co-pct').value='';
+  document.getElementById('co-cat').value='École';
+  openModal('modal-child-obj');
+}
+function editChildObj(i) {
+  const o = (state.childObjectifs||[])[i]; if(!o) return;
+  document.getElementById('mco-title').textContent='Modifier objectif';
+  document.getElementById('co-edit-id').value=i;
+  document.getElementById('co-nom').value=o.nom||'';
+  document.getElementById('co-cat').value=o.cat||'École';
+  document.getElementById('co-pct').value=o.pct||0;
+  document.getElementById('co-date').value=o.date||'';
+  document.getElementById('co-reward').value=o.reward||'';
+  document.getElementById('co-desc').value=o.desc||'';
+  openModal('modal-child-obj');
+}
+function saveChildObj() {
+  const nom = document.getElementById('co-nom').value.trim();
+  if(!nom) return showToast('⚠️ Nom requis');
+  const editId = document.getElementById('co-edit-id').value;
+  const data = {
+    nom, cat:document.getElementById('co-cat').value,
+    pct:+document.getElementById('co-pct').value||0,
+    date:document.getElementById('co-date').value,
+    reward:document.getElementById('co-reward').value.trim(),
+    desc:document.getElementById('co-desc').value.trim()
+  };
+  if(editId!=='') {
+    state.childObjectifs[+editId] = data;
+  } else {
+    if(!state.childObjectifs) state.childObjectifs=[];
+    state.childObjectifs.push(data);
+  }
+  save('childObjectifs'); closeModal('modal-child-obj'); renderEnfant();
+  showToast(editId!==''?'✏️ Objectif modifié':'🎯 Objectif ajouté !');
+}
+function deleteChildObj(i) {
+  if(!confirm('Supprimer cet objectif ?')) return;
+  state.childObjectifs.splice(i,1); save('childObjectifs'); renderEnfant();
+}
+function setChildObjPct(i, pct) {
+  if(!state.childObjectifs[i]) return;
+  state.childObjectifs[i].pct=pct; save('childObjectifs');
+  if(pct===100) showToast('🏆 Félicitations ! Objectif atteint !');
+  renderEnfant();
+}
+
+// ── CHILD TASKS ──
+function renderChildTasks() {
+  const el = document.getElementById('child-tasks-list');
+  if(!el) return;
+  const list = state.childTasks||[];
+  const done = list.filter(t=>t.done).length;
+  const pct = list.length ? Math.round(done/list.length*100) : 0;
+  const progFill = document.getElementById('child-tasks-prog-fill');
+  if(progFill) progFill.style.width=pct+'%';
+  const progLbl = document.getElementById('child-tasks-progress');
+  if(progLbl) progLbl.textContent = list.length ? `${done} / ${list.length} tâches réalisées (${pct}%)` : '';
+
+  const PRIO_COLORS = {haute:'var(--red)',normal:'var(--gold)',basse:'var(--accent)'};
+  const sorted = [...list].sort((a,b)=>a.done-b.done || (b.prio==='haute')-(a.prio==='haute'));
+  el.innerHTML = sorted.length ? sorted.map((t,i)=>{
+    const idx = list.indexOf(t);
+    return `<div class="child-task-item ${t.done?'done':''}" id="cht-${t.id||idx}">
+      <div class="ct-prio" style="background:${PRIO_COLORS[t.prio]||'var(--gold)'}"></div>
+      <div class="ct-check" onclick="toggleChildTask(${t.id||idx})">${t.done?'✓':''}</div>
+      <div class="ct-info" onclick="toggleChildTask(${t.id||idx})">
+        <div class="ct-nom">${t.nom}</div>
+        <div class="ct-meta">${t.cat||''}${t.date?' · 📅 '+t.date:''}${t.note?' · '+t.note:''}</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="ci-act-btn" onclick="editChildTask(${t.id||idx})">✏️</button>
+        <button class="ci-act-btn" onclick="deleteChildTask(${t.id||idx})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')
+  : '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune tâche pour le moment</div>';
+}
+function openChildTaskModal() {
+  document.getElementById('mct-title').textContent='Nouvelle tâche';
+  document.getElementById('ct-edit-id').value='';
+  clearForm(['ct-nom','ct-note','ct-date']);
+  document.getElementById('ct-prio').value='normal';
+  document.getElementById('ct-cat').value='École';
+  openModal('modal-child-task');
+}
+function editChildTask(id) {
+  const t=(state.childTasks||[]).find(x=>(x.id||state.childTasks.indexOf(x))===id); if(!t) return;
+  document.getElementById('mct-title').textContent='Modifier tâche';
+  document.getElementById('ct-edit-id').value=id;
+  document.getElementById('ct-nom').value=t.nom||'';
+  document.getElementById('ct-prio').value=t.prio||'normal';
+  document.getElementById('ct-cat').value=t.cat||'École';
+  document.getElementById('ct-date').value=t.date||'';
+  document.getElementById('ct-note').value=t.note||'';
+  openModal('modal-child-task');
+}
+function saveChildTask() {
+  const nom=document.getElementById('ct-nom').value.trim(); if(!nom) return showToast('⚠️ Nom requis');
+  const editId=document.getElementById('ct-edit-id').value;
+  const data={id:editId!==''?+editId:Date.now(),nom,prio:document.getElementById('ct-prio').value,cat:document.getElementById('ct-cat').value,date:document.getElementById('ct-date').value,note:document.getElementById('ct-note').value.trim(),done:false};
+  if(editId!==''){
+    const idx=(state.childTasks||[]).findIndex(t=>t.id===+editId);
+    if(idx>-1){data.done=state.childTasks[idx].done;state.childTasks[idx]=data;}
+  } else { if(!state.childTasks)state.childTasks=[]; state.childTasks.push(data); }
+  save('childTasks'); closeModal('modal-child-task'); renderEnfant();
+  showToast(editId!==''?'✏️ Tâche modifiée':'✅ Tâche ajoutée !');
+}
+function toggleChildTask(id) {
+  const t=(state.childTasks||[]).find(x=>x.id===id); if(!t) return;
+  t.done=!t.done; save('childTasks');
+  if(t.done) showToast('✅ Bien joué !');
+  renderEnfant();
+}
+function deleteChildTask(id) {
+  if(!confirm('Supprimer cette tâche ?')) return;
+  state.childTasks=(state.childTasks||[]).filter(t=>t.id!==id); save('childTasks'); renderEnfant();
+}
+function resetChildTasks() {
+  if(!confirm('Remettre toutes les tâches à zéro ?')) return;
+  (state.childTasks||[]).forEach(t=>t.done=false); save('childTasks'); renderEnfant();
+  showToast('🔄 Tâches remises à zéro');
+}
+
+// ── CHILD BESOINS ──
+function renderChildBesoins() {
+  const el=document.getElementById('child-besoins-list'); if(!el) return;
+  const list=state.childBesoins||[];
+  const totalBudget=list.reduce((a,b)=>a+(b.prix||0),0);
+  const restant=list.filter(b=>!b.done).reduce((a,b)=>a+(b.prix||0),0);
+  const URG_COLORS={urgent:'var(--red)',normal:'var(--gold)',basse:'var(--text3)'};
+  const sorted=[...list].sort((a,b)=>a.done-b.done||(b.urgence==='urgent')-(a.urgence==='urgent'));
+  el.innerHTML = list.length ? `
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="c-kpi"><div class="c-kv" style="color:var(--gold)">${fmtXAF(restant)}</div><div class="c-kl">Reste à acheter</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--text2)">${fmtXAF(totalBudget)}</div><div class="c-kl">Budget total</div></div>
+      <div class="c-kpi"><div class="c-kv" style="color:var(--red)">${list.filter(b=>b.urgence==='urgent'&&!b.done).length}</div><div class="c-kl">Urgents</div></div>
+    </div>` +
+    sorted.map((b,i)=>{
+      const idx=list.indexOf(b);
+      return `<div class="child-besoin-item ${b.done?'done-b':''}">
+        <div class="cb-check" onclick="toggleChildBesoin(${b.id||idx})">${b.done?'✓':''}</div>
+        <div class="cb-info">
+          <div class="cb-nom">${b.nom}</div>
+          <div class="cb-meta">${b.cat||''}${b.note?' · '+b.note:''}</div>
+        </div>
+        ${b.prix?`<div style="font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--gold);flex-shrink:0">${fmtXAF(b.prix)}</div>`:''}
+        ${b.urgence==='urgent'?`<span style="font-size:.65rem;font-weight:800;color:var(--red);background:rgba(193,68,14,.1);padding:2px 7px;border-radius:8px;flex-shrink:0">URGENT</span>`:''}
+        <div style="display:flex;gap:4px">
+          <button class="ci-act-btn" onclick="editChildBesoin(${b.id||idx})">✏️</button>
+          <button class="ci-act-btn" onclick="deleteChildBesoin(${b.id||idx})">🗑</button>
+        </div>
+      </div>`;
+    }).join('')
+  : '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun besoin enregistré</div>';
+}
+function openChildBesoinModal() {
+  document.getElementById('mcb-title').textContent='Nouveau besoin';
+  document.getElementById('cb-edit-id').value='';
+  clearForm(['cb-nom','cb-note']); document.getElementById('cb-prix').value='';
+  document.getElementById('cb-cat').value='Vêtements'; document.getElementById('cb-urgence').value='normal';
+  openModal('modal-child-besoin');
+}
+function editChildBesoin(id) {
+  const b=(state.childBesoins||[]).find(x=>x.id===id); if(!b) return;
+  document.getElementById('mcb-title').textContent='Modifier besoin';
+  document.getElementById('cb-edit-id').value=id;
+  document.getElementById('cb-nom').value=b.nom||'';
+  document.getElementById('cb-cat').value=b.cat||'Vêtements';
+  document.getElementById('cb-prix').value=b.prix||'';
+  document.getElementById('cb-urgence').value=b.urgence||'normal';
+  document.getElementById('cb-note').value=b.note||'';
+  openModal('modal-child-besoin');
+}
+function saveChildBesoin() {
+  const nom=document.getElementById('cb-nom').value.trim(); if(!nom) return showToast('⚠️ Nom requis');
+  const editId=document.getElementById('cb-edit-id').value;
+  const data={id:editId!==''?+editId:Date.now(),nom,cat:document.getElementById('cb-cat').value,prix:+document.getElementById('cb-prix').value||0,urgence:document.getElementById('cb-urgence').value,note:document.getElementById('cb-note').value.trim(),done:false};
+  if(editId!==''){
+    const idx=(state.childBesoins||[]).findIndex(b=>b.id===+editId);
+    if(idx>-1){data.done=state.childBesoins[idx].done;state.childBesoins[idx]=data;}
+  } else { if(!state.childBesoins)state.childBesoins=[]; state.childBesoins.push(data); }
+  save('childBesoins'); closeModal('modal-child-besoin'); renderEnfant();
+  showToast(editId!==''?'✏️ Besoin modifié':'🛍️ Besoin ajouté !');
+}
+function toggleChildBesoin(id) {
+  const b=(state.childBesoins||[]).find(x=>x.id===id); if(!b) return;
+  b.done=!b.done; save('childBesoins'); renderEnfant();
+  if(b.done) showToast('✅ '+b.nom+' acheté !');
+}
+function deleteChildBesoin(id) {
+  if(!confirm('Supprimer ce besoin ?')) return;
+  state.childBesoins=(state.childBesoins||[]).filter(b=>b.id!==id); save('childBesoins'); renderEnfant();
+}
+
+// ── HEALTH edit ──
+function editChildHealth(i) {
+  const h=(state.childHealth||[])[i]; if(!h) return;
+  document.getElementById('cs-type').value=h.type||'';
+  document.getElementById('cs-desc').value=h.desc||'';
+  document.getElementById('cs-date').value=h.date||'';
+  openModal('modal-child-sante');
+  document.getElementById('modal-child-sante').dataset.editIdx=i;
+}
+function addChildSante() {
+  const desc=v('cs-desc'); if(!desc) return showToast('❌ Description requise');
+  const modal=document.getElementById('modal-child-sante');
+  const editIdx=modal.dataset.editIdx;
+  const data={type:v('cs-type'),desc,date:v('cs-date')};
+  if(editIdx!==undefined&&editIdx!==''){
+    state.childHealth[+editIdx]=data; delete modal.dataset.editIdx;
+  } else { state.childHealth.push(data); }
+  save('childHealth'); closeModal('modal-child-sante'); renderEnfant(); showToast('✅ Sauvegardé');
+  clearForm(['cs-desc','cs-date']);
+}
+
+// ── MED edit ──
+function editChildMed(i) {
+  const m=(state.childMeds||[])[i]; if(!m) return;
+  document.getElementById('cm-nom').value=m.nom||'';
+  document.getElementById('cm-qty').value=m.qty||'';
+  document.getElementById('cm-statut').value=m.statut||'ok';
+  openModal('modal-child-med');
+  document.getElementById('modal-child-med').dataset.editIdx=i;
+}
+function addChildMed() {
+  const nom=v('cm-nom'); if(!nom) return showToast('❌ Nom requis');
+  const modal=document.getElementById('modal-child-med');
+  const editIdx=modal.dataset.editIdx;
+  const data={nom,qty:v('cm-qty'),statut:v('cm-statut')};
+  if(editIdx!==undefined&&editIdx!==''){
+    state.childMeds[+editIdx]=data; delete modal.dataset.editIdx;
+  } else { state.childMeds.push(data); }
+  save('childMeds'); closeModal('modal-child-med'); renderEnfant(); showToast('✅ Sauvegardé');
+  clearForm(['cm-nom','cm-qty']);
+}
+
+// ── NOTE edit ──
+function editChildNote(i) {
+  const n=(state.childNotes||[])[i]; if(!n) return;
+  document.getElementById('cn-mat').value=n.mat||'';
+  document.getElementById('cn-note').value=n.note||'';
+  document.getElementById('cn-date').value=n.date||'';
+  openModal('modal-child-note');
+  document.getElementById('modal-child-note').dataset.editIdx=i;
+}
+function addChildNote() {
+  const mat=v('cn-mat'); if(!mat) return showToast('❌ Matière requise');
+  const modal=document.getElementById('modal-child-note');
+  const editIdx=modal.dataset.editIdx;
+  const data={mat,note:+v('cn-note')||0,date:v('cn-date')};
+  if(editIdx!==undefined&&editIdx!==''){
+    state.childNotes[+editIdx]=data; delete modal.dataset.editIdx;
+  } else { state.childNotes.push(data); }
+  save('childNotes'); closeModal('modal-child-note'); renderEnfant(); showToast('✅ Note ajoutée');
+  clearForm(['cn-mat','cn-note','cn-date']);
+}
+
+// ── ACTIVITE edit ──
+function editChildActivite(i) {
+  const a=(state.childActivites||[])[i]; if(!a) return;
+  document.getElementById('ca-nom').value=a.nom||'';
+  document.getElementById('ca-jour').value=a.jour||'';
+  document.getElementById('ca-heure').value=a.heure||'';
+  openModal('modal-child-activite');
+  document.getElementById('modal-child-activite').dataset.editIdx=i;
+}
+function addChildActivite() {
+  const nom=v('ca-nom'); if(!nom) return showToast('❌ Nom requis');
+  const modal=document.getElementById('modal-child-activite');
+  const editIdx=modal.dataset.editIdx;
+  const data={nom,jour:v('ca-jour'),heure:v('ca-heure')};
+  if(editIdx!==undefined&&editIdx!==''){
+    state.childActivites[+editIdx]=data; delete modal.dataset.editIdx;
+  } else { state.childActivites.push(data); }
+  save('childActivites'); closeModal('modal-child-activite'); renderEnfant(); showToast('✅ Activité ajoutée');
+  clearForm(['ca-nom','ca-jour','ca-heure']);
+}
+
+function deleteChildHealth(i){state.childHealth.splice(i,1);save('childHealth');renderEnfant();}
+function deleteChildMed(i){state.childMeds.splice(i,1);save('childMeds');renderEnfant();}
+function deleteChildNote(i){state.childNotes.splice(i,1);save('childNotes');renderEnfant();}
+function deleteChildActivite(i){state.childActivites.splice(i,1);save('childActivites');renderEnfant();}
 
 function saveChildInfo() {
   state.child = {nom:v('ci-nom'),age:+v('ci-age')||9,classe:v('ci-classe')};
   save('child'); closeModal('modal-child-info'); renderEnfant(); showToast('✅ Infos sauvegardées');
 }
-function addChildSante() {
-  const desc = v('cs-desc'); if (!desc) return showToast('❌ Description requise');
-  state.childHealth.push({type:v('cs-type'),desc,date:v('cs-date')});
-  save('childHealth'); closeModal('modal-child-sante'); renderEnfant(); showToast('✅ Ajouté');
-  clearForm(['cs-desc','cs-date']);
-}
-function addChildMed() {
-  const nom = v('cm-nom'); if (!nom) return showToast('❌ Nom requis');
-  state.childMeds.push({nom,qty:v('cm-qty'),statut:v('cm-statut')});
-  save('childMeds'); closeModal('modal-child-med'); renderEnfant(); showToast('✅ Médicament ajouté');
-  clearForm(['cm-nom','cm-qty']);
-}
-function addChildNote() {
-  const mat = v('cn-mat'); if (!mat) return showToast('❌ Matière requise');
-  state.childNotes.push({mat,note:+v('cn-note')||0,date:v('cn-date')});
-  save('childNotes'); closeModal('modal-child-note'); renderEnfant(); showToast('✅ Note ajoutée');
-  clearForm(['cn-mat','cn-note','cn-date']);
-}
-function addChildActivite() {
-  const nom = v('ca-nom'); if (!nom) return showToast('❌ Nom requis');
-  state.childActivites.push({nom,jour:v('ca-jour'),heure:v('ca-heure')});
-  save('childActivites'); closeModal('modal-child-activite'); renderEnfant(); showToast('✅ Activité ajoutée');
-  clearForm(['ca-nom','ca-jour','ca-heure']);
-}
-function deleteChildHealth(i){state.childHealth.splice(i,1);save('childHealth');renderEnfant();}
-function deleteChildMed(i){state.childMeds.splice(i,1);save('childMeds');renderEnfant();}
-function deleteChildNote(i){state.childNotes.splice(i,1);save('childNotes');renderEnfant();}
-function deleteChildActivite(i){state.childActivites.splice(i,1);save('childActivites');renderEnfant();}
 
 // ══ OBJECTIFS ══
 function renderObjectifs() {
@@ -3598,6 +4268,268 @@ function resetCreanceModal() {
   clearForm(['cre-nom','cre-montant','cre-date','cre-contact','cre-desc']);
 }
 
+// ══════════════════════════════════════════════
+//  COURSES — Liste de Courses
+// ══════════════════════════════════════════════
+
+const CAT_COURSES = {
+  'Élément de base':  { icon:'🍚', color:'#2D6A4F', bg:'rgba(45,106,79,.12)' },
+  'Petit déjeuner':   { icon:'☕', color:'#8B4513', bg:'rgba(139,69,19,.12)' },
+  'Repas':            { icon:'🍽️', color:'#1B4F72', bg:'rgba(27,79,114,.12)' },
+  'Assaisonnement':   { icon:'🧂', color:'#6C3483', bg:'rgba(108,52,131,.12)' },
+  'Autre de cuisine': { icon:'🥘', color:'#CA6702', bg:'rgba(202,103,2,.12)' },
+  'Hygiène':          { icon:'🧴', color:'#117A8B', bg:'rgba(17,122,139,.12)' },
+  'Santé':            { icon:'💊', color:'#C1440E', bg:'rgba(193,68,14,.12)' },
+  'Projet maison':    { icon:'🏠', color:'#5D6D7E', bg:'rgba(93,109,126,.12)' },
+  'Gaz':              { icon:'🔥', color:'#E74C3C', bg:'rgba(231,76,60,.12)' },
+  'Autre':            { icon:'📦', color:'#7F8C8D', bg:'rgba(127,140,141,.12)' },
+};
+
+let _coursesFilter = 'Toutes';
+
+function loadDefaultCourses() {
+  state.courses = [
+    // ── Élément de base
+    {id:Date.now()+1,  nom:'Riz',               cat:'Élément de base', qty:'10kg',    prix:11000, prixreel:0, note:'', done:false},
+    {id:Date.now()+2,  nom:'Gaz',               cat:'Gaz',             qty:'35kg',    prix:5000,  prixreel:0, note:'Bouteille à recharger', done:false},
+    {id:Date.now()+3,  nom:'Huile',             cat:'Élément de base', qty:'4L',      prix:4000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+4,  nom:'Sel',               cat:'Élément de base', qty:'1kg',     prix:850,   prixreel:0, note:'', done:false},
+    // ── Petit déjeuner
+    {id:Date.now()+5,  nom:'Sucre',             cat:'Petit déjeuner',  qty:'2kg',     prix:2000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+6,  nom:'Saucisson',         cat:'Petit déjeuner',  qty:'1,5kg',   prix:3000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+7,  nom:'Beurre',            cat:'Petit déjeuner',  qty:'2,5kg',   prix:6500,  prixreel:0, note:'', done:false},
+    {id:Date.now()+8,  nom:'Lait',              cat:'Petit déjeuner',  qty:'2kg',     prix:3400,  prixreel:0, note:'', done:false},
+    {id:Date.now()+9,  nom:'Cacao',             cat:'Petit déjeuner',  qty:'300g',    prix:2100,  prixreel:0, note:'', done:false},
+    // ── Repas
+    {id:Date.now()+10, nom:'Viandes (9kg)',      cat:'Repas',           qty:'1,2,2,2', prix:10000, prixreel:0, note:'Bœuf, poulet, porc', done:false},
+    {id:Date.now()+11, nom:'Poisson (3kg)',      cat:'Repas',           qty:'1,1,1',   prix:6000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+12, nom:'Légumes (3kg)',      cat:'Repas',           qty:'1,1,2',   prix:4000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+13, nom:'Spaghetti (2kg)',    cat:'Repas',           qty:'0,5×4',   prix:2000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+14, nom:'Palette d\'œufs',   cat:'Repas',           qty:'32',      prix:3000,  prixreel:0, note:'', done:false},
+    // ── Assaisonnement
+    {id:Date.now()+15, nom:'Tomate',             cat:'Assaisonnement',  qty:'',        prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+16, nom:'Oignon',             cat:'Assaisonnement',  qty:'',        prix:300,   prixreel:0, note:'', done:false},
+    {id:Date.now()+17, nom:'Cube',               cat:'Assaisonnement',  qty:'10',      prix:500,   prixreel:0, note:'', done:false},
+    {id:Date.now()+18, nom:'Poivron',            cat:'Assaisonnement',  qty:'',        prix:500,   prixreel:0, note:'', done:false},
+    {id:Date.now()+19, nom:'Poivre',             cat:'Assaisonnement',  qty:'',        prix:300,   prixreel:0, note:'', done:false},
+    {id:Date.now()+20, nom:'Ail',                cat:'Assaisonnement',  qty:'',        prix:500,   prixreel:0, note:'', done:false},
+    // ── Autre de cuisine
+    {id:Date.now()+21, nom:'Patte d\'arachide',  cat:'Autre de cuisine',qty:'1',       prix:5000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+22, nom:'Chocolat',           cat:'Autre de cuisine',qty:'1',       prix:3000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+23, nom:'Piment',             cat:'Autre de cuisine',qty:'',        prix:500,   prixreel:0, note:'', done:false},
+    {id:Date.now()+24, nom:'Allumette',          cat:'Autre de cuisine',qty:'4',       prix:200,   prixreel:0, note:'', done:false},
+    // ── Hygiène
+    {id:Date.now()+25, nom:'Savons',             cat:'Hygiène',         qty:'4',       prix:1200,  prixreel:0, note:'', done:false},
+    {id:Date.now()+26, nom:'Savon en poudre',    cat:'Hygiène',         qty:'1kg',     prix:1500,  prixreel:0, note:'', done:false},
+    {id:Date.now()+27, nom:'Savon liquide',      cat:'Hygiène',         qty:'1L',      prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+28, nom:'Savon du sol',       cat:'Hygiène',         qty:'1L',      prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+29, nom:'Savon des vitres',   cat:'Hygiène',         qty:'1L',      prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+30, nom:'Papier Toilette (PQ)',cat:'Hygiène',        qty:'6',       prix:1700,  prixreel:0, note:'', done:false},
+    {id:Date.now()+31, nom:'Lave-marmite D',     cat:'Hygiène',         qty:'2',       prix:200,   prixreel:0, note:'', done:false},
+    {id:Date.now()+32, nom:'Lave-marmite V',     cat:'Hygiène',         qty:'2',       prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+33, nom:'Éponge',             cat:'Hygiène',         qty:'2',       prix:700,   prixreel:0, note:'', done:false},
+    {id:Date.now()+34, nom:'Senteur',            cat:'Hygiène',         qty:'4',       prix:4000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+35, nom:'Serpillère',         cat:'Hygiène',         qty:'1',       prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+36, nom:'Balai',              cat:'Hygiène',         qty:'1',       prix:2000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+37, nom:'Balai brosse',       cat:'Hygiène',         qty:'1',       prix:2000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+38, nom:'Sachet poubelle',    cat:'Hygiène',         qty:'1',       prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+39, nom:'Pile crayon',        cat:'Hygiène',         qty:'8',       prix:1000,  prixreel:0, note:'', done:false},
+    {id:Date.now()+40, nom:'Lave marmite',       cat:'Hygiène',         qty:'2',       prix:400,   prixreel:0, note:'', done:false},
+    // ── Santé
+    {id:Date.now()+41, nom:'Méd. verre terre',   cat:'Santé',           qty:'3',       prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+42, nom:'Alcool',             cat:'Santé',           qty:'35L',     prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+43, nom:'Sparadra',           cat:'Santé',           qty:'1',       prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+44, nom:'Compresse',          cat:'Santé',           qty:'1',       prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+45, nom:'Bétadine',           cat:'Santé',           qty:'1L',      prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+46, nom:'Bande médicale',     cat:'Santé',           qty:'2',       prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+47, nom:'Budget médical',     cat:'Santé',           qty:'1',       prix:0,     prixreel:0, note:'', done:false},
+    {id:Date.now()+48, nom:'Doliprane',          cat:'Santé',           qty:'1',       prix:0,     prixreel:0, note:'', done:false},
+  ];
+}
+
+// ── Filtrage actif
+let _coursesActiveFilter = 'Toutes';
+
+function renderCourses() {
+  const list = state.courses || [];
+  const total = list.length;
+  const done  = list.filter(c=>c.done).length;
+  const pct   = total ? Math.round(done/total*100) : 0;
+
+  // Progress bar
+  const pfill = document.getElementById('courses-progress-fill');
+  const plabel = document.getElementById('courses-progress-label');
+  if(pfill) { pfill.style.width = pct+'%'; pfill.style.background = pct===100 ? 'linear-gradient(90deg,#52B788,#2D6A4F)' : 'linear-gradient(90deg,var(--accent),var(--accent2))'; }
+  if(plabel) plabel.textContent = `${done} / ${total} articles`;
+
+  // KPIs
+  const kpiRow = document.getElementById('courses-kpis-row');
+  const totalPrev = list.reduce((a,c)=>a+(c.prix||0),0);
+  const totalReel = list.filter(c=>c.done).reduce((a,c)=>a+(c.prixreel||c.prix||0),0);
+  const reste    = list.filter(c=>!c.done).reduce((a,c)=>a+(c.prix||0),0);
+  if(kpiRow) kpiRow.innerHTML = `
+    <div class="c-kpi"><div class="c-kv" style="color:var(--blue)">${pct}%</div><div class="c-kl">Progression</div></div>
+    <div class="c-kpi"><div class="c-kv" style="color:var(--accent)">${fmtXAF(totalReel)}</div><div class="c-kl">Déjà acheté</div></div>
+    <div class="c-kpi"><div class="c-kv" style="color:var(--gold)">${fmtXAF(reste)}</div><div class="c-kl">Reste à acheter</div></div>
+    <div class="c-kpi"><div class="c-kv" style="color:var(--text2)">${fmtXAF(totalPrev)}</div><div class="c-kl">Budget total</div></div>
+  `;
+
+  // Filtres
+  const cats = ['Toutes', ...Object.keys(CAT_COURSES).filter(c=>list.some(i=>i.cat===c))];
+  const fWrap = document.getElementById('courses-filters');
+  if(fWrap) fWrap.innerHTML = cats.map(c=>`
+    <button class="courses-filter-btn ${_coursesActiveFilter===c?'active':''}" onclick="_setCourseFilter('${c}')">${c==='Toutes'?'🏷️ Toutes':((CAT_COURSES[c]?.icon||'')+ ' '+c)}</button>
+  `).join('');
+
+  // Sections groupées par catégorie
+  const secEl = document.getElementById('courses-sections');
+  if(!secEl) return;
+  const filtered = _coursesActiveFilter==='Toutes' ? list : list.filter(c=>c.cat===_coursesActiveFilter);
+  const groups = {};
+  filtered.forEach(c=>{ if(!groups[c.cat]) groups[c.cat]=[]; groups[c.cat].push(c); });
+
+  // Trier : items non-done en premier dans chaque groupe
+  secEl.innerHTML = Object.keys(groups).map(cat=>{
+    const cfg = CAT_COURSES[cat] || {icon:'📦',color:'#7F8C8D',bg:'rgba(127,140,141,.12)'};
+    const items = groups[cat].slice().sort((a,b)=>a.done-b.done);
+    const catDone = items.filter(i=>i.done).length;
+    const catTotal = items.length;
+    const catPrev = items.reduce((a,i)=>a+(i.prix||0),0);
+    return `
+    <div class="course-section">
+      <div class="course-section-header" style="background:${cfg.bg};color:${cfg.color}" onclick="_toggleCourseSection('cs-${cat.replace(/\s/g,'_')}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem">${cfg.icon}</span>
+          <span>${cat}</span>
+          <span class="cs-badge">${catDone}/${catTotal}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${catPrev ? `<span style="font-family:var(--mono);font-size:.72rem;opacity:.8">${fmtXAF(catPrev)}</span>` : ''}
+          <span style="font-size:.8rem;opacity:.7" id="cs-arr-${cat.replace(/\s/g,'_')}">▼</span>
+        </div>
+      </div>
+      <div class="course-section-body" id="cs-${cat.replace(/\s/g,'_')}">
+        ${items.map(item=>_courseItemHTML(item)).join('')}
+      </div>
+    </div>`;
+  }).join('') || '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun article pour ce filtre</div>';
+
+  // Badge sidebar
+  const restantBadge = list.filter(c=>!c.done).length;
+  const bdg = document.getElementById('badgeCourses');
+  if(bdg) { bdg.textContent=restantBadge; bdg.style.display=restantBadge>0?'':'none'; }
+  syncMobBadges && syncMobBadges();
+}
+
+function _courseItemHTML(item) {
+  return `
+  <div class="course-item ${item.done?'done':''}" id="ci-${item.id}">
+    <div class="course-check" onclick="toggleCourse(${item.id})">${item.done?'✓':''}</div>
+    <div class="ci-info" onclick="toggleCourse(${item.id})">
+      <div class="ci-nom">${item.nom}</div>
+      <div class="ci-qty">${item.qty||''}${item.qty&&item.note?' · ':''}<span class="ci-note">${item.note||''}</span></div>
+    </div>
+    <div class="ci-prix">
+      ${item.prixreel ? `<div class="ci-reel">${fmtXAF(item.prixreel)}</div>` : ''}
+      ${item.prix ? `<div class="ci-prev" style="${item.prixreel?'text-decoration:line-through;opacity:.5':''}">${fmtXAF(item.prix)}</div>` : ''}
+    </div>
+    <div class="ci-actions">
+      <button class="ci-act-btn" onclick="editCourse(${item.id})" title="Modifier">✏️</button>
+      <button class="ci-act-btn" onclick="deleteCourse(${item.id})" title="Supprimer" style="font-size:.7rem">🗑</button>
+    </div>
+  </div>`;
+}
+
+function _setCourseFilter(cat) {
+  _coursesActiveFilter = cat;
+  renderCourses();
+}
+
+function _toggleCourseSection(id) {
+  const el = document.getElementById(id);
+  const cat = id.replace('cs-','').replace(/_/g,' ');
+  const arr = document.getElementById('cs-arr-'+id.replace('cs-',''));
+  if(!el) return;
+  const hidden = el.style.display==='none';
+  el.style.display = hidden ? '' : 'none';
+  if(arr) arr.textContent = hidden ? '▼' : '▶';
+}
+
+function toggleCourse(id) {
+  const c = state.courses.find(x=>x.id===id);
+  if(!c) return;
+  c.done = !c.done;
+  // Animation
+  const el = document.getElementById('ci-'+id);
+  if(el) {
+    el.style.transform='scale(.97)';
+    setTimeout(()=>{ el.style.transform=''; renderCourses(); },150);
+  } else { renderCourses(); }
+  save('courses');
+  if(c.done) showToast('✅ ' + c.nom + ' acheté !');
+}
+
+function openCoursesModal() {
+  document.getElementById('mcours-title').textContent = 'Nouvel article';
+  document.getElementById('cour-edit-id').value = '';
+  clearForm(['cour-nom','cour-qty','cour-note']);
+  document.getElementById('cour-prix').value = '';
+  document.getElementById('cour-prixreel').value = '';
+  document.getElementById('cour-cat').value = 'Élément de base';
+  openModal('modal-courses');
+}
+
+function editCourse(id) {
+  const c = state.courses.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('mcours-title').textContent = 'Modifier article';
+  document.getElementById('cour-edit-id').value = id;
+  document.getElementById('cour-nom').value = c.nom || '';
+  document.getElementById('cour-cat').value = c.cat || 'Élément de base';
+  document.getElementById('cour-qty').value = c.qty || '';
+  document.getElementById('cour-prix').value = c.prix || '';
+  document.getElementById('cour-prixreel').value = c.prixreel || '';
+  document.getElementById('cour-note').value = c.note || '';
+  openModal('modal-courses');
+}
+
+function saveCourse() {
+  const nom = document.getElementById('cour-nom').value.trim();
+  if(!nom) return showToast('⚠️ Le nom est requis');
+  const editId = +document.getElementById('cour-edit-id').value;
+  const data = {
+    nom, cat: document.getElementById('cour-cat').value,
+    qty: document.getElementById('cour-qty').value.trim(),
+    prix: +document.getElementById('cour-prix').value || 0,
+    prixreel: +document.getElementById('cour-prixreel').value || 0,
+    note: document.getElementById('cour-note').value.trim(),
+    done: false,
+  };
+  if(editId) {
+    const idx = state.courses.findIndex(c=>c.id===editId);
+    if(idx>-1) { data.done = state.courses[idx].done; state.courses[idx] = {...data, id:editId}; }
+  } else {
+    data.id = Date.now();
+    state.courses.push(data);
+  }
+  save('courses'); closeModal('modal-courses'); renderCourses();
+  showToast(editId ? '✏️ Article modifié' : '✅ Article ajouté');
+}
+
+function deleteCourse(id) {
+  if(!confirm('Supprimer cet article de la liste ?')) return;
+  state.courses = state.courses.filter(c=>c.id!==id);
+  save('courses'); renderCourses();
+  showToast('Article supprimé');
+}
+
+function resetCourses() {
+  if(!confirm('Décocher tous les articles pour une nouvelle session de courses ?')) return;
+  state.courses.forEach(c=>{ c.done=false; c.prixreel=0; });
+  save('courses'); renderCourses();
+  showToast('🔄 Liste remise à zéro — bonne course !');
+}
+
 // ══ EXPORT BILAN — menu toggle ══
 function toggleExportMenu() {
   const d = document.getElementById('export-dropdown');
@@ -3851,6 +4783,105 @@ initDate();
 loadAll();
 </script>
 
+<!-- ══ MODAL CHILD OBJECTIF ══ -->
+<div class="modal-overlay" id="modal-child-obj" onclick="closeModalOut(event,'modal-child-obj')">
+<div class="modal">
+  <div class="modal-title">🎯 <span id="mco-title">Nouvel objectif</span><span class="modal-close" onclick="closeModal('modal-child-obj')">✕</span></div>
+  <input type="hidden" id="co-edit-id">
+  <div class="form-group"><label class="form-label">Objectif *</label><input class="form-input" id="co-nom" placeholder="Ex: Avoir 16/20 en maths..."></div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="co-cat">
+        <option value="École">📚 École</option>
+        <option value="Sport">⚽ Sport</option>
+        <option value="Comportement">😊 Comportement</option>
+        <option value="Lecture">📖 Lecture</option>
+        <option value="Santé">💊 Santé</option>
+        <option value="Autre">🎯 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Avancement (%)</label>
+      <input class="form-input" id="co-pct" type="number" min="0" max="100" placeholder="0">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Date cible</label><input class="form-input" type="date" id="co-date"></div>
+    <div class="form-group"><label class="form-label">Récompense</label><input class="form-input" id="co-reward" placeholder="Ex: Sortie ciné..."></div>
+  </div>
+  <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="co-desc" placeholder="Détails..." style="min-height:60px"></textarea></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveChildObj()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-child-obj')">Annuler</button>
+  </div>
+</div></div>
+
+<!-- ══ MODAL CHILD TÂCHE ══ -->
+<div class="modal-overlay" id="modal-child-task" onclick="closeModalOut(event,'modal-child-task')">
+<div class="modal">
+  <div class="modal-title">✅ <span id="mct-title">Nouvelle tâche</span><span class="modal-close" onclick="closeModal('modal-child-task')">✕</span></div>
+  <input type="hidden" id="ct-edit-id">
+  <div class="form-group"><label class="form-label">Tâche *</label><input class="form-input" id="ct-nom" placeholder="Ex: Ranger sa chambre, Réviser les maths..."></div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Priorité</label>
+      <select class="form-select" id="ct-prio">
+        <option value="normal">🟡 Normale</option>
+        <option value="haute">🔴 Haute</option>
+        <option value="basse">🟢 Basse</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="ct-cat">
+        <option value="École">📚 École</option>
+        <option value="Maison">🏠 Maison</option>
+        <option value="Sport">⚽ Sport</option>
+        <option value="Santé">💊 Santé</option>
+        <option value="Autre">📌 Autre</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Échéance</label><input class="form-input" type="date" id="ct-date"></div>
+  <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="ct-note" placeholder="Détails supplémentaires..."></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveChildTask()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-child-task')">Annuler</button>
+  </div>
+</div></div>
+
+<!-- ══ MODAL CHILD BESOIN ══ -->
+<div class="modal-overlay" id="modal-child-besoin" onclick="closeModalOut(event,'modal-child-besoin')">
+<div class="modal">
+  <div class="modal-title">🛍️ <span id="mcb-title">Nouveau besoin</span><span class="modal-close" onclick="closeModal('modal-child-besoin')">✕</span></div>
+  <input type="hidden" id="cb-edit-id">
+  <div class="form-group"><label class="form-label">Article *</label><input class="form-input" id="cb-nom" placeholder="Ex: Chaussures de sport, Cartable..."></div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="cb-cat">
+        <option value="Vêtements">👕 Vêtements</option>
+        <option value="Fournitures">📐 Fournitures</option>
+        <option value="Jouets">🎮 Jouets</option>
+        <option value="Sport">⚽ Sport</option>
+        <option value="Santé">💊 Santé</option>
+        <option value="Autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Prix estimé (XAF)</label>
+      <input class="form-input" id="cb-prix" type="number" placeholder="0">
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Priorité</label>
+    <select class="form-select" id="cb-urgence">
+      <option value="normal">Normale</option>
+      <option value="urgent">🔴 Urgent</option>
+      <option value="basse">Peut attendre</option>
+    </select>
+  </div>
+  <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="cb-note" placeholder="Taille, couleur, marque..."></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveChildBesoin()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-child-besoin')">Annuler</button>
+  </div>
+</div></div>
+
 <!-- ══ MOBILE BOTTOM NAV ══ -->
 <nav id="mobile-nav" aria-label="Navigation mobile">
   <div class="mob-nav-btn active" id="mnav-dashboard" onclick="mobNav('dashboard',this)">
@@ -3897,6 +4928,7 @@ loadAll();
     <div class="mob-drawer-section">
       <div class="mob-drawer-label">Maison</div>
       <div class="mob-drawer-item" onclick="mobDrawerNav('stocks')"><span class="mob-d-icon">🛒</span>Stocks &amp; Courses<span class="mob-d-badge" id="mdrawer-badge-stocks" style="display:none">0</span></div>
+      <div class="mob-drawer-item" onclick="mobDrawerNav('courses')"><span class="mob-d-icon">🧺</span>Liste de Courses<span class="mob-d-badge" id="mdrawer-badge-courses" style="display:none">0</span></div>
       <div class="mob-drawer-item" onclick="mobDrawerNav('budget')"><span class="mob-d-icon">💰</span>Budget Maison</div>
       <div class="mob-drawer-item" onclick="mobDrawerNav('taches')"><span class="mob-d-icon">✅</span>Tâches<span class="mob-d-badge" id="mdrawer-badge-taches" style="display:none">0</span></div>
     </div>
@@ -3963,6 +4995,7 @@ function syncMobBadges() {
   const map = {
     'badgeStock':    ['mnav-badge-stocks','mdrawer-badge-stocks'],
     'badgeTaches':   ['mnav-badge-taches','mdrawer-badge-taches'],
+    'badgeCourses':  ['mdrawer-badge-courses'],
     'badgeCreances': ['mdrawer-badge-creances'],
     'badgeDettes':   ['mdrawer-badge-dettes'],
     'badgeMaint':    ['mdrawer-badge-maint'],
