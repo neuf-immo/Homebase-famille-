@@ -520,6 +520,10 @@ tr:hover td { background:var(--bg); }
       <span>🛒</span><span data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
       <span class="nav-badge" id="badgeStock">0</span>
     </div>
+    <div class="nav-item" onclick="showPage('courses')">
+      <span>🧺</span><span>Liste de Courses</span>
+      <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
+    </div>
     <div class="nav-item" onclick="showPage('budget')">
       <span>💰</span><span data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
     </div>
@@ -539,6 +543,13 @@ tr:hover td { background:var(--bg); }
   </div>
   <div class="nav-section">
     <div class="nav-label">Finances</div>
+    <div class="nav-item" onclick="showPage('ressources')">
+      <span>💰</span><span>Ressources</span>
+    </div>
+    <div class="nav-item" onclick="showPage('creances')">
+      <span>📋</span><span>Créances</span>
+      <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
+    </div>
     <div class="nav-item" onclick="showPage('dettes')">
       <span>💳</span><span>Dettes</span>
       <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
@@ -984,6 +995,90 @@ tr:hover td { background:var(--bg); }
   <div id="engagements-list"></div>
 </div>
 
+<!-- ═══════════════════ RESSOURCES ═══════════════════ -->
+<div id="page-ressources" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">💰 Ressources</div>
+      <div class="page-sub">Suivi de toutes vos sources de revenus</div>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('modal-ressource')">+ Ajouter ressource</button>
+  </div>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="kpi green"><div class="kpi-icon">💰</div><div class="kpi-val" id="res-total">0</div><div class="kpi-label">Total mensuel (XAF)</div></div>
+    <div class="kpi blue"><div class="kpi-icon">📊</div><div class="kpi-val" id="res-count">0</div><div class="kpi-label">Nb sources</div></div>
+    <div class="kpi gold"><div class="kpi-icon">📈</div><div class="kpi-val" id="res-avg">0</div><div class="kpi-label">Moyenne / source</div></div>
+  </div>
+  <div class="filter-row">
+    <input class="filter-search" id="res-search" type="text" placeholder="🔍 Filtrer…" oninput="renderRessources()">
+    <select class="form-select" id="res-filter-source" onchange="renderRessources()" style="height:36px;font-size:.82rem">
+      <option value="">Toutes sources</option>
+      <option value="loyer1">🏠 Loyer 1</option>
+      <option value="loyer2">🏠 Loyer 2</option>
+      <option value="neuf-sat">📡 Neuf SAT</option>
+      <option value="neuf-bat">🏗️ Neuf Bat</option>
+      <option value="neuf-ebenisterie">🪵 Neuf Éb.</option>
+      <option value="neuf-clean">🧹 Neuf Clean</option>
+      <option value="neuf-immo">🏢 Neuf Immo</option>
+      <option value="neuf-soudure">⚙️ Neuf Soud.</option>
+      <option value="neuf-service">🛎️ Neuf Serv.</option>
+      <option value="neuf-box">📦 Neuf Box</option>
+      <option value="autre">📋 Autre</option>
+    </select>
+  </div>
+  <div id="ressources-list"></div>
+</div>
+
+<!-- ═══════════════════ CRÉANCES ═══════════════════ -->
+<div id="page-creances" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">📋 Créances</div>
+      <div class="page-sub">Ce que vous devez recevoir</div>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('modal-creance')">+ Ajouter créance</button>
+  </div>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="kpi red"><div class="kpi-icon">⏳</div><div class="kpi-val" id="cre-attente">0</div><div class="kpi-label">En attente</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💸</div><div class="kpi-val" id="cre-montant">0</div><div class="kpi-label">Montant total (XAF)</div></div>
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="cre-regle">0</div><div class="kpi-label">Réglées</div></div>
+  </div>
+  <div class="filter-row">
+    <input class="filter-search" id="cre-search" type="text" placeholder="🔍 Filtrer…" oninput="renderCreances()">
+    <button class="filter-chip active" data-cfilter="all" onclick="setCrFilter(this)">Toutes</button>
+    <button class="filter-chip" data-cfilter="attente" onclick="setCrFilter(this)">⏳ En attente</button>
+    <button class="filter-chip" data-cfilter="retard" onclick="setCrFilter(this)">🔴 En retard</button>
+    <button class="filter-chip" data-cfilter="regle" onclick="setCrFilter(this)">✅ Réglées</button>
+  </div>
+  <div id="creances-list"></div>
+</div>
+
+<!-- ═══════════════════ LISTE DE COURSES ═══════════════════ -->
+<div id="page-courses" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🧺 Liste de Courses</div>
+      <div class="page-sub">Articles à acheter — cochez au fur et à mesure</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="resetCourses()">🔄 Réinitialiser</button>
+      <button class="btn btn-primary" onclick="openModal('modal-course')">+ Article</button>
+    </div>
+  </div>
+  <div class="grid3" style="margin-bottom:16px">
+    <div class="kpi blue"><div class="kpi-icon">🛒</div><div class="kpi-val" id="crs-total">0</div><div class="kpi-label">Total articles</div></div>
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="crs-done">0</div><div class="kpi-label">Cochés</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="crs-budget">0</div><div class="kpi-label">Budget estimé (XAF)</div></div>
+  </div>
+  <div class="filter-row">
+    <input class="filter-search" id="crs-search" type="text" placeholder="🔍 Filtrer articles…" oninput="renderCourses()">
+    <button class="filter-chip active" data-crfilter="all" onclick="setCrsFilter(this)">Tout</button>
+    <button class="filter-chip" data-crfilter="todo" onclick="setCrsFilter(this)">À acheter</button>
+    <button class="filter-chip" data-crfilter="done" onclick="setCrsFilter(this)">✅ Cochés</button>
+  </div>
+  <div id="courses-list"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
@@ -1416,6 +1511,79 @@ tr:hover td { background:var(--bg); }
   <button class="btn btn-primary" style="width:100%" onclick="changePassword()">✅ Enregistrer</button>
 </div></div>
 
+<!-- ═══ MODAL RESSOURCE ═══ -->
+<div id="modal-ressource" class="modal-overlay" onclick="closeModalOut(event,'modal-ressource')">
+<div class="modal">
+  <div class="modal-title">💰 Ressource <span class="modal-close" onclick="closeModal('modal-ressource')">✕</span></div>
+  <div class="form-group"><label class="form-label">Source</label>
+    <select class="form-select" id="res-source">
+      <option value="loyer1">🏠 Loyer 1</option><option value="loyer2">🏠 Loyer 2</option>
+      <option value="neuf-sat">📡 Neuf SAT</option><option value="neuf-bat">🏗️ Neuf Bat</option>
+      <option value="neuf-ebenisterie">🪵 Neuf Éb.</option><option value="neuf-clean">🧹 Neuf Clean</option>
+      <option value="neuf-immo">🏢 Neuf Immo</option><option value="neuf-soudure">⚙️ Neuf Soud.</option>
+      <option value="neuf-service">🛎️ Neuf Serv.</option><option value="neuf-box">📦 Neuf Box</option>
+      <option value="autre">📋 Autre</option>
+    </select>
+  </div>
+  <div class="form-group"><label class="form-label">Montant (XAF)</label>
+    <input class="form-input" id="res-montant" type="number" placeholder="0">
+  </div>
+  <div class="form-group"><label class="form-label">Date</label>
+    <input class="form-input" id="res-date" type="date">
+  </div>
+  <div class="form-group"><label class="form-label">Description</label>
+    <input class="form-input" id="res-desc" placeholder="Note optionnelle">
+  </div>
+  <button class="btn btn-primary" onclick="saveRessource()" style="width:100%">Enregistrer</button>
+</div></div>
+
+<!-- ═══ MODAL CRÉANCE ═══ -->
+<div id="modal-creance" class="modal-overlay" onclick="closeModalOut(event,'modal-creance')">
+<div class="modal">
+  <div class="modal-title">📋 Créance <span class="modal-close" onclick="closeModal('modal-creance')">✕</span></div>
+  <div class="form-group"><label class="form-label">Débiteur (qui vous doit)</label>
+    <input class="form-input" id="cre-nom" placeholder="Nom">
+  </div>
+  <div class="form-group"><label class="form-label">Montant (XAF)</label>
+    <input class="form-input" id="cre-montant" type="number" placeholder="0">
+  </div>
+  <div class="form-group"><label class="form-label">Date échéance</label>
+    <input class="form-input" id="cre-date" type="date">
+  </div>
+  <div class="form-group"><label class="form-label">Notes</label>
+    <input class="form-input" id="cre-notes" placeholder="Contexte…">
+  </div>
+  <button class="btn btn-primary" onclick="saveCreance()" style="width:100%">Enregistrer</button>
+</div></div>
+
+<!-- ═══ MODAL COURSE ═══ -->
+<div id="modal-course" class="modal-overlay" onclick="closeModalOut(event,'modal-course')">
+<div class="modal">
+  <div class="modal-title">🛒 Article <span class="modal-close" onclick="closeModal('modal-course')">✕</span></div>
+  <div class="form-group"><label class="form-label">Nom article</label>
+    <input class="form-input" id="crs-nom" placeholder="Ex: Tomates">
+  </div>
+  <div class="form-group"><label class="form-label">Catégorie</label>
+    <select class="form-select" id="crs-cat">
+      <option value="Fruits & Légumes">🥦 Fruits & Légumes</option>
+      <option value="Viande & Poisson">🥩 Viande & Poisson</option>
+      <option value="Épicerie">🥫 Épicerie</option>
+      <option value="Produits laitiers">🥛 Produits laitiers</option>
+      <option value="Hygiène">🧴 Hygiène</option>
+      <option value="Entretien">🧹 Entretien</option>
+      <option value="Boissons">🥤 Boissons</option>
+      <option value="Autre">📦 Autre</option>
+    </select>
+  </div>
+  <div class="form-group"><label class="form-label">Quantité</label>
+    <input class="form-input" id="crs-qty" placeholder="Ex: 2 kg">
+  </div>
+  <div class="form-group"><label class="form-label">Prix estimé (XAF)</label>
+    <input class="form-input" id="crs-prix" type="number" placeholder="0">
+  </div>
+  <button class="btn btn-primary" onclick="saveCourse()" style="width:100%">Ajouter</button>
+</div></div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -1494,7 +1662,8 @@ const state = {
   stocks: [], budget: [], taches: [], locatifs: [],
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
-  objectifs: [], dettes: [], maintenance: [], engagements: [], events: []
+  objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
+  ressources: [], creances: [], courses: []
 };
 
 // ══ FIREBASE ══
@@ -1502,7 +1671,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -1649,6 +1818,9 @@ function renderPage(id) {
   if (id==='chantiers') renderChantiers();
   if (id==='enfant') renderEnfant();
   if (id==='objectifs') renderObjectifs();
+  if (id==='ressources') renderRessources();
+  if (id==='creances') renderCreances();
+  if (id==='courses') renderCourses();
 }
 
 function renderAll() {
@@ -1663,6 +1835,9 @@ function renderAll() {
   renderDettes();
   renderMaintenance();
   renderEngagements();
+  renderRessources();
+  renderCreances();
+  renderCourses();
   updateBadges();
 }
 
@@ -2163,14 +2338,18 @@ function addObjectif() {
 
 // ══ BADGES ══
 function updateBadges() {
-  const bas    = state.stocks.filter(s=>s.alerte!=='ok').length;
-  const taches = state.taches.filter(t=>!t.done).length;
-  const dettes = (state.dettes||[]).filter(d=>d.statut!=='réglé').length;
-  const maint  = (state.maintenance||[]).filter(m=>!m.done&&m.urgence==='critique').length;
-  const engs   = (state.engagements||[]).filter(e=>!e.done).length;
+  const bas      = state.stocks.filter(s=>s.alerte!=='ok').length;
+  const taches   = state.taches.filter(t=>!t.done).length;
+  const dettes   = (state.dettes||[]).filter(d=>d.statut!=='réglé').length;
+  const maint    = (state.maintenance||[]).filter(m=>!m.done&&m.urgence==='critique').length;
+  const engs     = (state.engagements||[]).filter(e=>!e.done).length;
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const creances = (state.creances||[]).filter(c=>!c.regle&&c.date&&new Date(c.date)<today).length;
+  const courses  = (state.courses||[]).filter(c=>!c.done).length;
   const setBadge = (id,n) => { const el=document.getElementById(id); if(!el) return; el.textContent=n||''; el.style.display=n?'':'none'; };
   setBadge('badgeStock', bas); setBadge('badgeTaches', taches);
   setBadge('badgeDettes', dettes); setBadge('badgeMaint', maint); setBadge('badgeEng', engs);
+  setBadge('badgeCreances', creances); setBadge('badgeCourses', courses);
 }
 
 // ══ HELPERS ══
@@ -3365,6 +3544,238 @@ function setLocFilter(el) {
 }
 
 function filterLocatifs() { renderLocatifs(); }
+
+// ════════════════════════════════════════
+// ══ RESSOURCES ══
+// ════════════════════════════════════════
+
+const SOURCE_LABELS = {
+  'loyer1':'🏠 Loyer 1','loyer2':'🏠 Loyer 2','neuf-sat':'📡 Neuf SAT',
+  'neuf-bat':'🏗️ Neuf Bat','neuf-ebenisterie':'🪵 Neuf Éb.','neuf-clean':'🧹 Neuf Clean',
+  'neuf-immo':'🏢 Neuf Immo','neuf-soudure':'⚙️ Neuf Soud.','neuf-service':'🛎️ Neuf Serv.',
+  'neuf-box':'📦 Neuf Box','autre':'📋 Autre'
+};
+
+function renderRessources() {
+  const q   = (document.getElementById('res-search')?.value||'').toLowerCase();
+  const src = document.getElementById('res-filter-source')?.value||'';
+  let items = state.ressources || [];
+  if(q)   items = items.filter(r=>(r.desc||'').toLowerCase().includes(q)||(SOURCE_LABELS[r.source]||r.source||'').toLowerCase().includes(q));
+  if(src) items = items.filter(r=>r.source===src);
+
+  const total = (state.ressources||[]).reduce((a,b)=>a+(b.montant||0),0);
+  const count = (state.ressources||[]).length;
+  document.getElementById('res-total') && (document.getElementById('res-total').textContent = fmtXAF(total));
+  document.getElementById('res-count') && (document.getElementById('res-count').textContent = count);
+  document.getElementById('res-avg')   && (document.getElementById('res-avg').textContent   = fmtXAF(count?Math.round(total/count):0));
+
+  const el = document.getElementById('ressources-list');
+  if(!el) return;
+  if(!items.length) { el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:40px">Aucune ressource — ajoutez votre première source de revenu</div>`; return; }
+
+  // Grouper par source
+  const grouped = {};
+  items.forEach(r => { const k=r.source||'autre'; if(!grouped[k])grouped[k]=[]; grouped[k].push(r); });
+  el.innerHTML = Object.keys(grouped).map(src => {
+    const rows = grouped[src];
+    const stotal = rows.reduce((a,b)=>a+(b.montant||0),0);
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-weight:700">${SOURCE_LABELS[src]||src}</span>
+        <span style="font-family:var(--mono);font-weight:800;color:var(--gold)">${fmtXAF(stotal)}</span>
+      </div>
+      ${rows.map((r,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border)">
+          <div style="flex:1">
+            <div style="font-size:.83rem">${r.desc||'—'}</div>
+            <div style="font-size:.72rem;color:var(--text3);font-family:var(--mono)">${r.date||''}</div>
+          </div>
+          <span style="font-family:var(--mono);font-weight:700;color:var(--gold)">${fmtXAF(r.montant)}</span>
+          <button class="btn btn-outline btn-icon btn-sm" onclick="deleteRessource(${state.ressources.indexOf(r)})">🗑️</button>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function saveRessource() {
+  const source  = document.getElementById('res-source').value;
+  const montant = parseFloat(document.getElementById('res-montant').value)||0;
+  const date    = document.getElementById('res-date').value;
+  const desc    = document.getElementById('res-desc').value.trim();
+  if(!montant) { showToast('❌ Montant requis'); return; }
+  state.ressources.push({id:Date.now(),source,montant,date,desc});
+  save('ressources'); closeModal('modal-ressource'); renderRessources(); renderDashboard(); updateBadges();
+  clearForm(['res-montant','res-date','res-desc']); showToast('✅ Ressource ajoutée');
+}
+
+function deleteRessource(i) {
+  if(!confirm('Supprimer cette ressource ?')) return;
+  state.ressources.splice(i,1); save('ressources'); renderRessources(); renderDashboard(); updateBadges();
+}
+
+
+// ════════════════════════════════════════
+// ══ CRÉANCES ══
+// ════════════════════════════════════════
+
+let crFilter = 'all';
+function setCrFilter(btn) {
+  crFilter = btn.dataset.cfilter;
+  document.querySelectorAll('[data-cfilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCreances();
+}
+
+function renderCreances() {
+  const q = (document.getElementById('cre-search')?.value||'').toLowerCase();
+  const today = new Date(); today.setHours(0,0,0,0);
+  let items = state.creances || [];
+  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(c.notes||''.toLowerCase(),q));
+  if(crFilter==='attente') items = items.filter(c=>!c.regle && (!c.date || new Date(c.date)>=today));
+  if(crFilter==='retard')  items = items.filter(c=>!c.regle && c.date && new Date(c.date)<today);
+  if(crFilter==='regle')   items = items.filter(c=>c.regle);
+
+  const attente = (state.creances||[]).filter(c=>!c.regle).length;
+  const montantTotal = (state.creances||[]).filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
+  const regle = (state.creances||[]).filter(c=>c.regle).length;
+  document.getElementById('cre-attente') && (document.getElementById('cre-attente').textContent = attente);
+  document.getElementById('cre-montant') && (document.getElementById('cre-montant').textContent = fmtXAF(montantTotal));
+  document.getElementById('cre-regle')   && (document.getElementById('cre-regle').textContent   = regle);
+
+  const el = document.getElementById('creances-list');
+  if(!el) return;
+  if(!items.length) { el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:40px">Aucune créance${crFilter!=='all'?' dans ce filtre':''}</div>`; return; }
+
+  el.innerHTML = items.map(c => {
+    const idx   = state.creances.indexOf(c);
+    const retard = !c.regle && c.date && new Date(c.date) < today;
+    return `<div class="card" style="border-left:4px solid ${c.regle?'var(--accent)':retard?'var(--red)':'var(--gold)'};margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-weight:700">${c.nom}</div>
+          <div style="font-size:.78rem;color:var(--text2)">${c.date?'Échéance : '+c.date:''} ${c.notes?'· '+c.notes:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-weight:800;color:var(--gold);font-size:1.1rem">${fmtXAF(c.montant)}</div>
+          <span class="badge ${c.regle?'badge-green':retard?'badge-red':'badge-orange'}">${c.regle?'Réglée':retard?'En retard':'En attente'}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        ${!c.regle?`<button class="btn btn-outline btn-sm" onclick="reglerCreance(${idx})">✅ Régler</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="deleteCreance(${idx})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveCreance() {
+  const nom     = document.getElementById('cre-nom').value.trim();
+  const montant = parseFloat(document.getElementById('cre-montant').value)||0;
+  const date    = document.getElementById('cre-date').value;
+  const notes   = document.getElementById('cre-notes').value.trim();
+  if(!nom||!montant) { showToast('❌ Nom et montant requis'); return; }
+  state.creances.push({id:Date.now(),nom,montant,date,notes,regle:false});
+  save('creances'); closeModal('modal-creance'); renderCreances(); updateBadges();
+  clearForm(['cre-nom','cre-montant','cre-date','cre-notes']); showToast('✅ Créance ajoutée');
+}
+
+function reglerCreance(i) {
+  state.creances[i].regle = true;
+  save('creances'); renderCreances(); updateBadges(); showToast('✅ Créance marquée réglée');
+}
+
+function deleteCreance(i) {
+  state.creances.splice(i,1); save('creances'); renderCreances(); updateBadges();
+}
+
+
+// ════════════════════════════════════════
+// ══ LISTE DE COURSES ══
+// ════════════════════════════════════════
+
+let crsFilter = 'all';
+function setCrsFilter(btn) {
+  crsFilter = btn.dataset.crfilter;
+  document.querySelectorAll('[data-crfilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCourses();
+}
+
+const CAT_EMOJI = {
+  'Fruits & Légumes':'🥦','Viande & Poisson':'🥩','Épicerie':'🥫',
+  'Produits laitiers':'🥛','Hygiène':'🧴','Entretien':'🧹','Boissons':'🥤','Autre':'📦'
+};
+
+function renderCourses() {
+  const q = (document.getElementById('crs-search')?.value||'').toLowerCase();
+  let items = state.courses || [];
+  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(q)||(c.cat||'').toLowerCase().includes(q));
+  if(crsFilter==='todo') items = items.filter(c=>!c.done);
+  if(crsFilter==='done') items = items.filter(c=>c.done);
+
+  const total  = (state.courses||[]).length;
+  const done   = (state.courses||[]).filter(c=>c.done).length;
+  const budget = (state.courses||[]).filter(c=>!c.done).reduce((a,b)=>a+(b.prix||0),0);
+  document.getElementById('crs-total')  && (document.getElementById('crs-total').textContent  = total);
+  document.getElementById('crs-done')   && (document.getElementById('crs-done').textContent   = done);
+  document.getElementById('crs-budget') && (document.getElementById('crs-budget').textContent = fmtXAF(budget));
+
+  const badge = document.getElementById('badgeCourses');
+  if(badge) { const rem=total-done; badge.textContent=rem; badge.style.display=rem>0?'inline-flex':'none'; }
+
+  const el = document.getElementById('courses-list');
+  if(!el) return;
+  if(!items.length) { el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:40px">Liste vide — ajoutez vos articles</div>`; return; }
+
+  // Grouper par catégorie
+  const grouped = {};
+  items.forEach(c => { if(!grouped[c.cat])grouped[c.cat]=[]; grouped[c.cat].push(c); });
+
+  el.innerHTML = Object.keys(grouped).map(cat => `
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:8px">${CAT_EMOJI[cat]||'📦'} ${cat}</div>
+      ${grouped[cat].map(c => {
+        const idx = state.courses.indexOf(c);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--border);${c.done?'opacity:.5':''}">
+          <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${c.done?'var(--accent)':'var(--border)'};background:${c.done?'var(--accent)':'transparent'};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:.7rem"
+            onclick="toggleCourse(${idx})">${c.done?'✓':''}</div>
+          <div style="flex:1">
+            <div style="font-size:.85rem;${c.done?'text-decoration:line-through':''}">${c.nom}</div>
+            ${c.qty?`<div style="font-size:.72rem;color:var(--text3)">${c.qty}</div>`:''}
+          </div>
+          ${c.prix?`<span style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">${fmtXAF(c.prix)}</span>`:''}
+          <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCourse(${idx})" style="padding:2px 6px">🗑️</button>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function toggleCourse(i) {
+  state.courses[i].done = !state.courses[i].done;
+  save('courses'); renderCourses();
+}
+
+function saveCourse() {
+  const nom  = document.getElementById('crs-nom').value.trim();
+  const cat  = document.getElementById('crs-cat').value;
+  const qty  = document.getElementById('crs-qty').value.trim();
+  const prix = parseFloat(document.getElementById('crs-prix').value)||0;
+  if(!nom) { showToast('❌ Nom requis'); return; }
+  state.courses.push({id:Date.now(),nom,cat,qty,prix,done:false});
+  save('courses'); closeModal('modal-course'); renderCourses();
+  clearForm(['crs-nom','crs-qty','crs-prix']); showToast('✅ Article ajouté');
+}
+
+function deleteCourse(i) {
+  state.courses.splice(i,1); save('courses'); renderCourses();
+}
+
+function resetCourses() {
+  if(!confirm('Décocher tous les articles ?')) return;
+  state.courses.forEach(c=>c.done=false);
+  save('courses'); renderCourses(); showToast('🔄 Liste réinitialisée');
+}
+
 
 // ══ INIT ══
 checkSession();
