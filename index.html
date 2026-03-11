@@ -2733,6 +2733,13 @@ function checkRappels() {
 // ══════════════════════════════════════════════════════
 let currentUser = null;
 
+function hashSimple(str) {
+  // Hash simple côté client (non cryptographique mais suffisant pour usage famille)
+  let hash = 0;
+  for(let i=0;i<str.length;i++){ hash=((hash<<5)-hash)+str.charCodeAt(i); hash|=0; }
+  return 'h'+Math.abs(hash).toString(36);
+}
+
 // Comptes par défaut — stockés dans Firebase sous homebase/users
 const DEFAULT_USERS = [
   { id:'admin', username:'admin', nom:'Administrateur', password: hashSimple('HomeBase2026!'),
@@ -2743,20 +2750,26 @@ const DEFAULT_USERS = [
     role:'member', avatar:'👩', color:'#6C3483', actif:true },
 ];
 
-function hashSimple(str) {
-  // Hash simple côté client (non cryptographique mais suffisant pour usage famille)
-  let hash = 0;
-  for(let i=0;i<str.length;i++){ hash=((hash<<5)-hash)+str.charCodeAt(i); hash|=0; }
-  return 'h'+Math.abs(hash).toString(36);
-}
-
 async function loadUsers() {
-  let users = await fbGet('users');
-  if(!users || (Array.isArray(users)&&users.length===0)) {
-    // Première installation — créer les comptes par défaut
-    users = DEFAULT_USERS;
-    await fbSet('users', users);
+  // 1. Essayer Firebase
+  let users = null;
+  try { users = await fbGet('users'); } catch(e) {}
+
+  // 2. Si Firebase échoue ou vide → localStorage
+  if(!users || (Array.isArray(users) && users.length === 0)) {
+    const cached = localStorage.getItem('hb_users');
+    if(cached) { try { users = JSON.parse(cached); } catch(e){} }
   }
+
+  // 3. Si toujours rien → comptes par défaut
+  if(!users || (Array.isArray(users) && users.length === 0)) {
+    users = DEFAULT_USERS;
+    // Sauvegarder en local immédiatement (pas besoin de Firebase)
+    try { localStorage.setItem('hb_users', JSON.stringify(users)); } catch(e){}
+    // Tenter de sauvegarder sur Firebase (best-effort)
+    fbSet('users', users).catch(()=>{});
+  }
+
   if(Array.isArray(users)) return users;
   return Object.values(users);
 }
@@ -2868,7 +2881,7 @@ function quickSelect(username) {
 
 // ── ADMIN : Gestion des comptes ──
 async function openAdminPanel() {
-  if(currentUser?.role!=='admin') return showToast('❌ Accès réservé à l'administrateur');
+  if(currentUser?.role!=='admin') return showToast("❌ Accès réservé à l'administrateur");
   document.getElementById('user-dropdown').classList.remove('open');
   await renderAdminUsers();
   openModal('modal-admin');
