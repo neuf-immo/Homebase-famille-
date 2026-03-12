@@ -395,6 +395,17 @@ tr:hover td { background:var(--bg); }
 
 /* ── CHANTIER ── */
 .chantier-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); }
+.dep-section { margin-top:14px; border-top:1px solid var(--border); padding-top:12px; }
+.dep-section-title { font-size:.75rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+.dep-item { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); font-size:.8rem; }
+.dep-item:last-child { border-bottom:none; }
+.dep-cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dep-name { flex:1; font-weight:500; }
+.dep-montant { font-family:var(--mono); font-weight:700; color:var(--red); white-space:nowrap; }
+.dep-statut-badge { font-size:.62rem; padding:2px 6px; border-radius:4px; white-space:nowrap; }
+.dep-budget-row { display:flex; justify-content:space-between; align-items:center; font-size:.78rem; margin:10px 0 4px; gap:8px; }
+.dep-budget-bar { height:6px; border-radius:3px; background:var(--bg2); overflow:hidden; margin-bottom:10px; }
+.dep-budget-fill { height:100%; border-radius:3px; transition:width .5s; }
 .chantier-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
 .chantier-pct { font-family:var(--mono); font-size:1.4rem; font-weight:700; }
 
@@ -792,6 +803,11 @@ tr:hover td { background:var(--bg); }
           <span class="nav-lbl">Liste de Courses</span>
           <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
           <span class="nav-tip">Liste de Courses</span>
+        </div>
+        <div class="nav-item" onclick="showPage('projetsmaison')">
+          <i class="fa-solid fa-house-chimney-crack fa-fw"></i>
+          <span class="nav-lbl">Développement du Foyer</span>
+          <span class="nav-tip">Dev. Foyer</span>
         </div>
         <div class="nav-item" onclick="showPage('budget')">
           <i class="fa-solid fa-wallet fa-fw"></i>
@@ -1408,11 +1424,12 @@ tr:hover td { background:var(--bg); }
       <div class="page-title">📋 Créances</div>
       <div class="page-sub">Ce que vous devez recevoir</div>
     </div>
-    <button class="btn btn-primary" onclick="openModal('modal-creance')">+ Ajouter créance</button>
+    <button class="btn btn-primary" onclick="openCreanceModal()">+ Ajouter créance</button>
   </div>
-  <div class="grid3" style="margin-bottom:20px">
-    <div class="kpi red"><div class="kpi-icon">⏳</div><div class="kpi-val" id="cre-attente">0</div><div class="kpi-label">En attente</div></div>
-    <div class="kpi gold"><div class="kpi-icon">💸</div><div class="kpi-val" id="cre-montant-kpi">0</div><div class="kpi-label">Montant total (XAF)</div></div>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi red"><div class="kpi-icon">🔴</div><div class="kpi-val" id="cre-retard">0</div><div class="kpi-label">En retard</div></div>
+    <div class="kpi gold"><div class="kpi-icon">⏳</div><div class="kpi-val" id="cre-attente">0</div><div class="kpi-label">En attente</div></div>
+    <div class="kpi blue"><div class="kpi-icon">💸</div><div class="kpi-val" id="cre-montant-kpi">0</div><div class="kpi-label">Montant total dû</div></div>
     <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="cre-regle">0</div><div class="kpi-label">Réglées</div></div>
   </div>
   <div class="filter-row">
@@ -1519,9 +1536,121 @@ tr:hover td { background:var(--bg); }
   <div id="routines-grid" class="grid2" style="align-items:start"></div>
 </div>
 
+
+<!-- ═══════════════════ DÉVELOPPEMENT DU FOYER ═══════════════════ -->
+<div id="page-projetsmaison" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🏗️ Développement du Foyer</div>
+      <div class="page-sub">Projets d'aménagement, d'équipement et de décoration de la maison</div>
+    </div>
+    <button class="btn btn-primary" onclick="openProjetModal()">+ Nouveau projet</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi green"><div class="kpi-icon">🏗️</div><div class="kpi-val" id="pm-total">0</div><div class="kpi-label">Projets actifs</div></div>
+    <div class="kpi gold"><div class="kpi-icon">💰</div><div class="kpi-val" id="pm-budget">0</div><div class="kpi-label">Budget total</div></div>
+    <div class="kpi red"><div class="kpi-icon">🔴</div><div class="kpi-val" id="pm-depense">0</div><div class="kpi-label">Dépensé</div></div>
+    <div class="kpi blue"><div class="kpi-icon">📊</div><div class="kpi-val" id="pm-reste">0</div><div class="kpi-label">Restant</div></div>
+  </div>
+
+  <!-- Filtres statut -->
+  <div class="filter-row" style="margin-bottom:16px">
+    <button class="filter-chip active" data-pmfilter="tous"     onclick="setPmFilter(this)">Tous</button>
+    <button class="filter-chip"        data-pmfilter="en cours" onclick="setPmFilter(this)">🔨 En cours</button>
+    <button class="filter-chip"        data-pmfilter="planifié" onclick="setPmFilter(this)">📋 Planifié</button>
+    <button class="filter-chip"        data-pmfilter="terminé"  onclick="setPmFilter(this)">✅ Terminé</button>
+  </div>
+
+  <div id="pm-grid" class="grid2" style="align-items:start"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- PROJET MAISON MODAL -->
+<div id="modal-projetmaison" class="modal-overlay" onclick="closeModalOut(event,'modal-projetmaison')">
+<div class="modal">
+  <div class="modal-title" id="pm-modal-title">🏗️ Nouveau projet <span class="modal-close" onclick="closeModal('modal-projetmaison')">✕</span></div>
+  <input type="hidden" id="pm-edit-id">
+  <div class="form-group"><label class="form-label">Nom du projet</label>
+    <input class="form-input" id="pm-nom" placeholder="Ex: Acquisition cuisine complète">
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="pm-cat">
+        <option value="cuisine">🍳 Cuisine</option>
+        <option value="salon">🛋️ Salon</option>
+        <option value="chambre">🛏️ Chambre</option>
+        <option value="sdb">🚿 Salle de bain</option>
+        <option value="exterieur">🌿 Extérieur</option>
+        <option value="deco">🖼️ Décoration</option>
+        <option value="equipement">🔌 Équipement</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="pm-statut">
+        <option value="planifié">📋 Planifié</option>
+        <option value="en cours">🔨 En cours</option>
+        <option value="pause">⏸️ En pause</option>
+        <option value="terminé">✅ Terminé</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Budget prévu (XAF)</label>
+    <input class="form-input" type="number" id="pm-budget" placeholder="0">
+  </div>
+  <div class="form-group"><label class="form-label">Description / objectif</label>
+    <textarea class="form-textarea" id="pm-desc" placeholder="Détails, liste d'éléments à acquérir…" style="height:70px"></textarea>
+  </div>
+  <div style="font-size:.72rem;color:var(--text3);margin-bottom:10px">💡 Le budget dépensé et l'avancement se calculent depuis les dépenses ajoutées.</div>
+  <button class="btn btn-primary" style="width:100%" onclick="saveProjet()">💾 Enregistrer</button>
+</div></div>
+
+<!-- DÉPENSE PROJET MAISON MODAL -->
+<div id="modal-dep-pm" class="modal-overlay" onclick="closeModalOut(event,'modal-dep-pm')">
+<div class="modal">
+  <div class="modal-title" id="dep-pm-modal-title">+ Nouvelle dépense <span class="modal-close" onclick="closeModal('modal-dep-pm')">✕</span></div>
+  <input type="hidden" id="dep-pm-projet-id">
+  <input type="hidden" id="dep-pm-edit-id">
+  <div style="font-size:.75rem;color:var(--text3);margin-bottom:12px;font-style:italic">Projet : <strong id="dep-pm-projet-nom"></strong></div>
+  <div class="form-group"><label class="form-label">Libellé</label>
+    <input class="form-input" id="dep-pm-nom" placeholder="Ex: Marmite céramique × 7">
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="dep-pm-cat">
+        <option value="equipement">🔌 Équipement</option>
+        <option value="mobilier">🪑 Mobilier</option>
+        <option value="electromenager">🍽️ Électroménager</option>
+        <option value="deco">🖼️ Déco & finitions</option>
+        <option value="textile">🛏️ Textile & literie</option>
+        <option value="rangement">📦 Rangement</option>
+        <option value="luminaire">💡 Luminaire</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Montant (XAF)</label>
+      <input class="form-input" type="number" id="dep-pm-montant" placeholder="0">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="dep-pm-statut">
+        <option value="à acheter">🛒 À acheter</option>
+        <option value="commandé">📦 Commandé</option>
+        <option value="payé">✅ Payé</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Note</label>
+      <input class="form-input" id="dep-pm-note" placeholder="Fournisseur, couleur…">
+    </div>
+  </div>
+  <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveDepPm()">💾 Enregistrer</button>
+</div></div>
+
 <!-- ROUTINE MODAL -->
 <div id="modal-routine" class="modal-overlay" onclick="closeModalOut(event,'modal-routine')">
 <div class="modal">
@@ -1723,12 +1852,10 @@ tr:hover td { background:var(--bg); }
         <option value="Fix-Hygiene">🧴 Fix — Hygiène maison</option>
         <option value="Var-Assaison">🧄 Variable — Assaisonnement</option>
         <option value="Var-AutreCuisine">🥜 Variable — Autre cuisine</option>
-        <option value="Var-ProjCuisine">🍳 Variable — Projet cuisine</option>
-        <option value="Var-Deco">🖼️ Variable — Déco</option>
-        <option value="Var-Equipement">🔌 Variable — Équipement</option>
-        <option value="Var-Meuble">🪑 Variable — Meuble</option>
+        <!-- Déco/Équipement/Meuble/Cuisine → Développement du Foyer -->
         <option value="Sante">💊 Santé</option>
         <option value="Autre">📦 Autre</option>
+      <option value="Foyer">🏗️ Développement du Foyer</option>
       </select>
     </div>
     <div class="form-group"><label class="form-label">Quantité</label><input class="form-input" id="s-qty" placeholder="Ex: 10kg"></div>
@@ -1821,24 +1948,65 @@ tr:hover td { background:var(--bg); }
 <!-- CHANTIER -->
 <div id="modal-chantier" class="modal-overlay" onclick="closeModalOut(event,'modal-chantier')">
 <div class="modal">
-  <div class="modal-title">🔨 <span data-fr="Nouveau chantier" data-en="New project">Nouveau chantier</span> <span class="modal-close" onclick="closeModal('modal-chantier')">✕</span></div>
-  <div class="form-group"><label class="form-label" data-fr="Nom du chantier" data-en="Project name">Nom du chantier</label><input class="form-input" id="c-nom" placeholder="Ex: Rénovation cuisine"></div>
+  <div class="modal-title">🔨 Nouveau chantier <span class="modal-close" onclick="closeModal('modal-chantier')">✕</span></div>
+  <input type="hidden" id="c-edit-idx" value="-1">
+  <div class="form-group"><label class="form-label">Nom du chantier</label><input class="form-input" id="c-nom" placeholder="Ex: Rénovation cuisine"></div>
   <div class="form-row">
-    <div class="form-group"><label class="form-label" data-fr="Budget total (XAF)" data-en="Total budget">Budget total (XAF)</label><input class="form-input" type="number" id="c-budget" placeholder="500000"></div>
-    <div class="form-group"><label class="form-label" data-fr="Dépensé (XAF)" data-en="Spent (XAF)">Dépensé (XAF)</label><input class="form-input" type="number" id="c-depense" placeholder="0"></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label class="form-label" data-fr="Avancement (%)" data-en="Progress (%)">Avancement (%)</label><input class="form-input" type="number" id="c-pct" placeholder="0" min="0" max="100"></div>
-    <div class="form-group"><label class="form-label" data-fr="Statut" data-en="Status">Statut</label>
+    <div class="form-group"><label class="form-label">Budget total (XAF)</label><input class="form-input" type="number" id="c-budget" placeholder="500000"></div>
+    <div class="form-group"><label class="form-label">Statut</label>
       <select class="form-select" id="c-statut">
         <option value="en cours">🔨 En cours</option>
         <option value="pause">⏸️ En pause</option>
         <option value="terminé">✅ Terminé</option>
         <option value="planifié">📋 Planifié</option>
-      </select></div>
+      </select>
+    </div>
   </div>
-  <div class="form-group"><label class="form-label" data-fr="Description" data-en="Description">Description</label><textarea class="form-textarea" id="c-desc" placeholder="Détails du chantier..."></textarea></div>
-  <button class="btn btn-primary" style="width:100%" onclick="addChantier()">✅ <span data-fr="Enregistrer" data-en="Save">Enregistrer</span></button>
+  <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="c-desc" placeholder="Détails du chantier..."></textarea></div>
+  <div style="font-size:.72rem;color:var(--text3);margin-bottom:10px">💡 Le budget dépensé et l'avancement sont calculés automatiquement depuis les dépenses.</div>
+  <button class="btn btn-primary" style="width:100%" onclick="addChantier()">✅ Enregistrer</button>
+</div></div>
+
+<!-- DÉPENSE CHANTIER MODAL -->
+<div id="modal-dep" class="modal-overlay" onclick="closeModalOut(event,'modal-dep')">
+<div class="modal">
+  <div class="modal-title" id="dep-modal-title">+ Nouvelle dépense <span class="modal-close" onclick="closeModal('modal-dep')">✕</span></div>
+  <input type="hidden" id="dep-chantier-id">
+  <input type="hidden" id="dep-edit-id">
+  <div style="font-size:.75rem;color:var(--text3);margin-bottom:12px;font-style:italic">Chantier : <strong id="dep-chantier-nom"></strong></div>
+  <div class="form-group"><label class="form-label">Libellé</label>
+    <input class="form-input" id="dep-nom" placeholder="Ex: Sacs de ciment 50kg × 20">
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="dep-cat">
+        <option value="materiaux">🧱 Matériaux</option>
+        <option value="mdo">👷 Main d'œuvre</option>
+        <option value="equipement">🔧 Équipement</option>
+        <option value="transport">🚛 Transport</option>
+        <option value="finitions">🎨 Finitions</option>
+        <option value="electricite">⚡ Électricité</option>
+        <option value="plomberie">🚿 Plomberie</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Montant (XAF)</label>
+      <input class="form-input" type="number" id="dep-montant" placeholder="0">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Statut paiement</label>
+      <select class="form-select" id="dep-statut">
+        <option value="en attente">⏳ En attente</option>
+        <option value="payé">✅ Payé</option>
+        <option value="impayé">❌ Impayé</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Note (optionnel)</label>
+      <input class="form-input" id="dep-note" placeholder="Fournisseur, détails...">
+    </div>
+  </div>
+  <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveDep()">💾 Enregistrer</button>
 </div></div>
 
 <!-- CHILD INFO -->
@@ -2167,20 +2335,85 @@ tr:hover td { background:var(--bg); }
 <!-- ═══ MODAL CRÉANCE ═══ -->
 <div id="modal-creance" class="modal-overlay" onclick="closeModalOut(event,'modal-creance')">
 <div class="modal">
-  <div class="modal-title">📋 Créance <span class="modal-close" onclick="closeModal('modal-creance')">✕</span></div>
-  <div class="form-group"><label class="form-label">Débiteur (qui vous doit)</label>
-    <input class="form-input" id="cre-nom" placeholder="Nom">
+  <div class="modal-title" id="cre-modal-title">📋 Nouvelle créance <span class="modal-close" onclick="closeModal('modal-creance')">✕</span></div>
+  <input type="hidden" id="cre-edit-id">
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Débiteur (qui vous doit)</label>
+      <input class="form-input" id="cre-nom" placeholder="Nom complet">
+    </div>
+    <div class="form-group"><label class="form-label">📞 Téléphone</label>
+      <input class="form-input" id="cre-tel" type="tel" placeholder="Ex: 077000000">
+    </div>
   </div>
-  <div class="form-group"><label class="form-label">Montant (XAF)</label>
-    <input class="form-input" id="cre-montant" type="number" placeholder="0">
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Montant (XAF)</label>
+      <input class="form-input" id="cre-montant" type="number" placeholder="0">
+    </div>
+    <div class="form-group"><label class="form-label">Date échéance</label>
+      <input class="form-input" id="cre-date" type="date">
+    </div>
   </div>
-  <div class="form-group"><label class="form-label">Date échéance</label>
-    <input class="form-input" id="cre-date" type="date">
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Mode de règlement prévu</label>
+      <select class="form-select" id="cre-mode">
+        <option value="espèces">💵 Espèces</option>
+        <option value="mobile money">📱 Mobile Money</option>
+        <option value="virement">🏦 Virement bancaire</option>
+        <option value="chèque">📝 Chèque</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Priorité</label>
+      <select class="form-select" id="cre-priorite">
+        <option value="normale">🟡 Normale</option>
+        <option value="haute">🔴 Haute</option>
+        <option value="basse">🟢 Basse</option>
+      </select>
+    </div>
   </div>
-  <div class="form-group"><label class="form-label">Notes</label>
-    <input class="form-input" id="cre-notes" placeholder="Contexte…">
+  <div class="form-group"><label class="form-label">Contexte / objet</label>
+    <input class="form-input" id="cre-notes" placeholder="Ex: Prêt du 12 mars, remboursement achat commun…">
   </div>
-  <button class="btn btn-primary" onclick="saveCreance()" style="width:100%">Enregistrer</button>
+  <div class="form-group"><label class="form-label">🔔 Rappel avant échéance (jours)</label>
+    <select class="form-select" id="cre-rappel">
+      <option value="1">1 jour avant</option>
+      <option value="3" selected>3 jours avant</option>
+      <option value="7">7 jours avant</option>
+      <option value="14">14 jours avant</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" onclick="saveCreance()" style="width:100%">💾 Enregistrer</button>
+</div></div>
+
+<!-- MODAL RÈGLEMENT CRÉANCE -->
+<div id="modal-reglement-creance" class="modal-overlay" onclick="closeModalOut(event,'modal-reglement-creance')">
+<div class="modal">
+  <div class="modal-title">💰 Enregistrer un règlement <span class="modal-close" onclick="closeModal('modal-reglement-creance')">✕</span></div>
+  <input type="hidden" id="reg-cre-idx">
+  <div style="font-size:.78rem;color:var(--text3);margin-bottom:12px">
+    Débiteur : <strong id="reg-cre-nom"></strong> · Montant dû : <strong id="reg-cre-du" style="color:var(--red)"></strong>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Montant reçu (XAF)</label>
+      <input class="form-input" type="number" id="reg-cre-montant" placeholder="0">
+    </div>
+    <div class="form-group"><label class="form-label">Mode de règlement</label>
+      <select class="form-select" id="reg-cre-mode">
+        <option value="espèces">💵 Espèces</option>
+        <option value="mobile money">📱 Mobile Money</option>
+        <option value="virement">🏦 Virement bancaire</option>
+        <option value="chèque">📝 Chèque</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Note (optionnel)</label>
+    <input class="form-input" id="reg-cre-note" placeholder="Ex: Versement partiel, promesse du reste…">
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary" style="flex:1" onclick="validerReglement()">✅ Valider le règlement</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-reglement-creance')">Annuler</button>
+  </div>
 </div></div>
 
 <!-- ═══ MODAL COURSE ═══ -->
@@ -2290,7 +2523,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: []
+  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: []
 };
 
 // ══ FIREBASE ══
@@ -2298,7 +2531,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2316,6 +2549,30 @@ async function loadAll() {
     if (s.cat === 'Var-ProjMaison') { s.cat = _migMap[s.id] || 'Var-Deco'; _migrated = true; }
   });
   if (_migrated) save('stocks');
+
+
+
+  // ── SYNC : dépenses projets → courses (pour les utilisateurs existants) ──
+  if (state.depensesProjets && state.depensesProjets.length > 0) {
+    if (!state.courses) state.courses = [];
+    let coursesSynced = false;
+    state.depensesProjets.forEach(dep => {
+      const already = state.courses.find(c => c.projetDepId == dep.id);
+      if (!already) {
+        const p = (state.projetsMailson||[]).find(x=>x.id==dep.projetId);
+        state.courses.push({
+          id: Date.now() + Math.floor(Math.random()*99999),
+          nom: dep.nom, cat:'Foyer', qty:'1', prix: dep.montant,
+          done: dep.statut === 'payé',
+          note: dep.note||'',
+          projetDepId: dep.id, projetId: dep.projetId,
+          projetNom: p ? p.nom : '',
+        });
+        coursesSynced = true;
+      }
+    });
+    if (coursesSynced) save('courses');
+  }
 
   renderAll();
 }
@@ -2358,22 +2615,7 @@ function loadExcelData() {
     {id:22, nom:'Chocolat',          cat:'Var-AutreCuisine',  qty:'1',       prix:3000,  prixr:0, alerte:'ok'},
     {id:23, nom:'Piment',            cat:'Var-AutreCuisine',  qty:'—',       prix:500,   prixr:0, alerte:'ok'},
     {id:24, nom:'Allumette',         cat:'Var-AutreCuisine',  qty:'4',       prix:200,   prixr:0, alerte:'ok'},
-    // VARIABLE — PROJET ACQUISITION CUISINE
-    {id:25, nom:'Marmite céramique', cat:'Var-ProjCuisine',   qty:'7',       prix:120000,prixr:0, alerte:'ok'},
-    {id:26, nom:'Égouttoir',         cat:'Var-ProjCuisine',   qty:'1',       prix:18000, prixr:0, alerte:'ok'},
-    {id:27, nom:'Bouilloire',        cat:'Var-ProjCuisine',   qty:'1',       prix:6000,  prixr:0, alerte:'ok'},
-    {id:28, nom:'Verre flûte',       cat:'Var-ProjCuisine',   qty:'6',       prix:6000,  prixr:0, alerte:'ok'},
-    {id:29, nom:'Frigo',             cat:'Var-ProjCuisine',   qty:'1',       prix:90000, prixr:0, alerte:'ok'},
-    {id:30, nom:'Louche en silicone',cat:'Var-ProjCuisine',   qty:'1',       prix:10000, prixr:0, alerte:'ok'},
-    {id:31, nom:'Fuoir',             cat:'Var-ProjCuisine',   qty:'1',       prix:5000,  prixr:0, alerte:'ok'},
-    // VARIABLE — PROJET DE MAISON
-    {id:32, nom:'Tringles',          cat:'Var-Deco',          qty:'1',       prix:15000, prixr:0, alerte:'ok'},
-    {id:35, nom:'Tasseau de déco',   cat:'Var-Deco',          qty:'6',       prix:30000, prixr:0, alerte:'ok'},
-    {id:36, nom:'PVC déco',          cat:'Var-Deco',          qty:'1',       prix:10000, prixr:0, alerte:'ok'},
-    {id:37, nom:'Tapis',             cat:'Var-Deco',          qty:'1',       prix:25000, prixr:0, alerte:'ok'},
-    {id:33, nom:'Faire un salon',    cat:'Var-Equipement',    qty:'1',       prix:60000, prixr:0, alerte:'ok'},
-    {id:34, nom:'Tablette',          cat:'Var-Meuble',        qty:'1',       prix:20000, prixr:0, alerte:'ok'},
-    {id:38, nom:'Terminer meuble TV',cat:'Var-Meuble',        qty:'1',       prix:25000, prixr:0, alerte:'ok'},
+    // Cuisine/Déco/Équipement/Meuble → Développement du Foyer (liste courses)
     // FIX — HYGIÈNE DE LA MAISON
     {id:39, nom:'Savons',            cat:'Fix-Hygiene',       qty:'4',       prix:1200,  prixr:0, alerte:'ok'},
     {id:40, nom:'Savon en poudre',   cat:'Fix-Hygiene',       qty:'1kg',     prix:1500,  prixr:0, alerte:'ok'},
@@ -2416,9 +2658,7 @@ function loadExcelData() {
   ];
 
   if (state.chantiers.length === 0) state.chantiers = [
-    {nom:'Acquisition cuisine complète', budget:255000,depense:0,pct:0, statut:'planifié', desc:'Marmite céram. ×7, égouttoir, bouilloire, verres flûte ×6, frigo, louche silicone, fuoir'},
-    {nom:'Aménagement salon',            budget:60000, depense:0,pct:0, statut:'planifié', desc:'Faire un salon complet'},
-    {nom:'Décoration & finitions',       budget:125000,depense:0,pct:10,statut:'en cours', desc:'Tringles, tablette, tasseaux ×6, PVC déco, tapis, meuble TV'},
+    // Projets maison déplacés vers "Développement du Foyer" (page projetsmaison)
   ];
 
   if (state.events.length === 0) {
@@ -2460,6 +2700,7 @@ function renderPage(id) {
   if (id==='courses') renderCourses();
   if (id==='tresorerie') renderTresorerie();
   if (id==='routines') renderRoutines();
+  if (id==='projetsmaison') renderProjetsMailson();
 }
 
 function renderAll() {
@@ -2479,6 +2720,7 @@ function renderAll() {
   renderCourses();
   renderTresorerie();
   renderRoutines();
+  renderProjetsMailson();
   updateBadges();
 }
 
@@ -2569,10 +2811,7 @@ function renderStocks() {
     {k:'Fix-Hygiene',       lbl:'🧴 Fix — Hygiène maison',              bud:21200,  col:'var(--blue)'},
     {k:'Var-Assaison',      lbl:'🧄 Variable — Assaisonnement',         bud:3100,   col:'var(--orange)'},
     {k:'Var-AutreCuisine',  lbl:'🥜 Variable — Autre cuisine',          bud:8700,   col:'var(--orange2)'},
-    {k:'Var-ProjCuisine',   lbl:'🍳 Variable — Projet acquisition cuisine', bud:255000, col:'var(--purple)'},
-    {k:'Var-Deco',          lbl:'🖼️ Variable — Déco',                   bud:80000,  col:'var(--gold)'},
-    {k:'Var-Equipement',    lbl:'🔌 Variable — Équipement',               bud:60000,  col:'var(--orange)'},
-    {k:'Var-Meuble',        lbl:'🪑 Variable — Meuble',                   bud:45000,  col:'var(--blue2)'},
+    // Var-ProjCuisine, Var-Deco, Var-Equipement, Var-Meuble → déplacés vers Développement du Foyer
     {k:'Sante',             lbl:'💊 Santé / Pharmacie',                 bud:0,      col:'var(--red)'},
     {k:'Autre',             lbl:'📦 Autre',                             bud:0,      col:'var(--text3)'},
   ];
@@ -2822,43 +3061,215 @@ function addLocatif() {
 }
 
 // ══ CHANTIERS ══
+// ═══════════════════════════════════════════
+// ══ CHANTIERS + DÉPENSES ══
+// ═══════════════════════════════════════════
+
+const DEP_CATS = {
+  materiaux:   { lbl:'🧱 Matériaux',     col:'#C1440E' },
+  mdo:         { lbl:"👷 Main d'œuvre", col:'#2D6A4F' },
+  equipement:  { lbl:'🔧 Équipement',    col:'#5DADE2' },
+  transport:   { lbl:'🚛 Transport',     col:'#CA6702' },
+  finitions:   { lbl:'🎨 Finitions',     col:'#BB8FCE' },
+  electricite: { lbl:'⚡ Électricité',   col:'#FAB833' },
+  plomberie:   { lbl:'🚿 Plomberie',     col:'#52B788' },
+  autre:       { lbl:'📦 Autre',         col:'#888' },
+};
+
+function recalcChantier(chantierId) {
+  const ch = state.chantiers.find(x => x.id == chantierId);
+  if (!ch) return;
+  const items = (state.depensesChantier || []).filter(d => d.chantierId == chantierId);
+  const totalDepense = items.reduce((s, d) => s + (+d.montant || 0), 0);
+  ch.depense = totalDepense;
+  // Progression = dépensé / budget (si budget défini), sinon garde pct manuel
+  if (ch.budget > 0) {
+    ch.pct = Math.min(100, Math.round((totalDepense / ch.budget) * 100));
+  }
+  save('chantiers');
+}
+
 function renderChantiers() {
-  const statColors = {'en cours':'badge-blue',pause:'badge-gold',terminé:'badge-green',planifié:'badge-purple'};
-  document.getElementById('chantiers-grid').innerHTML = state.chantiers.map((c,i)=>`
-    <div class="chantier-card">
+  // Assurer id sur chantiers existants
+  let needsSave = false;
+  state.chantiers.forEach(ch => { if (!ch.id) { ch.id = Date.now() + Math.floor(Math.random()*9999); needsSave = true; } });
+  if (needsSave) save('chantiers');
+
+  const statColors = {'en cours':'badge-blue', pause:'badge-gold', terminé:'badge-green', planifié:'badge-purple'};
+
+  document.getElementById('chantiers-grid').innerHTML = state.chantiers.map((ch, i) => {
+    const deps = (state.depensesChantier || []).filter(d => d.chantierId == ch.id);
+    const totalDep = deps.reduce((s,d) => s+(+d.montant||0), 0);
+    ch.depense = totalDep;
+    if (ch.budget > 0) ch.pct = Math.min(100, Math.round((totalDep/ch.budget)*100));
+    const pct = ch.pct || 0;
+    const pctColor = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--gold)' : 'var(--accent)';
+    const barColor = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--gold)' : 'var(--accent2)';
+    const reste = (ch.budget||0) - totalDep;
+
+    // Grouper dépenses par catégorie pour affichage
+    const groupedDeps = {};
+    deps.forEach(d => {
+      if (!groupedDeps[d.cat]) groupedDeps[d.cat] = [];
+      groupedDeps[d.cat].push(d);
+    });
+
+    const depsHtml = deps.length > 0 ? `
+      <div class="dep-section">
+        <div class="dep-section-title">
+          <span>📋 Liste des dépenses (${deps.length})</span>
+          <button class="btn btn-primary btn-sm" style="font-size:.65rem;padding:3px 8px" onclick="openDepModal(${ch.id})">+ Ajouter</button>
+        </div>
+        ${Object.entries(groupedDeps).map(([cat, items]) => {
+          const catInfo = DEP_CATS[cat] || DEP_CATS.autre;
+          const catTotal = items.reduce((s,d)=>s+(+d.montant||0),0);
+          return `<div style="margin-bottom:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+              <span style="font-size:.72rem;font-weight:700;color:${catInfo.col}">${catInfo.lbl}</span>
+              <span style="font-size:.72rem;font-family:var(--mono);color:${catInfo.col}">${fmtXAF(catTotal)}</span>
+            </div>
+            ${items.map(d => `<div class="dep-item">
+              <div class="dep-cat-dot" style="background:${catInfo.col}"></div>
+              <div class="dep-name">${d.nom}</div>
+              <div class="dep-montant">${fmtXAF(d.montant)}</div>
+              <span class="dep-statut-badge badge ${d.statut==='payé'?'badge-green':d.statut==='en attente'?'badge-gold':'badge-red'}">${d.statut}</span>
+              <button class="btn btn-outline btn-icon btn-sm" onclick="editDep(${d.id})" title="Modifier">✏️</button>
+              <button class="btn btn-outline btn-icon btn-sm" onclick="deleteDep(${d.id},${ch.id})" title="Supprimer">🗑️</button>
+            </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>` : `
+      <div class="dep-section">
+        <div class="dep-section-title">
+          <span>📋 Aucune dépense</span>
+          <button class="btn btn-primary btn-sm" style="font-size:.65rem;padding:3px 8px" onclick="openDepModal(${ch.id})">+ Ajouter</button>
+        </div>
+      </div>`;
+
+    return `<div class="chantier-card">
       <div class="chantier-header">
         <div>
-          <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${c.nom}</div>
-          <span class="badge ${statColors[c.statut]||'badge-gray'}">${c.statut}</span>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${ch.nom}</div>
+          <span class="badge ${statColors[ch.statut]||'badge-gray'}">${ch.statut}</span>
         </div>
-        <div class="chantier-pct" style="color:${c.pct>=80?'var(--accent)':c.pct>=40?'var(--gold)':'var(--red)'}">${c.pct||0}%</div>
+        <div class="chantier-pct" style="color:${pctColor}">${pct}%</div>
       </div>
-      <div class="progress-bar" style="height:8px;margin-bottom:12px">
-        <div class="progress-fill" style="width:${c.pct||0}%;background:${c.pct>=80?'var(--accent2)':c.pct>=40?'var(--gold)':'var(--red)'}"></div>
+      <div class="progress-bar" style="height:10px;margin-bottom:8px;border-radius:5px">
+        <div class="progress-fill" style="width:${pct}%;background:${barColor};border-radius:5px;transition:width .6s"></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:8px">
-        <span>Budget : <strong style="font-family:var(--mono)">${fmtXAF(c.budget)}</strong></span>
-        <span>Dépensé : <strong style="font-family:var(--mono);color:var(--red)">${fmtXAF(c.depense)}</strong></span>
+      <div class="dep-budget-row">
+        <span>💰 Budget&nbsp;<strong style="font-family:var(--mono)">${fmtXAF(ch.budget)}</strong></span>
+        <span>🔴 Dépensé&nbsp;<strong style="font-family:var(--mono);color:var(--red)">${fmtXAF(totalDep)}</strong></span>
+        <span style="color:${reste>=0?'var(--accent)':'var(--red)'}">📊 Reste&nbsp;<strong style="font-family:var(--mono)">${fmtXAF(reste)}</strong></span>
       </div>
-      ${c.desc?`<div style="font-size:0.78rem;color:var(--text2);margin-bottom:10px">${c.desc}</div>`:''}
-      <div style="display:flex;justify-content:flex-end;gap:6px">
-        <button class="btn btn-outline btn-sm" onclick="updatePct(${i})">📈 <span data-fr="Avancement" data-en="Progress">Avancement</span></button>
+      ${ch.desc?`<div style="font-size:0.78rem;color:var(--text2);margin-bottom:6px">${ch.desc}</div>`:''}
+      ${depsHtml}
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
+        <button class="btn btn-outline btn-sm" onclick="editChantier(${i})">✏️ Modifier</button>
         <button class="btn btn-outline btn-icon btn-sm" onclick="deleteChantier(${i})">🗑️</button>
       </div>
-    </div>`).join('') || `<div style="color:var(--text3);text-align:center;padding:40px">Aucun chantier enregistré</div>`;
+    </div>`;
+  }).join('') || `<div style="color:var(--text3);text-align:center;padding:40px">Aucun chantier enregistré</div>`;
 }
-function updatePct(i) {
-  const val = prompt('Avancement (0-100) :', state.chantiers[i].pct||0);
-  if (val===null) return;
-  state.chantiers[i].pct = Math.min(100,Math.max(0,+val||0));
-  save('chantiers'); renderChantiers(); showToast('✅ Avancement mis à jour');
+
+function editChantier(i) {
+  const ch = state.chantiers[i];
+  document.querySelector('#modal-chantier .modal-title').innerHTML = '✏️ Modifier chantier <span class="modal-close" onclick="closeModal(\'modal-chantier\')">✕</span>';
+  sv('c-nom', ch.nom); sv('c-budget', ch.budget||0);
+  sv('c-statut', ch.statut); sv('c-desc', ch.desc||'');
+  document.getElementById('c-edit-idx').value = i;
+  openModal('modal-chantier');
 }
-function deleteChantier(i) { state.chantiers.splice(i,1); save('chantiers'); renderChantiers(); }
+
+function deleteChantier(i) {
+  const ch = state.chantiers[i];
+  if (!confirm('Supprimer ce chantier et toutes ses dépenses ?')) return;
+  state.depensesChantier = (state.depensesChantier||[]).filter(d => d.chantierId != ch.id);
+  state.chantiers.splice(i, 1);
+  save('chantiers'); save('depensesChantier'); renderChantiers();
+  showToast('🗑️ Chantier supprimé');
+}
+
 function addChantier() {
   const nom = v('c-nom'); if (!nom) return showToast('❌ Nom requis');
-  state.chantiers.push({nom,budget:+v('c-budget')||0,depense:+v('c-depense')||0,pct:+v('c-pct')||0,statut:v('c-statut'),desc:v('c-desc')});
-  save('chantiers'); closeModal('modal-chantier'); renderChantiers(); showToast('✅ Chantier ajouté');
-  clearForm(['c-nom','c-budget','c-depense','c-pct','c-desc']);
+  const editIdx = +document.getElementById('c-edit-idx').value;
+  if (editIdx >= 0 && editIdx < state.chantiers.length) {
+    // Mode édition
+    const ch = state.chantiers[editIdx];
+    ch.nom = nom; ch.budget = +v('c-budget')||0; ch.statut = v('c-statut'); ch.desc = v('c-desc')||'';
+    recalcChantier(ch.id);
+  } else {
+    state.chantiers.push({id: Date.now(), nom, budget:+v('c-budget')||0, depense:0, pct:0, statut:v('c-statut'), desc:v('c-desc')||''});
+    save('chantiers');
+  }
+  document.getElementById('c-edit-idx').value = -1;
+  document.querySelector('#modal-chantier .modal-title').innerHTML = '🔨 Nouveau chantier <span class="modal-close" onclick="closeModal(\'modal-chantier\')">✕</span>';
+  closeModal('modal-chantier'); renderChantiers(); showToast('✅ Chantier enregistré');
+  clearForm(['c-nom','c-budget','c-desc']);
+}
+
+// ── DÉPENSES ──────────────────────────────────────────
+function openDepModal(chantierId) {
+  document.getElementById('dep-chantier-id').value = chantierId;
+  document.getElementById('dep-edit-id').value = '';
+  document.getElementById('dep-modal-title').textContent = '+ Nouvelle dépense';
+  const ch = state.chantiers.find(x => x.id == chantierId);
+  document.getElementById('dep-chantier-nom').textContent = ch ? ch.nom : '';
+  clearForm(['dep-nom','dep-montant','dep-note']);
+  document.getElementById('dep-cat').value = 'materiaux';
+  document.getElementById('dep-statut').value = 'en attente';
+  openModal('modal-dep');
+}
+
+function editDep(depId) {
+  const d = (state.depensesChantier||[]).find(x => x.id == depId);
+  if (!d) return;
+  document.getElementById('dep-chantier-id').value = d.chantierId;
+  document.getElementById('dep-edit-id').value = d.id;
+  document.getElementById('dep-modal-title').textContent = '✏️ Modifier dépense';
+  const ch = state.chantiers.find(x => x.id == d.chantierId);
+  document.getElementById('dep-chantier-nom').textContent = ch ? ch.nom : '';
+  sv('dep-nom', d.nom); sv('dep-montant', d.montant);
+  sv('dep-cat', d.cat); sv('dep-statut', d.statut);
+  sv('dep-note', d.note||'');
+  openModal('modal-dep');
+}
+
+function saveDep() {
+  const nom = v('dep-nom'); if (!nom) return showToast('❌ Libellé requis');
+  const montant = +v('dep-montant');
+  if (!montant) return showToast('❌ Montant requis');
+  const chantierId = +document.getElementById('dep-chantier-id').value;
+  const editId = +document.getElementById('dep-edit-id').value || 0;
+  if (!state.depensesChantier) state.depensesChantier = [];
+  const obj = {
+    id: editId || Date.now(),
+    chantierId, nom, montant,
+    cat: v('dep-cat'),
+    statut: v('dep-statut'),
+    note: v('dep-note')||'',
+    date: new Date().toISOString().split('T')[0]
+  };
+  if (editId) {
+    const idx = state.depensesChantier.findIndex(x => x.id == editId);
+    if (idx >= 0) state.depensesChantier[idx] = obj;
+  } else {
+    state.depensesChantier.push(obj);
+  }
+  save('depensesChantier');
+  recalcChantier(chantierId);
+  closeModal('modal-dep');
+  renderChantiers();
+  showToast(editId ? '✅ Dépense modifiée' : '✅ Dépense ajoutée');
+}
+
+function deleteDep(depId, chantierId) {
+  if (!confirm('Supprimer cette dépense ?')) return;
+  state.depensesChantier = (state.depensesChantier||[]).filter(x => x.id != depId);
+  save('depensesChantier');
+  recalcChantier(chantierId);
+  renderChantiers();
+  showToast('🗑️ Dépense supprimée');
 }
 
 // ══ ENFANT ══
@@ -2988,7 +3399,8 @@ function updateBadges() {
   const maint    = (state.maintenance||[]).filter(m=>!m.done&&m.urgence==='critique').length;
   const engs     = (state.engagements||[]).filter(e=>!e.done).length;
   const today    = new Date(); today.setHours(0,0,0,0);
-  const creances = (state.creances||[]).filter(c=>!c.regle&&c.date&&new Date(c.date)<today).length;
+  const today2 = new Date(); today2.setHours(0,0,0,0);
+  const creances = (state.creances||[]).filter(c=>!c.regle&&c.date&&new Date(c.date)<today2).length;
   const courses  = (state.courses||[]).filter(c=>!c.done).length;
   const setBadge = (id,n) => { const el=document.getElementById(id); if(!el) return; el.textContent=n||''; el.style.display=n?'':'none'; };
   setBadge('badgeStock', bas); setBadge('badgeTaches', taches);
@@ -3549,6 +3961,15 @@ function checkRappels() {
   // Maintenance critique non résolue
   (state.maintenance||[]).filter(m=>!m.done&&m.urgence==='critique').forEach(m=>{
     alerts.push({type:'danger',msg:`🔧 Maintenance critique : ${m.desc} (${m.bien||m.locatif||''})`});
+  });
+
+  // ── Créances en retard ou proches ──
+  (state.creances||[]).filter(c=>!c.regle).forEach(cr=>{
+    if(!cr.date) return;
+    const diff = (new Date(cr.date)-today)/(1000*60*60*24);
+    const restedu = cr.montant - (cr.montantRegle||0);
+    if(diff<0)       alerts.push({type:'danger',  msg:`📋 Créance en retard : ${cr.nom} doit ${fmtXAF(restedu)} (${Math.abs(Math.round(diff))}j de retard)`});
+    else if(diff<=3) alerts.push({type:'warning', msg:`📋 Créance J-${Math.round(diff)} : ${cr.nom} — ${fmtXAF(restedu)} attendus`});
   });
 
   return alerts;
@@ -4464,72 +4885,242 @@ function renderCreances() {
   const q = (document.getElementById('cre-search')?.value||'').toLowerCase();
   const today = new Date(); today.setHours(0,0,0,0);
   let items = state.creances || [];
-  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q));
+  if(q) items = items.filter(c=>(c.nom||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q)||(c.tel||'').includes(q));
   if(crFilter==='attente') items = items.filter(c=>!c.regle && (!c.date || new Date(c.date)>=today));
   if(crFilter==='retard')  items = items.filter(c=>!c.regle && c.date && new Date(c.date)<today);
   if(crFilter==='regle')   items = items.filter(c=>c.regle);
 
-  const attente = (state.creances||[]).filter(c=>!c.regle).length;
-  const montantTotal = (state.creances||[]).filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
-  const regle = (state.creances||[]).filter(c=>c.regle).length;
-  document.getElementById('cre-attente') && (document.getElementById('cre-attente').textContent = attente);
-  document.getElementById('cre-montant-kpi') && (document.getElementById('cre-montant-kpi').textContent = fmtXAF(montantTotal));
-  document.getElementById('cre-regle')   && (document.getElementById('cre-regle').textContent   = regle);
+  const all = state.creances||[];
+  const retardCt = all.filter(c=>!c.regle && c.date && new Date(c.date)<today).length;
+  const attente  = all.filter(c=>!c.regle && (!c.date||new Date(c.date)>=today)).length;
+  const montantTotal = all.filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
+  const regle    = all.filter(c=>c.regle).length;
+
+  const g = id => document.getElementById(id);
+  g('cre-retard')      && (g('cre-retard').textContent      = retardCt);
+  g('cre-attente')     && (g('cre-attente').textContent     = attente);
+  g('cre-montant-kpi') && (g('cre-montant-kpi').textContent = fmtXAF(montantTotal));
+  g('cre-regle')       && (g('cre-regle').textContent       = regle);
 
   const el = document.getElementById('creances-list');
   if(!el) return;
   if(!items.length) { el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:40px">Aucune créance${crFilter!=='all'?' dans ce filtre':''}</div>`; return; }
 
+  const MODE_ICON = {espèces:'💵','mobile money':'📱',virement:'🏦',chèque:'📝',autre:'📦'};
+  const PRIO_COL  = {haute:'var(--red)',normale:'var(--gold)',basse:'var(--accent2)'};
+
+  const WA_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#25D366" style="vertical-align:middle;margin-right:3px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.99.584 3.842 1.585 5.394L2.05 21.95l4.671-1.517A9.955 9.955 0 0011.999 22C17.523 22 22 17.523 22 12c0-5.522-4.477-10-10.001-10zm0 18c-1.706 0-3.3-.461-4.674-1.267l-.337-.2-3.489 1.133 1.158-3.397-.219-.35A8 8 0 013.999 12c0-4.418 3.583-8 8-8 4.418 0 8 3.582 8 8s-3.582 8-8 8z"/></svg>`;
+
   el.innerHTML = items.map(c => {
-    const idx   = state.creances.indexOf(c);
-    const retard = !c.regle && c.date && new Date(c.date) < today;
-    return `<div class="card" style="border-left:4px solid ${c.regle?'var(--accent)':retard?'var(--red)':'var(--gold)'};margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-weight:700">${c.nom}</div>
-          <div style="font-size:.78rem;color:var(--text2)">${c.date?'Échéance : '+c.date:''} ${c.notes?'· '+c.notes:''}</div>
+    const idx          = state.creances.indexOf(c);
+    const montantRegle = c.montantRegle || 0;
+    const restedu      = c.montant - montantRegle;
+    const partiel      = montantRegle > 0 && !c.regle;
+    const retard       = !c.regle && c.date && new Date(c.date) < today;
+    const joursRestants = c.date && !c.regle
+      ? Math.ceil((new Date(c.date) - today) / (1000*60*60*24)) : null;
+    const rappelJ = +(c.rappel||3);
+
+    // ── Bandeau alerte ──
+    const alerteHtml = c.regle ? '' : retard
+      ? `<div style="background:rgba(193,68,14,.12);border:1px solid var(--red);border-radius:8px;padding:8px 12px;font-size:.74rem;color:var(--red);font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+           <span>🚨 En retard de <strong>${Math.abs(joursRestants)}j</strong> — Relance nécessaire</span>
+           ${c.tel?`<div style="display:flex;gap:5px">
+             <a href="tel:${c.tel}" style="text-decoration:none;background:var(--red);color:#fff;padding:3px 8px;border-radius:6px;font-size:.68rem">📞 Appeler</a>
+             <a href="https://wa.me/241${c.tel.replace(/^0/,'')}" target="_blank" style="text-decoration:none;background:#25D366;color:#fff;padding:3px 8px;border-radius:6px;font-size:.68rem">${WA_SVG}WhatsApp</a>
+           </div>`:''}
+         </div>`
+      : joursRestants !== null && joursRestants <= rappelJ
+        ? `<div style="background:rgba(201,168,76,.1);border:1px solid var(--gold);border-radius:8px;padding:7px 12px;font-size:.74rem;color:var(--gold);font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+             <span>⚠️ Échéance dans <strong>${joursRestants}j</strong></span>
+             ${c.tel?`<div style="display:flex;gap:5px">
+               <a href="tel:${c.tel}" style="text-decoration:none;background:var(--gold);color:#fff;padding:3px 8px;border-radius:6px;font-size:.68rem">📞 Appeler</a>
+               <a href="https://wa.me/241${c.tel.replace(/^0/,'')}" target="_blank" style="text-decoration:none;background:#25D366;color:#fff;padding:3px 8px;border-radius:6px;font-size:.68rem">${WA_SVG}WhatsApp</a>
+             </div>`:''}
+           </div>`
+        : '';
+
+    // ── Barre progression partielle ──
+    const barrePartiel = partiel ? (() => {
+      const pct = Math.round((montantRegle/c.montant)*100);
+      return `<div style="margin:8px 0 4px">
+        <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text3);margin-bottom:3px">
+          <span>Reçu : <strong style="color:var(--accent)">${fmtXAF(montantRegle)}</strong></span>
+          <span>Reste : <strong style="color:var(--red)">${fmtXAF(restedu)}</strong></span>
         </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--mono);font-weight:800;color:var(--gold);font-size:1.1rem">${fmtXAF(c.montant)}</div>
-          <span class="badge ${c.regle?'badge-green':retard?'badge-red':'badge-orange'}">${c.regle?'Réglée':retard?'En retard':'En attente'}</span>
+        <div style="height:5px;background:var(--bg2);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px;transition:width .5s"></div>
+        </div>
+      </div>`;
+    })() : '';
+
+    // ── Historique relances ──
+    const relances = c.relances||[];
+    const relancesHtml = relances.length
+      ? `<div style="margin-top:6px;padding:6px 8px;background:var(--bg2);border-radius:6px;font-size:.68rem;color:var(--text3)">
+           🕓 Relances : ${relances.map(r=>`<span style="margin-right:6px">${r.date} via ${r.canal}</span>`).join('')}
+         </div>` : '';
+
+    // ── Contacts ──
+    const telHtml = c.tel && !retard && !(joursRestants!==null&&joursRestants<=rappelJ) ? `
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <a href="tel:${c.tel}" class="btn btn-outline btn-sm" style="text-decoration:none;font-size:.72rem">📞 ${c.tel}</a>
+        <a href="https://wa.me/241${c.tel.replace(/^0/,'')}" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;font-size:.72rem;color:#25D366;border-color:#25D366">${WA_SVG}WhatsApp</a>
+        <button class="btn btn-outline btn-sm" style="font-size:.72rem" onclick="noterRelance(${idx},'tel')">📋 Relance notée (appel)</button>
+        <button class="btn btn-outline btn-sm" style="font-size:.72rem" onclick="noterRelance(${idx},'wa')">📋 Relance notée (WA)</button>
+      </div>` : c.tel ? `
+      <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" style="font-size:.68rem" onclick="noterRelance(${idx},'tel')">📋 Relance notée (appel)</button>
+        <button class="btn btn-outline btn-sm" style="font-size:.68rem" onclick="noterRelance(${idx},'wa')">📋 Relance notée (WA)</button>
+      </div>` : '';
+
+    const borderCol = c.regle ? 'var(--accent)' : retard ? 'var(--red)' : joursRestants!==null&&joursRestants<=rappelJ ? 'var(--gold)' : 'var(--border)';
+
+    return `<div class="card" style="border-left:4px solid ${borderCol};margin-bottom:10px">
+      ${alerteHtml}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">
+            <span style="font-weight:700;font-size:.95rem">${c.nom}</span>
+            ${c.priorite&&c.priorite!=='normale'?`<span class="badge ${c.priorite==='haute'?'badge-red':'badge-green'}" style="font-size:.6rem">Priorité ${c.priorite}</span>`:''}
+            ${c.mode?`<span style="font-size:.68rem;color:var(--text3)">${MODE_ICON[c.mode]||'📦'} ${c.mode}</span>`:''}
+          </div>
+          ${c.notes?`<div style="font-size:.75rem;color:var(--text2);margin-bottom:4px;font-style:italic">📝 ${c.notes}</div>`:''}
+          <div style="font-size:.71rem;color:var(--text3)">
+            ${c.date?`📅 Échéance : <strong>${c.date}</strong>`:'Pas de date fixée'}
+            ${c.regle&&c.dateReglement?` · ✅ Réglée le <strong>${c.dateReglement}</strong>`:''}
+          </div>
+          ${barrePartiel}
+          ${telHtml}
+          ${relancesHtml}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--mono);font-weight:800;color:${c.regle?'var(--accent)':retard?'var(--red)':'var(--gold)'};font-size:1.1rem">${fmtXAF(c.montant)}</div>
+          ${partiel?`<div style="font-size:.68rem;color:var(--red);font-family:var(--mono)">Reste : ${fmtXAF(restedu)}</div>`:''}
+          <span class="badge ${c.regle?'badge-green':retard?'badge-red':joursRestants!==null&&joursRestants<=rappelJ?'badge-gold':'badge-orange'}" style="font-size:.62rem;margin-top:4px;display:inline-block">
+            ${c.regle?'✅ Réglée':retard?'🔴 En retard':joursRestants!==null?`⏳ J-${joursRestants}`:'⏳ En attente'}
+          </span>
         </div>
       </div>
-      <div style="display:flex;gap:6px;margin-top:10px">
-        ${!c.regle?`<button class="btn btn-outline btn-sm" onclick="reglerCreance(${idx})">✅ Régler</button>`:''}
-        <button class="btn btn-outline btn-sm" onclick="deleteCreance(${idx})">🗑️</button>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${!c.regle?`<button class="btn btn-primary btn-sm" onclick="ouvrirReglement(${idx})">💰 Régler</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="editCreance(${idx})">✏️ Modifier</button>
+        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCreance(${idx})">🗑️</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function saveCreance() {
-  const modal   = document.getElementById('modal-creance');
-  const nom     = modal.querySelector('#cre-nom').value.trim();
-  const montant = parseFloat(modal.querySelector('#cre-montant').value)||0;
-  const date    = modal.querySelector('#cre-date').value;
-  const notes   = modal.querySelector('#cre-notes').value.trim();
-  if(!nom)     { showToast('❌ Nom du débiteur requis'); return; }
-  if(!montant) { showToast('❌ Montant requis'); return; }
-  if(!state.creances) state.creances = [];
-  state.creances.push({id:Date.now(), nom, montant, date, notes, regle:false});
-  save('creances');
-  closeModal('modal-creance');
-  renderCreances();
-  updateBadges();
-  // Reset les champs du modal
-  modal.querySelector('#cre-nom').value    = '';
-  modal.querySelector('#cre-montant').value= '';
-  modal.querySelector('#cre-date').value   = '';
-  modal.querySelector('#cre-notes').value  = '';
-  showToast('✅ Créance ajoutée');
+function openCreanceModal() {
+  document.getElementById('cre-modal-title').innerHTML = '📋 Nouvelle créance <span class="modal-close" onclick="closeModal(\'modal-creance\')">✕</span>';
+  document.getElementById('cre-edit-id').value = '';
+  clearForm(['cre-nom','cre-tel','cre-montant','cre-date','cre-notes']);
+  document.getElementById('cre-mode').value = 'espèces';
+  document.getElementById('cre-priorite').value = 'normale';
+  document.getElementById('cre-rappel').value = '3';
+  openModal('modal-creance');
 }
 
-function reglerCreance(i) {
-  state.creances[i].regle = true;
-  save('creances'); renderCreances(); updateBadges(); showToast('✅ Créance marquée réglée');
+function editCreance(i) {
+  const cr = state.creances[i]; if(!cr) return;
+  document.getElementById('cre-modal-title').innerHTML = '✏️ Modifier créance <span class="modal-close" onclick="closeModal(\'modal-creance\')">✕</span>';
+  document.getElementById('cre-edit-id').value = i;
+  sv('cre-nom', cr.nom); sv('cre-tel', cr.tel||'');
+  sv('cre-montant', cr.montant); sv('cre-date', cr.date||'');
+  sv('cre-notes', cr.notes||'');
+  sv('cre-mode', cr.mode||'espèces');
+  sv('cre-priorite', cr.priorite||'normale');
+  sv('cre-rappel', cr.rappel||'3');
+  openModal('modal-creance');
+}
+
+function saveCreance() {
+  const nom     = document.getElementById('cre-nom').value.trim();
+  const montant = parseFloat(document.getElementById('cre-montant').value)||0;
+  if(!nom)     { showToast('❌ Nom du débiteur requis'); return; }
+  if(!montant) { showToast('❌ Montant requis'); return; }
+  const editIdx = document.getElementById('cre-edit-id').value;
+  const prev = editIdx !== '' ? state.creances[+editIdx] : null;
+  const obj = {
+    id:           prev ? (prev.id||Date.now()) : Date.now(),
+    nom,
+    tel:          document.getElementById('cre-tel').value.trim(),
+    montant,
+    date:         document.getElementById('cre-date').value,
+    notes:        document.getElementById('cre-notes').value.trim(),
+    mode:         document.getElementById('cre-mode').value,
+    priorite:     document.getElementById('cre-priorite').value,
+    rappel:       document.getElementById('cre-rappel').value,
+    regle:        prev ? (prev.regle||false) : false,
+    montantRegle: prev ? (prev.montantRegle||0) : 0,
+    dateReglement:prev ? (prev.dateReglement||'') : '',
+    relances:     prev ? (prev.relances||[]) : [],
+  };
+  if(!state.creances) state.creances = [];
+  if(editIdx !== '' && editIdx >= 0) state.creances[+editIdx] = obj;
+  else state.creances.push(obj);
+  save('creances'); closeModal('modal-creance'); renderCreances(); updateBadges();
+  showToast(editIdx !== '' ? '✅ Créance modifiée' : '✅ Créance ajoutée');
+}
+
+function ouvrirReglement(i) {
+  const cr = state.creances[i]; if(!cr) return;
+  const restedu = cr.montant - (cr.montantRegle||0);
+  document.getElementById('reg-cre-idx').value = i;
+  document.getElementById('reg-cre-nom').textContent = cr.nom;
+  document.getElementById('reg-cre-du').textContent = fmtXAF(restedu);
+  document.getElementById('reg-cre-montant').value = restedu;
+  document.getElementById('reg-cre-mode').value = cr.mode||'espèces';
+  document.getElementById('reg-cre-note').value = '';
+  openModal('modal-reglement-creance');
+}
+
+function validerReglement() {
+  const i = +document.getElementById('reg-cre-idx').value;
+  const cr = state.creances[i]; if(!cr) return;
+  const montantRecu = +document.getElementById('reg-cre-montant').value||0;
+  if(!montantRecu) return showToast('❌ Montant requis');
+  const mode  = document.getElementById('reg-cre-mode').value;
+  const note  = document.getElementById('reg-cre-note').value.trim();
+  const today = new Date().toISOString().split('T')[0];
+
+  cr.montantRegle = (cr.montantRegle||0) + montantRecu;
+  if(cr.montantRegle >= cr.montant) {
+    cr.regle = true;
+    cr.montantRegle = cr.montant;
+    cr.dateReglement = today;
+  }
+
+  // ── Ajouter dans Ressources ──
+  if(!state.ressources) state.ressources = [];
+  state.ressources.push({
+    id:      Date.now(),
+    source:  cr.montantRegle>=cr.montant ? 'Remboursement créance (total)' : 'Remboursement créance (partiel)',
+    montant: montantRecu,
+    date:    today,
+    desc:    `${cr.nom} · ${mode}${note?' · '+note:''}${cr.notes?' — '+cr.notes:''}`,
+  });
+  save('ressources'); save('creances');
+
+  closeModal('modal-reglement-creance');
+  renderCreances(); renderRessources(); renderDashboard(); updateBadges();
+  const estTotal = cr.montantRegle >= cr.montant;
+  showToast(estTotal
+    ? `✅ ${cr.nom} — ${fmtXAF(montantRecu)} reçu · Créance soldée · Ajouté aux ressources 💰`
+    : `💰 ${fmtXAF(montantRecu)} reçu de ${cr.nom} · Reste ${fmtXAF(cr.montant-cr.montantRegle)} · Ajouté aux ressources`);
+}
+
+function noterRelance(i, canal) {
+  const cr = state.creances[i]; if(!cr) return;
+  if(!cr.relances) cr.relances = [];
+  const today = new Date().toISOString().split('T')[0];
+  cr.relances.push({date:today, canal: canal==='wa'?'WhatsApp':'Appel'});
+  save('creances'); renderCreances();
+  showToast(`📋 Relance ${canal==='wa'?'WhatsApp':'appel'} notée pour ${cr.nom}`);
 }
 
 function deleteCreance(i) {
+  if(!confirm('Supprimer cette créance ?')) return;
   state.creances.splice(i,1); save('creances'); renderCreances(); updateBadges();
 }
 
@@ -4586,17 +5177,31 @@ function renderCourses() {
             onclick="toggleCourse(${idx})">${c.done?'✓':''}</div>
           <div style="flex:1">
             <div style="font-size:.85rem;${c.done?'text-decoration:line-through':''}">${c.nom}</div>
-            ${c.qty?`<div style="font-size:.72rem;color:var(--text3)">${c.qty}</div>`:''}
+            ${c.projetNom?`<div style="font-size:.68rem;color:var(--accent);font-weight:600">🏗️ ${c.projetNom}</div>`:''}
+            ${(!c.projetNom&&c.qty)?`<div style="font-size:.72rem;color:var(--text3)">${c.qty}</div>`:''}
           </div>
           ${c.prix?`<span style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">${fmtXAF(c.prix)}</span>`:''}
-          <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCourse(${idx})" style="padding:2px 6px">🗑️</button>
+          ${!c.projetDepId?`<button class="btn btn-outline btn-icon btn-sm" onclick="deleteCourse(${idx})" style="padding:2px 6px">🗑️</button>`:'<span style="font-size:.65rem;color:var(--text3);padding:2px 4px" title="Géré depuis Développement du Foyer">🔗</span>'}
         </div>`;
       }).join('')}
     </div>`).join('');
 }
 
 function toggleCourse(i) {
-  state.courses[i].done = !state.courses[i].done;
+  const crs = state.courses[i];
+  crs.done = !crs.done;
+  // ── Retour vers Développement du Foyer ──
+  if (crs.projetDepId) {
+    const dep = (state.depensesProjets||[]).find(d => d.id == crs.projetDepId);
+    if (dep) {
+      dep.statut = crs.done ? 'payé' : 'à acheter';
+      save('depensesProjets');
+      recalcProjet(dep.projetId);
+      // Rafraîchir page projetsmaison si visible
+      if (document.getElementById('page-projetsmaison')?.classList.contains('active')) renderProjetsMailson();
+      showToast(crs.done ? '✅ Payé · Projet mis à jour 🏗️' : '↩️ Remis en liste');
+    }
+  }
   save('courses'); renderCourses();
 }
 
@@ -5505,6 +6110,310 @@ function deleteRoutine(id) {
   state.routines = state.routines.filter(x=>x.id!==id);
   save('routines'); renderRoutines();
   showToast('🗑️ Routine supprimée');
+}
+// ════════════════════════════════════════════════════════════
+
+
+// ═══════════════════════════════════════════════════
+// ══ DÉVELOPPEMENT DU FOYER ══════════════════════════
+// ═══════════════════════════════════════════════════
+
+const PM_CATS = {
+  cuisine:     { lbl:'🍳 Cuisine',       col:'var(--orange)' },
+  salon:       { lbl:'🛋️ Salon',         col:'var(--blue)' },
+  chambre:     { lbl:'🛏️ Chambre',       col:'var(--purple)' },
+  sdb:         { lbl:'🚿 Salle de bain', col:'var(--accent2)' },
+  exterieur:   { lbl:'🌿 Extérieur',     col:'var(--accent)' },
+  deco:        { lbl:'🖼️ Décoration',    col:'var(--gold)' },
+  equipement:  { lbl:'🔌 Équipement',    col:'var(--blue2)' },
+  autre:       { lbl:'📦 Autre',         col:'var(--text3)' },
+};
+const PM_DEP_CATS = {
+  equipement:     { lbl:'🔌 Équipement',       col:'#5DADE2' },
+  mobilier:       { lbl:'🪑 Mobilier',          col:'#CA6702' },
+  electromenager: { lbl:'🍽️ Électroménager',   col:'#C1440E' },
+  deco:           { lbl:'🖼️ Déco & finitions',  col:'#BB8FCE' },
+  textile:        { lbl:'🛏️ Textile & literie', col:'#52B788' },
+  rangement:      { lbl:'📦 Rangement',          col:'#2D6A4F' },
+  luminaire:      { lbl:'💡 Luminaire',          col:'#FAB833' },
+  autre:          { lbl:'📦 Autre',              col:'#888' },
+};
+const PM_STATUT_COL = { planifié:'badge-purple', 'en cours':'badge-blue', pause:'badge-gold', terminé:'badge-green' };
+const PM_DEP_STATUT = { 'à acheter':'badge-gray', commandé:'badge-gold', payé:'badge-green' };
+
+let pmFilter = 'tous';
+function setPmFilter(btn) {
+  document.querySelectorAll('[data-pmfilter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  pmFilter = btn.dataset.pmfilter;
+  renderProjetsMailson();
+}
+
+function loadDefaultProjetsMailson() {
+  state.projetsMailson = [
+    { id: 9001, nom:'Acquisition cuisine complète', cat:'cuisine',   statut:'planifié', budget:255000, desc:'Marmite céram. ×7, égouttoir, bouilloire, verres flûte ×6, frigo, louche silicone' },
+    { id: 9002, nom:'Aménagement salon',            cat:'salon',     statut:'planifié', budget:60000,  desc:'Faire un salon complet' },
+    { id: 9003, nom:'Décoration & finitions',       cat:'deco',      statut:'en cours', budget:125000, desc:'Tringles, tablette, tasseaux ×6, PVC déco, tapis, meuble TV' },
+  ];
+  // Dépenses initiales issues des stocks existants
+  state.depensesProjets = [
+    { id:90001, projetId:9001, nom:'Marmite céramique × 7',   cat:'electromenager', montant:35000, statut:'à acheter', note:'' },
+    { id:90002, projetId:9001, nom:'Frigo',                   cat:'electromenager', montant:150000,statut:'à acheter', note:'' },
+    { id:90003, projetId:9001, nom:'Bouilloire',              cat:'electromenager', montant:15000, statut:'à acheter', note:'' },
+    { id:90004, projetId:9001, nom:'Verres flûte × 6',        cat:'equipement',     montant:8000,  statut:'à acheter', note:'' },
+    { id:90005, projetId:9001, nom:'Égouttoir',               cat:'equipement',     montant:5000,  statut:'à acheter', note:'' },
+    { id:90006, projetId:9002, nom:'Canapé',                  cat:'mobilier',       montant:40000, statut:'à acheter', note:'Faire un salon' },
+    { id:90007, projetId:9003, nom:'Tringles',                cat:'deco',           montant:15000, statut:'payé',      note:'' },
+    { id:90008, projetId:9003, nom:'Tasseau × 6',             cat:'deco',           montant:30000, statut:'payé',      note:'' },
+    { id:90009, projetId:9003, nom:'PVC déco',                cat:'deco',           montant:10000, statut:'payé',      note:'' },
+    { id:90010, projetId:9003, nom:'Tapis',                   cat:'textile',        montant:25000, statut:'à acheter', note:'' },
+    { id:90011, projetId:9003, nom:'Tablette',                cat:'mobilier',       montant:20000, statut:'à acheter', note:'' },
+    { id:90012, projetId:9003, nom:'Terminer meuble TV',      cat:'mobilier',       montant:25000, statut:'à acheter', note:'' },
+  ];
+  save('projetsMailson'); save('depensesProjets');
+}
+
+function recalcProjet(projetId) {
+  const p = (state.projetsMailson||[]).find(x => x.id == projetId);
+  if (!p) return;
+  const deps = (state.depensesProjets||[]).filter(d => d.projetId == projetId);
+  const paid = deps.filter(d => d.statut === 'payé').reduce((s,d) => s+(+d.montant||0), 0);
+  p.depense = paid;
+  if (p.budget > 0) p.pct = Math.min(100, Math.round((paid / p.budget) * 100));
+  save('projetsMailson');
+}
+
+function renderProjetsMailson() {
+  if (!state.projetsMailson) state.projetsMailson = [];
+  if (state.projetsMailson.length === 0) { loadDefaultProjetsMailson(); return; }
+
+  let projets = [...state.projetsMailson];
+  if (pmFilter !== 'tous') projets = projets.filter(p => p.statut === pmFilter);
+
+  // KPIs globaux
+  const allDeps = state.depensesProjets || [];
+  const totalBudget = state.projetsMailson.reduce((s,p)=>s+(+p.budget||0),0);
+  const totalPaid   = allDeps.filter(d=>d.statut==='payé').reduce((s,d)=>s+(+d.montant||0),0);
+  const totalDep    = allDeps.reduce((s,d)=>s+(+d.montant||0),0);
+
+  const kpi = id => document.getElementById(id);
+  if(kpi('pm-total'))   kpi('pm-total').textContent   = state.projetsMailson.filter(p=>p.statut!=='terminé').length;
+  if(kpi('pm-budget'))  kpi('pm-budget').textContent  = fmtXAF(totalBudget);
+  if(kpi('pm-depense')) kpi('pm-depense').textContent = fmtXAF(totalPaid);
+  if(kpi('pm-reste'))   kpi('pm-reste').textContent   = fmtXAF(totalBudget - totalPaid);
+
+  const grid = document.getElementById('pm-grid');
+  if (!grid) return;
+  if (projets.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)">Aucun projet dans ce filtre.</div>';
+    return;
+  }
+
+  grid.innerHTML = projets.map(p => {
+    const deps = allDeps.filter(d => d.projetId == p.id);
+    const paidDeps = deps.filter(d => d.statut === 'payé');
+    const totalPaidP = paidDeps.reduce((s,d)=>s+(+d.montant||0),0);
+    const totalAllP  = deps.reduce((s,d)=>s+(+d.montant||0),0);
+    p.depense = totalPaidP;
+    if (p.budget > 0) p.pct = Math.min(100, Math.round((totalPaidP/p.budget)*100));
+    const pct = p.pct||0;
+    const catInfo = PM_CATS[p.cat] || PM_CATS.autre;
+    const pctCol = pct>=100?'var(--red)':pct>=70?'var(--gold)':'var(--accent)';
+    const barCol = pct>=100?'var(--red)':pct>=70?'var(--gold)':'var(--accent2)';
+    const reste = (p.budget||0) - totalPaidP;
+
+    // Grouper dépenses par cat
+    const grouped = {};
+    deps.forEach(d => { if(!grouped[d.cat]) grouped[d.cat]=[]; grouped[d.cat].push(d); });
+
+    const depsRows = deps.length > 0
+      ? Object.entries(grouped).map(([cat, items]) => {
+          const ci = PM_DEP_CATS[cat] || PM_DEP_CATS.autre;
+          const catTotal = items.reduce((s,d)=>s+(+d.montant||0),0);
+          return `<div style="margin-bottom:5px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+              <span style="font-size:.7rem;font-weight:700;color:${ci.col}">${ci.lbl}</span>
+              <span style="font-size:.7rem;font-family:var(--mono);color:${ci.col}">${fmtXAF(catTotal)}</span>
+            </div>
+            ${items.map(d=>`<div class="dep-item">
+              <div class="dep-cat-dot" style="background:${ci.col}"></div>
+              <div class="dep-name">${d.nom}</div>
+              <div class="dep-montant">${fmtXAF(d.montant)}</div>
+              <span class="dep-statut-badge badge ${PM_DEP_STATUT[d.statut]||'badge-gray'}">${d.statut}</span>
+              <button class="btn btn-outline btn-icon btn-sm" onclick="editDepPm(${d.id})" title="Modifier">✏️</button>
+              <button class="btn btn-outline btn-icon btn-sm" onclick="deleteDepPm(${d.id},${p.id})" title="Supprimer">🗑️</button>
+            </div>`).join('')}
+          </div>`;
+        }).join('')
+      : `<div style="color:var(--text3);font-size:.78rem;padding:6px 0">Aucune dépense — ajoutes-en une !</div>`;
+
+    return `<div class="chantier-card">
+      <div class="chantier-header">
+        <div>
+          <div style="font-weight:700;font-size:.95rem;margin-bottom:4px">${p.nom}</div>
+          <span style="font-size:.7rem;font-weight:600;color:${catInfo.col}">${catInfo.lbl}</span>
+          &nbsp;<span class="badge ${PM_STATUT_COL[p.statut]||'badge-gray'}" style="font-size:.62rem">${p.statut}</span>
+        </div>
+        <div class="chantier-pct" style="color:${pctCol}">${pct}%</div>
+      </div>
+      <div class="progress-bar" style="height:10px;margin-bottom:8px;border-radius:5px">
+        <div class="progress-fill" style="width:${pct}%;background:${barCol};border-radius:5px;transition:width .6s"></div>
+      </div>
+      <div class="dep-budget-row" style="margin-bottom:6px">
+        <span>💰 Budget <strong style="font-family:var(--mono)">${fmtXAF(p.budget||0)}</strong></span>
+        <span>✅ Payé <strong style="font-family:var(--mono);color:var(--red)">${fmtXAF(totalPaidP)}</strong></span>
+        <span style="color:${reste>=0?'var(--accent)':'var(--red)'}">📊 Reste <strong style="font-family:var(--mono)">${fmtXAF(reste)}</strong></span>
+      </div>
+      ${p.desc?`<div style="font-size:.74rem;color:var(--text2);margin-bottom:8px;font-style:italic">${p.desc}</div>`:''}
+      <div class="dep-section">
+        <div class="dep-section-title">
+          <span>🛒 Achats prévus (${deps.length}) · ${fmtXAF(totalAllP)} total</span>
+          <button class="btn btn-primary btn-sm" style="font-size:.65rem;padding:3px 8px" onclick="openDepPmModal(${p.id})">+ Ajouter</button>
+        </div>
+        ${depsRows}
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
+        <button class="btn btn-outline btn-sm" onclick="editProjet(${p.id})">✏️ Modifier</button>
+        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteProjet(${p.id})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── CRUD Projets ──
+function openProjetModal() {
+  document.getElementById('pm-modal-title').innerHTML = '🏗️ Nouveau projet <span class="modal-close" onclick="closeModal(\'modal-projetmaison\')">✕</span>';
+  document.getElementById('pm-edit-id').value = '';
+  clearForm(['pm-nom','pm-budget','pm-desc']);
+  document.getElementById('pm-cat').value = 'cuisine';
+  document.getElementById('pm-statut').value = 'planifié';
+  openModal('modal-projetmaison');
+}
+function editProjet(id) {
+  const p = (state.projetsMailson||[]).find(x=>x.id==id); if(!p) return;
+  document.getElementById('pm-modal-title').innerHTML = '✏️ Modifier projet <span class="modal-close" onclick="closeModal(\'modal-projetmaison\')">✕</span>';
+  document.getElementById('pm-edit-id').value = id;
+  sv('pm-nom', p.nom); sv('pm-cat', p.cat); sv('pm-statut', p.statut);
+  sv('pm-budget', p.budget||0); sv('pm-desc', p.desc||'');
+  openModal('modal-projetmaison');
+}
+function saveProjet() {
+  const nom = document.getElementById('pm-nom').value.trim();
+  if (!nom) return showToast('❌ Nom requis');
+  const editId = +document.getElementById('pm-edit-id').value||0;
+  if (!state.projetsMailson) state.projetsMailson = [];
+  const obj = { id: editId||Date.now(), nom,
+    cat: document.getElementById('pm-cat').value,
+    statut: document.getElementById('pm-statut').value,
+    budget: +document.getElementById('pm-budget').value||0,
+    desc: document.getElementById('pm-desc').value.trim(),
+    depense:0, pct:0
+  };
+  if (editId) {
+    const idx = state.projetsMailson.findIndex(x=>x.id==editId);
+    if(idx>=0) { obj.depense=state.projetsMailson[idx].depense||0; obj.pct=state.projetsMailson[idx].pct||0; state.projetsMailson[idx]=obj; }
+  } else state.projetsMailson.push(obj);
+  save('projetsMailson'); closeModal('modal-projetmaison'); renderProjetsMailson();
+  showToast(editId?'✅ Projet modifié':'✅ Projet ajouté');
+}
+function deleteProjet(id) {
+  if(!confirm('Supprimer ce projet et toutes ses dépenses ?')) return;
+  state.projetsMailson = (state.projetsMailson||[]).filter(x=>x.id!=id);
+  state.depensesProjets = (state.depensesProjets||[]).filter(x=>x.projetId!=id);
+  save('projetsMailson'); save('depensesProjets'); renderProjetsMailson();
+  showToast('🗑️ Projet supprimé');
+}
+
+// ── CRUD Dépenses Projets ──
+function openDepPmModal(projetId) {
+  const p = (state.projetsMailson||[]).find(x=>x.id==projetId);
+  document.getElementById('dep-pm-modal-title').innerHTML = '+ Nouvelle dépense <span class="modal-close" onclick="closeModal(\'modal-dep-pm\')">✕</span>';
+  document.getElementById('dep-pm-projet-id').value = projetId;
+  document.getElementById('dep-pm-edit-id').value = '';
+  document.getElementById('dep-pm-projet-nom').textContent = p?p.nom:'';
+  clearForm(['dep-pm-nom','dep-pm-montant','dep-pm-note']);
+  document.getElementById('dep-pm-cat').value = 'equipement';
+  document.getElementById('dep-pm-statut').value = 'à acheter';
+  openModal('modal-dep-pm');
+}
+function editDepPm(depId) {
+  const d = (state.depensesProjets||[]).find(x=>x.id==depId); if(!d) return;
+  const p = (state.projetsMailson||[]).find(x=>x.id==d.projetId);
+  document.getElementById('dep-pm-modal-title').innerHTML = '✏️ Modifier dépense <span class="modal-close" onclick="closeModal(\'modal-dep-pm\')">✕</span>';
+  document.getElementById('dep-pm-projet-id').value = d.projetId;
+  document.getElementById('dep-pm-edit-id').value = d.id;
+  document.getElementById('dep-pm-projet-nom').textContent = p?p.nom:'';
+  sv('dep-pm-nom',d.nom); sv('dep-pm-cat',d.cat); sv('dep-pm-montant',d.montant);
+  sv('dep-pm-statut',d.statut); sv('dep-pm-note',d.note||'');
+  openModal('modal-dep-pm');
+}
+function saveDepPm() {
+  const nom = document.getElementById('dep-pm-nom').value.trim();
+  if (!nom) return showToast('❌ Libellé requis');
+  const montant = +document.getElementById('dep-pm-montant').value;
+  if (!montant) return showToast('❌ Montant requis');
+  const projetId = +document.getElementById('dep-pm-projet-id').value;
+  const editId   = +document.getElementById('dep-pm-edit-id').value||0;
+  if (!state.depensesProjets) state.depensesProjets = [];
+  const statut = document.getElementById('dep-pm-statut').value;
+  const obj = { id:editId||Date.now(), projetId, nom, montant,
+    cat: document.getElementById('dep-pm-cat').value,
+    statut,
+    note: document.getElementById('dep-pm-note').value.trim()
+  };
+  if (editId) {
+    const idx = state.depensesProjets.findIndex(x=>x.id==editId);
+    if(idx>=0) state.depensesProjets[idx]=obj;
+  } else state.depensesProjets.push(obj);
+  save('depensesProjets'); recalcProjet(projetId);
+
+  // ── Sync vers Liste de courses ──
+  syncDepPmToCourses(obj);
+
+  closeModal('modal-dep-pm'); renderProjetsMailson();
+  // Rafraîchir courses si la page est visible
+  if (document.getElementById('page-courses')?.classList.contains('active')) renderCourses();
+  showToast(editId?'✅ Dépense modifiée':'✅ Dépense ajoutée');
+}
+
+function syncDepPmToCourses(dep) {
+  if (!state.courses) state.courses = [];
+  // Chercher un article courses déjà lié à cette dépense
+  const existing = state.courses.find(c => c.projetDepId == dep.id);
+  if (existing) {
+    // Mettre à jour
+    existing.nom   = dep.nom;
+    existing.prix  = dep.montant;
+    existing.note  = dep.note || '';
+    existing.done  = dep.statut === 'payé';
+    existing.projetId = dep.projetId;
+  } else {
+    // Créer
+    const p = (state.projetsMailson||[]).find(x=>x.id==dep.projetId);
+    state.courses.push({
+      id: Date.now() + Math.floor(Math.random()*999),
+      nom:  dep.nom,
+      cat:  'Foyer',
+      qty:  '1',
+      prix: dep.montant,
+      done: dep.statut === 'payé',
+      note: dep.note || '',
+      projetDepId: dep.id,
+      projetId: dep.projetId,
+      projetNom: p ? p.nom : '',
+    });
+  }
+  save('courses');
+}
+function deleteDepPm(depId, projetId) {
+  if(!confirm('Supprimer cette dépense ?')) return;
+  state.depensesProjets = (state.depensesProjets||[]).filter(x=>x.id!=depId);
+  // Supprimer aussi dans courses
+  state.courses = (state.courses||[]).filter(c => c.projetDepId != depId);
+  save('depensesProjets'); save('courses');
+  recalcProjet(projetId); renderProjetsMailson();
+  if (document.getElementById('page-courses')?.classList.contains('active')) renderCourses();
+  showToast('🗑️ Dépense supprimée');
 }
 // ════════════════════════════════════════════════════════════
 
