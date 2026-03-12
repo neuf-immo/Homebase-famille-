@@ -68,118 +68,188 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* ── SIDEBAR ── */
 .sidebar {
-  position:fixed; top:60px; left:0; bottom:0; width:240px; z-index:900;
+  position:fixed; top:60px; left:0; bottom:0; width:230px; z-index:900;
   background:var(--card); border-right:1px solid var(--border);
   display:flex; flex-direction:column;
-  transition:width 0.3s cubic-bezier(0.4,0,0.2,1);
-  overflow:hidden;
+  overflow:hidden; transition:width 0.28s cubic-bezier(0.4,0,0.2,1);
 }
+
+/* Logo agrandi en haut */
+.sidebar-logo {
+  display:flex; align-items:center; gap:10px;
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0; overflow:hidden;
+}
+.sidebar-logo-icon {
+  width:36px; height:36px; border-radius:10px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+}
+.sidebar-logo-text { font-weight:800; font-size:1rem; letter-spacing:-.5px; white-space:nowrap; overflow:hidden; transition:var(--transition); }
+
+/* Scroll zone */
 .sidebar-scroll {
   flex:1; overflow-y:auto; overflow-x:hidden;
-  padding:16px 10px 8px;
+  padding:12px 8px 8px;
   scrollbar-width:thin; scrollbar-color:var(--border) transparent;
 }
 .sidebar-scroll::-webkit-scrollbar { width:3px; }
 .sidebar-scroll::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-.nav-section { margin-bottom:4px; }
-.nav-section-header {
+
+/* Sections repliables */
+.nav-section { margin-bottom:2px; }
+.nav-section-hd {
   display:flex; align-items:center; justify-content:space-between;
-  padding:6px 10px 4px; cursor:pointer; user-select:none;
+  padding:6px 10px 3px; cursor:pointer; user-select:none;
 }
 .nav-label {
-  font-size:0.6rem; font-weight:700; letter-spacing:1.8px; color:var(--text3);
+  font-size:0.58rem; font-weight:700; letter-spacing:1.8px; color:var(--text3);
   text-transform:uppercase; font-family:var(--mono);
-  transition:var(--transition); white-space:nowrap; overflow:hidden;
+  white-space:nowrap; overflow:hidden; transition:opacity .2s;
 }
-.nav-section-arrow {
-  font-size:.55rem; color:var(--text3); transition:transform 0.25s ease;
-  flex-shrink:0; opacity:0.6;
+.nav-section-chevron {
+  font-size:.5rem; color:var(--text3); transition:transform 0.22s ease;
+  flex-shrink:0; opacity:.5;
 }
-.nav-section.collapsed .nav-section-arrow { transform:rotate(-90deg); }
-.nav-section-items { overflow:hidden; transition:max-height 0.3s ease, opacity 0.2s ease; max-height:500px; opacity:1; }
-.nav-section.collapsed .nav-section-items { max-height:0; opacity:0; }
+.nav-section.collapsed .nav-section-chevron { transform:rotate(-90deg); }
+.nav-section-body {
+  overflow:hidden;
+  max-height:400px; opacity:1;
+  transition:max-height 0.28s ease, opacity 0.2s ease;
+}
+.nav-section.collapsed .nav-section-body { max-height:0; opacity:0; }
+
+/* Items */
 .nav-item {
-  display:flex; align-items:center; gap:11px; padding:9px 12px;
-  border-radius:10px; cursor:pointer;
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-radius:10px; cursor:pointer; position:relative;
   font-size:0.83rem; font-weight:500; color:var(--text2);
-  position:relative; margin-bottom:1px;
-  transition:background 0.18s ease, color 0.18s ease, transform 0.15s ease;
-  white-space:nowrap; overflow:hidden;
+  margin-bottom:1px; overflow:hidden; white-space:nowrap;
+  transition:background .15s, color .15s, transform .12s;
 }
 .nav-item:hover { background:var(--bg2); color:var(--text); transform:translateX(2px); }
+
+/* Indicateur actif animé */
 .nav-item.active {
-  background:linear-gradient(135deg, var(--accent), #3a8a65);
-  color:#fff; box-shadow:0 4px 14px rgba(45,106,79,0.35); transform:none;
+  background:linear-gradient(120deg,var(--accent) 0%,#3a8a65 100%);
+  color:#fff; transform:none;
+  box-shadow:0 3px 12px rgba(45,106,79,.3);
 }
 .nav-item.active::before {
-  content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
-  width:3px; height:60%; background:#fff; border-radius:0 3px 3px 0; opacity:0.7;
+  content:''; position:absolute; left:0; top:20%; bottom:20%;
+  width:3px; background:#fff; border-radius:0 3px 3px 0; opacity:.75;
+  animation:activeBar .3s cubic-bezier(.34,1.56,.64,1);
 }
-.nav-item i { font-size:.92rem; width:18px; flex-shrink:0; text-align:center; transition:var(--transition); }
-.nav-item:hover i { transform:scale(1.15); }
+@keyframes activeBar { from{height:0;top:50%} to{} }
 .nav-item.active i { color:#fff; }
-.nav-item span.label { flex:1; transition:var(--transition); }
+.nav-item i { font-size:.9rem; width:18px; text-align:center; flex-shrink:0; transition:transform .15s; }
+.nav-item:hover i { transform:scale(1.12); }
+.nav-item .nav-lbl { flex:1; overflow:hidden; transition:var(--transition); }
+
 .nav-badge {
   margin-left:auto; background:var(--red); color:#fff;
   font-size:0.58rem; font-weight:700; padding:2px 6px;
   border-radius:10px; font-family:var(--mono); flex-shrink:0;
-  animation:badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
-@keyframes badgePop { from{transform:scale(0)} to{transform:scale(1)} }
-.nav-item.active .nav-badge { background:rgba(255,255,255,0.3); }
-.nav-item .nav-tooltip {
-  display:none; position:absolute; left:calc(100% + 12px); top:50%;
+.nav-item.active .nav-badge { background:rgba(255,255,255,.28); }
+
+/* Tooltip compact */
+.nav-item .nav-tip {
+  display:none; position:absolute; left:calc(100% + 10px); top:50%;
   transform:translateY(-50%); background:var(--text); color:var(--bg);
-  font-size:.72rem; font-weight:600; padding:5px 10px;
+  font-size:.7rem; font-weight:600; padding:4px 9px;
   border-radius:7px; white-space:nowrap; pointer-events:none; z-index:9999;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
 }
-.nav-item .nav-tooltip::before {
-  content:""; position:absolute; right:100%; top:50%; transform:translateY(-50%);
-  border:5px solid transparent; border-right-color:var(--text);
+.nav-item .nav-tip::before {
+  content:''; position:absolute; right:100%; top:50%; transform:translateY(-50%);
+  border:4px solid transparent; border-right-color:var(--text);
 }
-.sidebar-footer {
-  padding:10px 10px 14px; border-top:1px solid var(--border);
-  display:flex; align-items:center; gap:10px;
-  cursor:pointer; transition:var(--transition); flex-shrink:0;
-}
-.sidebar-footer:hover { background:var(--bg2); }
-.sidebar-footer-avatar {
-  width:34px; height:34px; border-radius:50%; flex-shrink:0;
-  background:linear-gradient(135deg,var(--gold),var(--orange2));
-  display:flex; align-items:center; justify-content:center;
-  font-weight:700; font-size:0.82rem; color:#fff;
-}
-.sidebar-footer-info { flex:1; overflow:hidden; min-width:0; transition:var(--transition); }
-.sidebar-footer-name { font-size:.82rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.sidebar-footer-role { font-size:.68rem; color:var(--text3); font-family:var(--mono); }
-.sidebar-footer-icon { color:var(--text3); font-size:.8rem; flex-shrink:0; transition:var(--transition); }
+
+/* Toggle collapse */
 .sidebar-toggle {
-  position:absolute; top:14px; right:-12px; z-index:910;
-  width:24px; height:24px; border-radius:50%;
+  position:absolute; top:12px; right:-11px; z-index:920;
+  width:22px; height:22px; border-radius:50%;
   background:var(--card); border:1px solid var(--border);
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:.65rem; color:var(--text3);
+  cursor:pointer; font-size:.6rem; color:var(--text3);
   transition:var(--transition); box-shadow:var(--shadow);
 }
 .sidebar-toggle:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
-.sidebar.collapsed { width:62px; }
-.sidebar.collapsed .nav-label { opacity:0; pointer-events:none; }
-.sidebar.collapsed .nav-section-arrow { opacity:0; }
-.sidebar.collapsed .nav-section.collapsed .nav-section-items { max-height:500px; opacity:1; }
-.sidebar.collapsed .nav-item { justify-content:center; padding:10px; gap:0; }
-.sidebar.collapsed .nav-item span.label { width:0; overflow:hidden; opacity:0; margin:0; }
-.sidebar.collapsed .nav-item .nav-badge { position:absolute; top:4px; right:4px; padding:1px 4px; }
-.sidebar.collapsed .nav-item:hover .nav-tooltip { display:block; }
-.sidebar.collapsed .nav-section-header { justify-content:center; padding:4px 0; }
-.sidebar.collapsed .sidebar-footer-info,
-.sidebar.collapsed .sidebar-footer-icon { width:0; overflow:hidden; opacity:0; }
-.sidebar.collapsed .sidebar-footer { justify-content:center; }
-.sidebar.collapsed .sidebar-toggle i { transform:rotate(180deg); }
+
+/* Profil bas */
+.sidebar-profile {
+  padding:10px 10px 12px; border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  cursor:pointer; transition:var(--transition); flex-shrink:0;
+  overflow:hidden;
+}
+.sidebar-profile:hover { background:var(--bg2); }
+.sidebar-profile-av {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),var(--orange2));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:.8rem; color:#fff;
+}
+.sidebar-profile-info { flex:1; overflow:hidden; min-width:0; transition:var(--transition); }
+.sidebar-profile-name { font-size:.8rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar-profile-role { font-size:.65rem; color:var(--text3); font-family:var(--mono); }
+.sidebar-profile-icon { color:var(--text3); font-size:.75rem; flex-shrink:0; transition:var(--transition); }
+
+/* ── MODE COMPACT (état par défaut — icônes seules) ── */
+.sidebar { width:58px; }
+.sidebar .sidebar-logo-text { opacity:0; width:0; }
+.sidebar .nav-label { opacity:0; }
+.sidebar .nav-section-chevron { opacity:0; }
+.sidebar .nav-section-hd { justify-content:center; }
+.sidebar .nav-section.collapsed .nav-section-body { max-height:400px !important; opacity:1 !important; }
+.sidebar .nav-item { justify-content:center; padding:10px; gap:0; }
+.sidebar .nav-item .nav-lbl { width:0; overflow:hidden; opacity:0; }
+.sidebar .nav-item .nav-badge { position:absolute; top:3px; right:3px; padding:1px 4px; }
+.sidebar .nav-item:hover .nav-tip { display:block; }
+.sidebar .sidebar-profile-info,
+.sidebar .sidebar-profile-icon { width:0; opacity:0; overflow:hidden; }
+.sidebar .sidebar-profile { justify-content:center; }
+
+/* ── MODE EXPANDED (après clic) ── */
+.sidebar.expanded {
+  width:240px;
+  z-index:1200;
+  box-shadow:4px 0 32px rgba(0,0,0,.18);
+}
+.sidebar.expanded .sidebar-logo-text { opacity:1; width:auto; }
+.sidebar.expanded .nav-label { opacity:1; }
+.sidebar.expanded .nav-section-chevron { opacity:.5; }
+.sidebar.expanded .nav-section-hd { justify-content:space-between; }
+.sidebar.expanded .nav-item { justify-content:flex-start; padding:9px 12px; gap:10px; }
+.sidebar.expanded .nav-item .nav-lbl { width:auto; overflow:visible; opacity:1; }
+.sidebar.expanded .nav-item .nav-badge { position:static; }
+.sidebar.expanded .nav-item:hover .nav-tip { display:none; }
+.sidebar.expanded .sidebar-profile-info,
+.sidebar.expanded .sidebar-profile-icon { width:auto; opacity:1; overflow:visible; }
+.sidebar.expanded .sidebar-profile { justify-content:flex-start; }
+.sidebar.expanded .sidebar-toggle i { transform:rotate(180deg); }
+
+/* ── OVERLAY fond flou ── */
+.sidebar-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  z-index:1100;
+  transition:opacity .25s ease;
+}
+.sidebar-overlay.open { display:block; animation:fadeIn .22s ease; }
+
+/* Glassmorphism subtil en dark mode */
+[data-theme="dark"] .sidebar {
+  background:rgba(22,27,34,.95);
+  backdrop-filter:blur(12px);
+}
 
 /* ── MAIN ── */
-.main { margin-left:240px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
-.sidebar.collapsed ~ main.main { margin-left:62px; }
+.main { margin-left:58px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); transition:margin-left .28s cubic-bezier(0.4,0,0.2,1); }
 
 /* ── PAGES ── */
 .page { display:none; animation:fadeIn 0.3s ease; }
@@ -368,78 +438,12 @@ tr:hover td { background:var(--bg); }
 .sep { border:none; border-top:1px solid var(--border); margin:20px 0; }
 
 /* ── RESPONSIVE ── */
-/* ── HAMBURGER & DRAWER ── */
-.hamburger-btn {
-  display:none; align-items:center; justify-content:center;
-  width:38px; height:38px; border-radius:10px; border:none;
-  background:transparent; cursor:pointer; color:var(--text);
-  font-size:1.1rem; transition:var(--transition); flex-shrink:0;
-}
-.hamburger-btn:hover { background:var(--bg2); }
-
-.drawer-overlay {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
-  z-index:1100; backdrop-filter:blur(2px);
-  animation:fadeIn .2s ease;
-}
-.drawer-overlay.open { display:block; }
-
-@media(max-width:768px){
-  /* Masquer sidebar fixe, afficher hamburger */
-  .sidebar { 
-    position:fixed; top:0; left:0; bottom:0; width:280px; z-index:1200;
-    transform:translateX(-100%);
-    transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    padding-top:0;
-  }
-  .sidebar.drawer-open { transform:translateX(0); }
-  .sidebar .sidebar-toggle { display:none; }
-  
-  /* Header drawer */
-  .sidebar::before {
-    content:""; display:block; height:56px; flex-shrink:0;
-  }
-  .sidebar-drawer-header {
-    position:absolute; top:0; left:0; right:0; height:56px;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 16px; border-bottom:1px solid var(--border);
-    background:var(--card); z-index:1;
-  }
-  .sidebar-drawer-logo { 
-    display:flex; align-items:center; gap:9px; 
-    font-weight:800; font-size:1rem;
-  }
-  .sidebar-drawer-logo-icon {
-    width:30px; height:30px; border-radius:8px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:flex; align-items:center; justify-content:center; font-size:.95rem;
-  }
-  .sidebar-drawer-close {
-    width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
-    background:transparent; cursor:pointer; color:var(--text2);
-    display:flex; align-items:center; justify-content:center;
-    font-size:.85rem; transition:var(--transition);
-  }
-  .sidebar-drawer-close:hover { background:var(--red); color:#fff; border-color:var(--red); }
-
-  /* Sidebar pleine largeur en drawer */
-  .sidebar .nav-item { justify-content:flex-start; padding:10px 14px; gap:11px; }
-  .sidebar .nav-item span.label { width:auto; overflow:visible; opacity:1; margin:0; flex:1; }
-  .sidebar .nav-label { opacity:1; pointer-events:auto; }
-  .sidebar .nav-section-arrow { opacity:0.6; }
-  .sidebar .nav-section-header { justify-content:space-between; padding:6px 10px 4px; }
-  .sidebar .sidebar-footer-info,
-  .sidebar .sidebar-footer-icon { width:auto; overflow:visible; opacity:1; }
-  .sidebar .sidebar-footer { justify-content:flex-start; }
-  .sidebar .nav-item .nav-tooltip { display:none !important; }
-  .sidebar .nav-item .nav-badge { position:static; }
-
-  .hamburger-btn { display:flex; }
-  .main { margin-left:0 !important; padding:16px; }
+@media(max-width:900px){
   .grid4 { grid-template-columns:1fr 1fr; }
   .grid3 { grid-template-columns:1fr 1fr; }
 }
 @media(max-width:600px){
+  .main { padding:16px; }
   .grid2,.grid3,.grid4 { grid-template-columns:1fr; }
   .form-row { grid-template-columns:1fr; }
 }
@@ -624,9 +628,6 @@ tr:hover td { background:var(--bg); }
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <button class="hamburger-btn" onclick="openDrawer()" title="Menu" id="hamburger-btn">
-    <i class="fa-solid fa-bars"></i>
-  </button>
   <div class="logo">
     <div class="logo-icon">🏠</div>
     <span>HomeBase</span>
@@ -660,169 +661,167 @@ tr:hover td { background:var(--bg); }
   </div>
 </div>
 
-<!-- DRAWER OVERLAY -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="sidebarClose()"></div>
 
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
-  <div class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire/Agrandir">
+  <!-- Toggle compact -->
+  <div class="sidebar-toggle" onclick="sidebarToggleCompact()" title="Réduire / Agrandir">
     <i class="fa-solid fa-chevron-left fa-fw"></i>
   </div>
-  <!-- Header visible uniquement en mode drawer (mobile) -->
-  <div class="sidebar-drawer-header" id="sidebar-drawer-header">
-    <div class="sidebar-drawer-logo">
-      <div class="sidebar-drawer-logo-icon">🏠</div>
-      <span>HomeBase</span>
-    </div>
-    <button class="sidebar-drawer-close" onclick="closeDrawer()" title="Fermer">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">🏠</div>
+    <span class="sidebar-logo-text">HomeBase</span>
   </div>
+
   <div class="sidebar-scroll">
 
     <!-- Principal -->
-    <div class="nav-section">
-      <div class="nav-section-header" onclick="toggleNavSection(this)">
+    <div class="nav-section" id="ns-principal">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-principal')">
         <div class="nav-label" data-fr="Principal" data-en="Main">Principal</div>
-        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
       </div>
-      <div class="nav-section-items">
+      <div class="nav-section-body">
         <div class="nav-item active" onclick="showPage('dashboard')">
           <i class="fa-solid fa-chart-pie fa-fw"></i>
-          <span class="label" data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
-          <span class="nav-tooltip">Tableau de bord</span>
+          <span class="nav-lbl" data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
+          <span class="nav-tip">Tableau de bord</span>
         </div>
         <div class="nav-item" onclick="showPage('calendrier')">
           <i class="fa-solid fa-calendar-days fa-fw"></i>
-          <span class="label">Calendrier</span>
+          <span class="nav-lbl">Calendrier</span>
           <span class="nav-badge" id="bdgCal" style="display:none">0</span>
-          <span class="nav-tooltip">Calendrier</span>
+          <span class="nav-tip">Calendrier</span>
         </div>
       </div>
     </div>
 
     <!-- Maison -->
-    <div class="nav-section">
-      <div class="nav-section-header" onclick="toggleNavSection(this)">
+    <div class="nav-section" id="ns-maison">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-maison')">
         <div class="nav-label" data-fr="Maison" data-en="Home">Maison</div>
-        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
       </div>
-      <div class="nav-section-items">
+      <div class="nav-section-body">
         <div class="nav-item" onclick="showPage('stocks')">
           <i class="fa-solid fa-box fa-fw"></i>
-          <span class="label" data-fr="Stocks & Courses" data-en="Stocks">Stocks & Courses</span>
+          <span class="nav-lbl" data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
           <span class="nav-badge" id="badgeStock">0</span>
-          <span class="nav-tooltip">Stocks & Courses</span>
+          <span class="nav-tip">Stocks & Courses</span>
         </div>
         <div class="nav-item" onclick="showPage('courses')">
           <i class="fa-solid fa-basket-shopping fa-fw"></i>
-          <span class="label">Liste de Courses</span>
+          <span class="nav-lbl">Liste de Courses</span>
           <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
-          <span class="nav-tooltip">Liste de Courses</span>
+          <span class="nav-tip">Liste de Courses</span>
         </div>
         <div class="nav-item" onclick="showPage('budget')">
           <i class="fa-solid fa-wallet fa-fw"></i>
-          <span class="label" data-fr="Budget Maison" data-en="Budget">Budget Maison</span>
-          <span class="nav-tooltip">Budget Maison</span>
+          <span class="nav-lbl" data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
+          <span class="nav-tip">Budget Maison</span>
         </div>
         <div class="nav-item" onclick="showPage('taches')">
           <i class="fa-solid fa-list-check fa-fw"></i>
-          <span class="label" data-fr="Tâches" data-en="Tasks">Tâches</span>
+          <span class="nav-lbl" data-fr="Tâches" data-en="Tasks">Tâches</span>
           <span class="nav-badge" id="badgeTaches">0</span>
-          <span class="nav-tooltip">Tâches</span>
+          <span class="nav-tip">Tâches</span>
         </div>
       </div>
     </div>
 
     <!-- Immobilier -->
-    <div class="nav-section">
-      <div class="nav-section-header" onclick="toggleNavSection(this)">
+    <div class="nav-section" id="ns-immo">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-immo')">
         <div class="nav-label" data-fr="Immobilier" data-en="Real Estate">Immobilier</div>
-        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
       </div>
-      <div class="nav-section-items">
+      <div class="nav-section-body">
         <div class="nav-item" onclick="showPage('locatifs')">
           <i class="fa-solid fa-building fa-fw"></i>
-          <span class="label" data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
-          <span class="nav-tooltip">Biens Locatifs</span>
+          <span class="nav-lbl" data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
+          <span class="nav-tip">Biens Locatifs</span>
         </div>
         <div class="nav-item" onclick="showPage('chantiers')">
           <i class="fa-solid fa-helmet-safety fa-fw"></i>
-          <span class="label" data-fr="Chantiers" data-en="Projects">Chantiers</span>
-          <span class="nav-tooltip">Chantiers</span>
+          <span class="nav-lbl" data-fr="Chantiers" data-en="Projects">Chantiers</span>
+          <span class="nav-tip">Chantiers</span>
         </div>
         <div class="nav-item" onclick="showPage('maintenance')">
           <i class="fa-solid fa-screwdriver-wrench fa-fw"></i>
-          <span class="label">Maintenance</span>
+          <span class="nav-lbl">Maintenance</span>
           <span class="nav-badge" id="badgeMaint" style="display:none">0</span>
-          <span class="nav-tooltip">Maintenance</span>
+          <span class="nav-tip">Maintenance</span>
         </div>
       </div>
     </div>
 
     <!-- Finances -->
-    <div class="nav-section">
-      <div class="nav-section-header" onclick="toggleNavSection(this)">
+    <div class="nav-section" id="ns-finances">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-finances')">
         <div class="nav-label">Finances</div>
-        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
       </div>
-      <div class="nav-section-items">
+      <div class="nav-section-body">
         <div class="nav-item" onclick="showPage('ressources')">
           <i class="fa-solid fa-sack-dollar fa-fw"></i>
-          <span class="label">Ressources</span>
-          <span class="nav-tooltip">Ressources</span>
+          <span class="nav-lbl">Ressources</span>
+          <span class="nav-tip">Ressources</span>
         </div>
         <div class="nav-item" onclick="showPage('creances')">
           <i class="fa-solid fa-file-invoice-dollar fa-fw"></i>
-          <span class="label">Créances</span>
+          <span class="nav-lbl">Créances</span>
           <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
-          <span class="nav-tooltip">Créances</span>
+          <span class="nav-tip">Créances</span>
         </div>
         <div class="nav-item" onclick="showPage('dettes')">
           <i class="fa-solid fa-credit-card fa-fw"></i>
-          <span class="label">Dettes</span>
+          <span class="nav-lbl">Dettes</span>
           <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
-          <span class="nav-tooltip">Dettes</span>
+          <span class="nav-tip">Dettes</span>
         </div>
       </div>
     </div>
 
     <!-- Famille -->
-    <div class="nav-section">
-      <div class="nav-section-header" onclick="toggleNavSection(this)">
+    <div class="nav-section" id="ns-famille">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-famille')">
         <div class="nav-label" data-fr="Famille" data-en="Family">Famille</div>
-        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
       </div>
-      <div class="nav-section-items">
+      <div class="nav-section-body">
         <div class="nav-item" onclick="showPage('enfant')">
           <i class="fa-solid fa-child fa-fw"></i>
-          <span class="label" data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
-          <span class="nav-tooltip">Mon Enfant</span>
+          <span class="nav-lbl" data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
+          <span class="nav-tip">Mon Enfant</span>
         </div>
         <div class="nav-item" onclick="showPage('objectifs')">
           <i class="fa-solid fa-bullseye fa-fw"></i>
-          <span class="label" data-fr="Objectifs" data-en="Goals">Objectifs</span>
-          <span class="nav-tooltip">Objectifs</span>
+          <span class="nav-lbl" data-fr="Objectifs" data-en="Goals">Objectifs</span>
+          <span class="nav-tip">Objectifs</span>
         </div>
         <div class="nav-item" onclick="showPage('engagements')">
           <i class="fa-solid fa-handshake fa-fw"></i>
-          <span class="label">Engagements</span>
+          <span class="nav-lbl">Engagements</span>
           <span class="nav-badge" id="badgeEng" style="display:none">0</span>
-          <span class="nav-tooltip">Engagements</span>
+          <span class="nav-tip">Engagements</span>
         </div>
       </div>
     </div>
 
   </div><!-- /sidebar-scroll -->
 
-  <!-- Footer profil -->
-  <div class="sidebar-footer" id="sidebar-footer" onclick="toggleUserMenu()">
-    <div class="sidebar-footer-avatar" id="sf-avatar">?</div>
-    <div class="sidebar-footer-info">
-      <div class="sidebar-footer-name" id="sf-name">—</div>
-      <div class="sidebar-footer-role" id="sf-role">Connexion requise</div>
+  <!-- Profil bas -->
+  <div class="sidebar-profile" id="sidebar-profile" onclick="toggleUserMenu()">
+    <div class="sidebar-profile-av" id="sp-av">?</div>
+    <div class="sidebar-profile-info">
+      <div class="sidebar-profile-name" id="sp-name">—</div>
+      <div class="sidebar-profile-role" id="sp-role">Non connecté</div>
     </div>
-    <i class="fa-solid fa-ellipsis-vertical sidebar-footer-icon"></i>
+    <i class="fa-solid fa-ellipsis-vertical sidebar-profile-icon"></i>
   </div>
 </nav>
 
@@ -2047,8 +2046,7 @@ function loadExcelData() {
 
 // ══ NAVIGATION ══
 function showPage(id) {
-  // Fermer le drawer si ouvert (mobile)
-  if(window.innerWidth <= 768) closeDrawer();
+  sidebarClose();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -3225,7 +3223,7 @@ async function doLogin() {
   sessionStorage.setItem('hb_user', JSON.stringify({id:user.id,username:user.username,nom:user.nom,role:user.role,avatar:user.avatar,color:user.color}));
   hideAuthScreen();
   updateTopbarUser();
-  updateSidebarFooter();
+  sidebarUpdateProfile();
   applyRolePermissions();
   showToast(`Bienvenue ${user.nom} ! 👋`);
 }
@@ -3261,64 +3259,43 @@ document.addEventListener('click', e=>{
   }
 });
 
-// ── SIDEBAR TOGGLE & SECTIONS ──
-
-// Drawer mobile
-function openDrawer() {
-  document.getElementById('sidebar').classList.add('drawer-open');
-  document.getElementById('drawer-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+// ── SIDEBAR PRO ──────────────────────────────────────
+function sidebarOpen() {
+  document.getElementById('sidebar').classList.add('expanded');
+  document.getElementById('sidebar-overlay').classList.add('open');
 }
 
-function closeDrawer() {
-  document.getElementById('sidebar').classList.remove('drawer-open');
-  document.getElementById('drawer-overlay').classList.remove('open');
-  document.body.style.overflow = '';
+function sidebarClose() {
+  document.getElementById('sidebar').classList.remove('expanded');
+  document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
-// Auto-fermer le drawer quand on change de page sur mobile
-const _origShowPage = window.showPage;
-
-function toggleSidebar() {
+function sidebarToggleCompact() {
   const sb = document.getElementById('sidebar');
-  const main = document.querySelector('.main');
-  sb.classList.toggle('collapsed');
-  const isCollapsed = sb.classList.contains('collapsed');
-  localStorage.setItem('hb_sidebar_collapsed', isCollapsed ? '1' : '0');
+  if (sb.classList.contains('expanded')) { sidebarClose(); }
+  else { sidebarOpen(); }
 }
 
-function toggleNavSection(header) {
-  const section = header.closest('.nav-section');
+function sidebarToggleSection(id) {
   const sb = document.getElementById('sidebar');
-  if(sb && sb.classList.contains('collapsed')) return; // pas de collapse en mode réduit
-  section.classList.toggle('collapsed');
+  if (!sb.classList.contains('expanded')) { sidebarOpen(); return; }
+  document.getElementById(id).classList.toggle('collapsed');
 }
 
-function initSidebar() {
-  const sb = document.getElementById('sidebar');
-  if(!sb) return;
-  if(localStorage.getItem('hb_sidebar_collapsed') === '1') sb.classList.add('collapsed');
-  // Gérer swipe gauche->droite pour fermer le drawer
-  let touchStartX = 0;
-  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-  document.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if(dx < -60 && sb.classList.contains('drawer-open')) closeDrawer();
-  }, {passive:true});
+function sidebarInit() {
+  // Sidebar toujours compact au démarrage — s'étend au clic
 }
 
-function updateSidebarFooter() {
-  if(!currentUser) return;
-  const av = document.getElementById('sf-avatar');
-  const nm = document.getElementById('sf-name');
-  const rl = document.getElementById('sf-role');
-  if(av){ av.textContent = currentUser.avatar || (currentUser.nom||'?')[0]; av.style.background = currentUser.color||'var(--gold)'; }
-  if(nm) nm.textContent = currentUser.nom || '—';
-  if(rl){
-    const roleLabels={admin:'👑 Administrateur',member:'👤 Membre',viewer:'👁️ Lecteur'};
-    rl.textContent = roleLabels[currentUser.role] || currentUser.role;
-  }
+function sidebarUpdateProfile() {
+  if (!currentUser) return;
+  const av = document.getElementById('sp-av');
+  const nm = document.getElementById('sp-name');
+  const rl = document.getElementById('sp-role');
+  if (av) { av.textContent = currentUser.avatar || (currentUser.nom || '?')[0]; av.style.background = currentUser.color || 'var(--gold)'; }
+  if (nm) nm.textContent = currentUser.nom || '—';
+  if (rl) { const map={admin:'👑 Administrateur',member:'👤 Membre',viewer:'👁️ Lecteur'}; rl.textContent = map[currentUser.role] || currentUser.role; }
 }
+// ─────────────────────────────────────────────────────
 
 function updateTopbarUser() {
   if(!currentUser) return;
@@ -3478,7 +3455,7 @@ function checkSession() {
       currentUser = JSON.parse(saved);
       hideAuthScreen();
       updateTopbarUser();
-      updateSidebarFooter();
+      sidebarUpdateProfile();
       applyRolePermissions();
     } catch{ sessionStorage.removeItem('hb_user'); }
   }
@@ -4372,7 +4349,7 @@ function filterLocatifs() {
 
 // ══ INIT ══
 checkSession();
-initSidebar();
+sidebarInit();
 initDate();
 loadAll();
 </script>
