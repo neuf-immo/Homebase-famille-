@@ -168,23 +168,41 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 }
 
 /* Toggle collapse */
+/* ── SIDEBAR TOGGLE FLOTTANT (logo clignotant) ── */
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(45,106,79,.65), 0 4px 16px rgba(45,106,79,.4); }
+  60%  { box-shadow: 0 0 0 9px rgba(45,106,79,0),  0 4px 16px rgba(45,106,79,.4); }
+  100% { box-shadow: 0 0 0 0 rgba(45,106,79,0),   0 4px 16px rgba(45,106,79,.3); }
+}
+@keyframes pulseDot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.5; transform:scale(.8); }
+}
 .sidebar-toggle {
-  position:fixed;
-  top: calc(60px + 18px);
+  position: fixed;
+  top: calc(60px + 14px);
   left: calc(58px - 18px);
   z-index: 1300;
   width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2.5px solid var(--card);
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: 2px solid var(--card);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: .82rem; color: #fff;
-  box-shadow: 0 4px 16px rgba(45,106,79,.45);
-  transition: left 0.28s cubic-bezier(0.4,0,0.2,1), background 0.18s, transform 0.18s;
+  cursor: pointer; font-size: 1.1rem;
+  animation: pulseRing 2.4s ease-out infinite;
+  transition: left 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.18s;
 }
-.sidebar-toggle:hover { background: var(--accent2); transform: scale(1.12); }
-.sidebar.expanded .sidebar-toggle {
-  left: calc(260px - 18px);
+.sidebar-toggle:hover { transform: scale(1.1); animation: none; box-shadow: 0 6px 22px rgba(45,106,79,.55); }
+.sidebar.expanded .sidebar-toggle { left: calc(260px - 18px); }
+.sidebar-toggle::after {
+  content: '';
+  position: absolute;
+  top: -4px; right: -4px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #3B82F6;
+  border: 2px solid var(--card);
+  animation: pulseDot 1.6s ease-in-out infinite;
 }
 
 /* Profil bas */
@@ -706,9 +724,9 @@ tr:hover td { background:var(--bg); }
 
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
-  <!-- Toggle compact -->
-  <div class="sidebar-toggle" onclick="sidebarToggleCompact()" title="Réduire / Agrandir">
-    <i class="fa-solid fa-chevron-left fa-fw"></i>
+  <!-- Toggle flottant logo -->
+  <div class="sidebar-toggle" onclick="sidebarToggleCompact()" title="Ouvrir / Fermer le menu">
+    🏠
   </div>
 
   <!-- Logo -->
