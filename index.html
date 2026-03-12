@@ -68,7 +68,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* ── SIDEBAR ── */
 .sidebar {
-  position:fixed; top:60px; left:0; bottom:0; width:230px; z-index:900;
+  position:fixed; top:60px; left:0; bottom:0; width:58px; z-index:900;
   background:var(--card); border-right:1px solid var(--border);
   display:flex; flex-direction:column;
   overflow:hidden; transition:width 0.28s cubic-bezier(0.4,0,0.2,1);
@@ -169,14 +169,23 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* Toggle collapse */
 .sidebar-toggle {
-  position:absolute; top:12px; right:-11px; z-index:920;
-  width:22px; height:22px; border-radius:50%;
-  background:var(--card); border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:.6rem; color:var(--text3);
-  transition:var(--transition); box-shadow:var(--shadow);
+  position:fixed;
+  top: calc(60px + 18px);
+  left: calc(58px - 18px);
+  z-index: 1300;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2.5px solid var(--card);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .82rem; color: #fff;
+  box-shadow: 0 4px 16px rgba(45,106,79,.45);
+  transition: left 0.28s cubic-bezier(0.4,0,0.2,1), background 0.18s, transform 0.18s;
 }
-.sidebar-toggle:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.sidebar-toggle:hover { background: var(--accent2); transform: scale(1.12); }
+.sidebar.expanded .sidebar-toggle {
+  left: calc(260px - 18px);
+}
 
 /* Profil bas */
 .sidebar-profile {
@@ -214,9 +223,9 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* ── MODE EXPANDED (après clic) ── */
 .sidebar.expanded {
-  width:240px;
+  width:260px;
   z-index:1200;
-  box-shadow:4px 0 32px rgba(0,0,0,.18);
+  box-shadow:4px 0 32px rgba(0,0,0,.22);
 }
 .sidebar.expanded .sidebar-logo-text { opacity:1; width:auto; }
 .sidebar.expanded .nav-label { opacity:1; }
@@ -229,7 +238,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 .sidebar.expanded .sidebar-profile-info,
 .sidebar.expanded .sidebar-profile-icon { width:auto; opacity:1; overflow:visible; }
 .sidebar.expanded .sidebar-profile { justify-content:flex-start; }
-.sidebar.expanded .sidebar-toggle i { transform:rotate(180deg); }
+/* toggle rotation handled by JS */
 
 /* ── OVERLAY fond flou ── */
 .sidebar-overlay {
@@ -249,7 +258,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 }
 
 /* ── MAIN ── */
-.main { margin-left:58px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); transition:margin-left .28s cubic-bezier(0.4,0,0.2,1); }
+.main { margin-left:58px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); }
 
 /* ── PAGES ── */
 .page { display:none; animation:fadeIn 0.3s ease; }
@@ -812,6 +821,21 @@ tr:hover td { background:var(--bg); }
       </div>
     </div>
 
+    <!-- Trésorerie -->
+    <div class="nav-section" id="ns-tresor">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-tresor')">
+        <div class="nav-label">Trésorerie</div>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
+      </div>
+      <div class="nav-section-body">
+        <div class="nav-item" onclick="showPage('tresorerie')">
+          <i class="fa-solid fa-vault fa-fw"></i>
+          <span class="nav-lbl">Trésorerie</span>
+          <span class="nav-tip">Trésorerie</span>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /sidebar-scroll -->
 
   <!-- Profil bas -->
@@ -891,8 +915,17 @@ tr:hover td { background:var(--bg); }
     </div>
   </div>
 
+  <!-- ── TRÉSORERIE ÉVOLUTION ── -->
+  <div class="chart-card" style="margin-top:20px">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span>📈 Évolution de la trésorerie</span>
+      <div style="display:flex;gap:6px" id="tresor-chart-legend"></div>
+    </div>
+    <canvas id="chart-tresorerie" style="max-height:200px"></canvas>
+  </div>
+
   <!-- ── CHARTS ROW ── -->
-  <div class="grid2" style="margin-top:20px">
+  <div class="grid2" style="margin-top:16px">
     <div class="chart-card">
       <div class="card-title">📊 Répartition du budget</div>
       <canvas id="chart-budget"></canvas>
@@ -1327,9 +1360,81 @@ tr:hover td { background:var(--bg); }
   <div id="courses-list"></div>
 </div>
 
+
+<!-- ═══════════════════ TRÉSORERIE ═══════════════════ -->
+<div id="page-tresorerie" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🏦 Trésorerie</div>
+      <div class="page-sub">Carte Visa · Moov Money · Épargne projets</div>
+    </div>
+    <button class="btn btn-primary" onclick="openTresorModal()">+ Ajouter</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid3" style="margin-bottom:20px" id="tresor-kpis">
+    <div class="kpi blue"><div class="kpi-icon">💳</div><div class="kpi-val" id="tresor-visa">0</div><div class="kpi-label">Carte Visa (XAF)</div></div>
+    <div class="kpi gold"><div class="kpi-icon">📱</div><div class="kpi-val" id="tresor-moov">0</div><div class="kpi-label">Moov Money (XAF)</div></div>
+    <div class="kpi green"><div class="kpi-icon">🎯</div><div class="kpi-val" id="tresor-epargne">0</div><div class="kpi-label">Épargne projets (XAF)</div></div>
+  </div>
+
+  <!-- Onglets par compte -->
+  <div class="filter-row" style="margin-bottom:16px">
+    <button class="filter-chip active" data-tfilter="all" onclick="setTresorFilter(this)">Tous</button>
+    <button class="filter-chip" data-tfilter="visa" onclick="setTresorFilter(this)">💳 Carte Visa</button>
+    <button class="filter-chip" data-tfilter="moov" onclick="setTresorFilter(this)">📱 Moov Money</button>
+    <button class="filter-chip" data-tfilter="epargne" onclick="setTresorFilter(this)">🎯 Épargne</button>
+  </div>
+
+  <div id="tresorerie-list"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- TRÉSORERIE MODAL -->
+<div id="modal-tresor" class="modal-overlay" onclick="closeModalOut(event,'modal-tresor')">
+<div class="modal">
+  <div class="modal-title" id="tresor-modal-title">➕ Ajouter une opération <span class="modal-close" onclick="closeModal('modal-tresor')">✕</span></div>
+  <input type="hidden" id="tresor-edit-id">
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Compte</label>
+      <select class="form-select" id="tresor-compte">
+        <option value="visa">💳 Carte Visa</option>
+        <option value="moov">📱 Moov Money</option>
+        <option value="epargne">🎯 Épargne projet</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="tresor-type">
+        <option value="credit">⬆️ Crédit (entrée)</option>
+        <option value="debit">⬇️ Débit (sortie)</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Montant (XAF)</label>
+      <input class="form-input" type="number" id="tresor-montant" placeholder="Ex: 50000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" type="date" id="tresor-date">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Description</label>
+    <input class="form-input" id="tresor-desc" placeholder="Ex: Retrait DAB, Virement, Épargne loyer…">
+  </div>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveTresor()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-tresor')">Annuler</button>
+  </div>
+</div>
+</div>
+
 
 <!-- STOCK -->
 <div id="modal-stock" class="modal-overlay" onclick="closeModalOut(event,'modal-stock')">
@@ -1911,7 +2016,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: []
+  ressources: [], creances: [], courses: [], tresorerie: []
 };
 
 // ══ FIREBASE ══
@@ -1919,7 +2024,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2070,6 +2175,7 @@ function renderPage(id) {
   if (id==='ressources') renderRessources();
   if (id==='creances') renderCreances();
   if (id==='courses') renderCourses();
+  if (id==='tresorerie') renderTresorerie();
 }
 
 function renderAll() {
@@ -2087,6 +2193,7 @@ function renderAll() {
   renderRessources();
   renderCreances();
   renderCourses();
+  renderTresorerie();
   updateBadges();
 }
 
@@ -2165,6 +2272,7 @@ function renderDashboard() {
   // Render charts (async small delay to let DOM settle)
   setTimeout(renderCharts, 60);
 }
+
 
 // ══ STOCKS ══
 
@@ -3611,6 +3719,93 @@ function renderCharts() {
     });
   }
 
+
+  // ── Chart 5 : Évolution trésorerie (Line) ──
+  destroyChart('tresorerie');
+  const tresCtx = document.getElementById('chart-tresorerie');
+  if (tresCtx) {
+    const ops = (state.tresorerie || []).filter(x => x.date);
+    // Construire soldes cumulés par date pour chaque compte
+    const comptes = ['visa', 'moov', 'epargne'];
+    const labels_set = new Set(ops.map(x => x.date));
+    const allDates = [...labels_set].sort();
+
+    // Si pas de données : afficher message
+    if (allDates.length === 0) {
+      destroyChart('tresorerie');
+    } else {
+      // Calculer solde cumulatif par compte à chaque date
+      const soldesCumulatifs = {};
+      comptes.forEach(cpt => {
+        let running = 0;
+        soldesCumulatifs[cpt] = allDates.map(date => {
+          ops.filter(x => x.compte === cpt && x.date <= date)
+             .forEach(x => { running = 0; }); // reset pour recalcul propre
+          running = ops.filter(x => x.compte === cpt && x.date <= date)
+                       .reduce((s, x) => x.type === 'credit' ? s + (+x.montant||0) : s - (+x.montant||0), 0);
+          return running;
+        });
+      });
+
+      const palTresor = {
+        visa:    { color: 'rgba(93,173,226,1)',    bg: 'rgba(93,173,226,0.08)'    },
+        moov:    { color: 'rgba(201,168,76,1)',    bg: 'rgba(201,168,76,0.08)'    },
+        epargne: { color: 'rgba(45,106,79,1)',     bg: 'rgba(45,106,79,0.08)'     }
+      };
+      const cptLabels = { visa:'💳 Visa', moov:'📱 Moov', epargne:'🎯 Épargne' };
+
+      _charts['tresorerie'] = new Chart(tresCtx, {
+        type: 'line',
+        data: {
+          labels: allDates.map(d => {
+            const [y,m,dd] = d.split('-');
+            return `${dd}/${m}/${y.slice(2)}`;
+          }),
+          datasets: comptes.map(cpt => ({
+            label: cptLabels[cpt],
+            data: soldesCumulatifs[cpt],
+            borderColor: palTresor[cpt].color,
+            backgroundColor: palTresor[cpt].bg,
+            borderWidth: 2.5,
+            pointRadius: allDates.length <= 10 ? 5 : 3,
+            pointHoverRadius: 7,
+            tension: 0.4,
+            fill: true,
+          }))
+        },
+        options: {
+          responsive: true, maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: c.text, font: { family: 'Sora', size: 11 }, boxWidth: 14, padding: 14 }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label} : ${ctx.raw >= 0 ? '+' : ''}${fmtXAF(ctx.raw)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                color: c.text,
+                callback: val => {
+                  if (Math.abs(val) >= 1000000) return (val/1000000).toFixed(1) + 'M';
+                  if (Math.abs(val) >= 1000) return (val/1000).toFixed(0) + 'k';
+                  return val;
+                }
+              },
+              grid: { color: c.grid }
+            },
+            x: { ticks: { color: c.text, font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+  }
+
   // ── Chart 4 : Biens locatifs (Doughnut) ──
   destroyChart('locatifs');
   const locCtx = document.getElementById('chart-locatifs');
@@ -4348,6 +4543,147 @@ function filterLocatifs() {
 }
 
 // ══ INIT ══
+
+// ══ TRÉSORERIE ══════════════════════════════════════════════
+let tresorFilter = 'all';
+function setTresorFilter(btn) {
+  document.querySelectorAll('[data-tfilter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tresorFilter = btn.dataset.tfilter;
+  renderTresorerie();
+}
+
+const TRESOR_LABELS = { visa:'💳 Carte Visa', moov:'📱 Moov Money', epargne:'🎯 Épargne projet' };
+const TRESOR_COLORS = { visa:'var(--blue2)', moov:'var(--gold)', epargne:'var(--accent)' };
+
+function renderTresorerie() {
+  const items = state.tresorerie || [];
+
+  // KPIs par compte
+  const solde = (compte) => items.filter(x=>x.compte===compte)
+    .reduce((s,x)=> x.type==='credit' ? s+(+x.montant||0) : s-(+x.montant||0), 0);
+  const fmtK = v => fmtXAF(Math.abs(v)) + (v<0?' ⚠️':'');
+  const el = id => document.getElementById(id);
+  if(el('tresor-visa')) el('tresor-visa').textContent = fmtK(solde('visa'));
+  if(el('tresor-moov')) el('tresor-moov').textContent = fmtK(solde('moov'));
+  if(el('tresor-epargne')) el('tresor-epargne').textContent = fmtK(solde('epargne'));
+
+  const filtered = tresorFilter==='all' ? items : items.filter(x=>x.compte===tresorFilter);
+  const sorted = [...filtered].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+
+  const list = document.getElementById('tresorerie-list');
+  if (!list) return;
+  if (sorted.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune opération. Cliquez sur <b>+ Ajouter</b> pour commencer.</div>';
+    return;
+  }
+
+  // Grouper par compte si filtre = all
+  if (tresorFilter === 'all') {
+    const groups = { visa:[], moov:[], epargne:[] };
+    sorted.forEach(x => { if(groups[x.compte]) groups[x.compte].push(x); });
+    list.innerHTML = Object.entries(groups).map(([compte, ops]) => {
+      if (!ops.length) return '';
+      const sol = solde(compte);
+      return `<div class="card" style="margin-bottom:16px">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span>${TRESOR_LABELS[compte]}</span>
+          <span style="font-family:var(--mono);font-size:.75rem;color:${sol>=0?'var(--accent)':'var(--red)'};font-weight:700">
+            Solde : ${sol>=0?'+':''}${fmtXAF(sol)}
+          </span>
+        </div>
+        ${ops.map(op => tresorRow(op)).join('')}
+      </div>`;
+    }).filter(Boolean).join('');
+  } else {
+    const sol = solde(tresorFilter);
+    list.innerHTML = `<div class="card">
+      <div style="text-align:right;font-family:var(--mono);font-size:.78rem;color:${sol>=0?'var(--accent)':'var(--red)'};font-weight:700;margin-bottom:12px">
+        Solde total : ${sol>=0?'+':''}${fmtXAF(sol)}
+      </div>
+      ${sorted.map(op => tresorRow(op)).join('')}
+    </div>`;
+  }
+}
+
+function tresorRow(op) {
+  const isCredit = op.type === 'credit';
+  return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+    <div style="width:32px;height:32px;border-radius:50%;background:${isCredit?'rgba(45,106,79,.15)':'rgba(220,53,69,.12)'};
+      display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">
+      ${isCredit?'⬆️':'⬇️'}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.desc||'—'}</div>
+      <div style="font-size:.72rem;color:var(--text3);font-family:var(--mono)">${op.date||''} · ${TRESOR_LABELS[op.compte]||op.compte}</div>
+    </div>
+    <div style="font-family:var(--mono);font-weight:700;font-size:.88rem;color:${isCredit?'var(--accent)':'var(--red)'};flex-shrink:0">
+      ${isCredit?'+':'-'}${fmtXAF(op.montant)}
+    </div>
+    <div style="display:flex;gap:4px;flex-shrink:0">
+      <button class="btn btn-outline btn-icon btn-sm" onclick="editTresor(${op.id})" title="Modifier">✏️</button>
+      <button class="btn btn-outline btn-icon btn-sm" onclick="deleteTresor(${op.id})" title="Supprimer">🗑️</button>
+    </div>
+  </div>`;
+}
+
+function openTresorModal() {
+  document.getElementById('tresor-modal-title').textContent = '➕ Ajouter une opération ✕';
+  document.getElementById('tresor-edit-id').value = '';
+  document.getElementById('tresor-compte').value = 'visa';
+  document.getElementById('tresor-type').value = 'credit';
+  document.getElementById('tresor-montant').value = '';
+  document.getElementById('tresor-desc').value = '';
+  document.getElementById('tresor-date').value = new Date().toISOString().split('T')[0];
+  openModal('modal-tresor');
+}
+
+function editTresor(id) {
+  const op = state.tresorerie.find(x=>x.id===id);
+  if (!op) return;
+  document.getElementById('tresor-modal-title').innerHTML = "✏️ Modifier l'op&eacute;ration <span class='modal-close' onclick=\"closeModal('modal-tresor')\">✕</span>";
+  document.getElementById('tresor-edit-id').value = id;
+  document.getElementById('tresor-compte').value = op.compte;
+  document.getElementById('tresor-type').value = op.type;
+  document.getElementById('tresor-montant').value = op.montant;
+  document.getElementById('tresor-desc').value = op.desc||'';
+  document.getElementById('tresor-date').value = op.date||'';
+  openModal('modal-tresor');
+}
+
+function saveTresor() {
+  const compte = document.getElementById('tresor-compte').value;
+  const type   = document.getElementById('tresor-type').value;
+  const montant = +(document.getElementById('tresor-montant').value)||0;
+  const desc   = document.getElementById('tresor-desc').value.trim();
+  const date   = document.getElementById('tresor-date').value;
+  if (!montant) return showToast('❌ Montant requis');
+  if (!date)    return showToast('❌ Date requise');
+  const editId = +document.getElementById('tresor-edit-id').value||0;
+  if (!state.tresorerie) state.tresorerie = [];
+  if (editId) {
+    const idx = state.tresorerie.findIndex(x=>x.id===editId);
+    if (idx>=0) state.tresorerie[idx] = {id:editId, compte, type, montant, desc, date};
+  } else {
+    state.tresorerie.push({id:Date.now(), compte, type, montant, desc, date});
+  }
+  save('tresorerie');
+  closeModal('modal-tresor');
+  renderTresorerie();
+  setTimeout(renderCharts, 80);
+  showToast('✅ Opération enregistrée');
+}
+
+function deleteTresor(id) {
+  if (!confirm('Supprimer cette opération ?')) return;
+  state.tresorerie = state.tresorerie.filter(x=>x.id!==id);
+  save('tresorerie');
+  renderTresorerie();
+  setTimeout(renderCharts, 80);
+  showToast('🗑️ Supprimée');
+}
+// ════════════════════════════════════════════════════════════
+
 checkSession();
 sidebarInit();
 initDate();
