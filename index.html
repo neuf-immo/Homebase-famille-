@@ -68,27 +68,118 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 
 /* ── SIDEBAR ── */
 .sidebar {
-  position:fixed; top:60px; left:0; bottom:0; width:220px; z-index:900;
+  position:fixed; top:60px; left:0; bottom:0; width:240px; z-index:900;
   background:var(--card); border-right:1px solid var(--border);
-  padding:20px 12px; overflow-y:auto; transition:var(--transition);
+  display:flex; flex-direction:column;
+  transition:width 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow:hidden;
 }
-.nav-section { margin-bottom:24px; }
-.nav-label { font-size:0.65rem; font-weight:700; letter-spacing:1.5px; color:var(--text3); text-transform:uppercase; padding:0 10px; margin-bottom:8px; font-family:var(--mono); }
+.sidebar-scroll {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  padding:16px 10px 8px;
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar { width:3px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+.nav-section { margin-bottom:4px; }
+.nav-section-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 10px 4px; cursor:pointer; user-select:none;
+}
+.nav-label {
+  font-size:0.6rem; font-weight:700; letter-spacing:1.8px; color:var(--text3);
+  text-transform:uppercase; font-family:var(--mono);
+  transition:var(--transition); white-space:nowrap; overflow:hidden;
+}
+.nav-section-arrow {
+  font-size:.55rem; color:var(--text3); transition:transform 0.25s ease;
+  flex-shrink:0; opacity:0.6;
+}
+.nav-section.collapsed .nav-section-arrow { transform:rotate(-90deg); }
+.nav-section-items { overflow:hidden; transition:max-height 0.3s ease, opacity 0.2s ease; max-height:500px; opacity:1; }
+.nav-section.collapsed .nav-section-items { max-height:0; opacity:0; }
 .nav-item {
-  display:flex; align-items:center; gap:10px; padding:9px 12px;
-  border-radius:var(--radius2); cursor:pointer; transition:var(--transition);
-  font-size:0.85rem; font-weight:500; color:var(--text2); position:relative;
-  margin-bottom:2px;
+  display:flex; align-items:center; gap:11px; padding:9px 12px;
+  border-radius:10px; cursor:pointer;
+  font-size:0.83rem; font-weight:500; color:var(--text2);
+  position:relative; margin-bottom:1px;
+  transition:background 0.18s ease, color 0.18s ease, transform 0.15s ease;
+  white-space:nowrap; overflow:hidden;
 }
-.nav-item i { font-size:.95rem; width:16px; flex-shrink:0; }
-.nav-item:hover { background:var(--bg2); color:var(--text); }
-.nav-item.active { background:var(--accent); color:#fff; }
+.nav-item:hover { background:var(--bg2); color:var(--text); transform:translateX(2px); }
+.nav-item.active {
+  background:linear-gradient(135deg, var(--accent), #3a8a65);
+  color:#fff; box-shadow:0 4px 14px rgba(45,106,79,0.35); transform:none;
+}
+.nav-item.active::before {
+  content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:3px; height:60%; background:#fff; border-radius:0 3px 3px 0; opacity:0.7;
+}
+.nav-item i { font-size:.92rem; width:18px; flex-shrink:0; text-align:center; transition:var(--transition); }
+.nav-item:hover i { transform:scale(1.15); }
 .nav-item.active i { color:#fff; }
-.nav-badge { margin-left:auto; background:var(--red); color:#fff; font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:10px; font-family:var(--mono); }
+.nav-item span.label { flex:1; transition:var(--transition); }
+.nav-badge {
+  margin-left:auto; background:var(--red); color:#fff;
+  font-size:0.58rem; font-weight:700; padding:2px 6px;
+  border-radius:10px; font-family:var(--mono); flex-shrink:0;
+  animation:badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes badgePop { from{transform:scale(0)} to{transform:scale(1)} }
 .nav-item.active .nav-badge { background:rgba(255,255,255,0.3); }
+.nav-item .nav-tooltip {
+  display:none; position:absolute; left:calc(100% + 12px); top:50%;
+  transform:translateY(-50%); background:var(--text); color:var(--bg);
+  font-size:.72rem; font-weight:600; padding:5px 10px;
+  border-radius:7px; white-space:nowrap; pointer-events:none; z-index:9999;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+.nav-item .nav-tooltip::before {
+  content:""; position:absolute; right:100%; top:50%; transform:translateY(-50%);
+  border:5px solid transparent; border-right-color:var(--text);
+}
+.sidebar-footer {
+  padding:10px 10px 14px; border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  cursor:pointer; transition:var(--transition); flex-shrink:0;
+}
+.sidebar-footer:hover { background:var(--bg2); }
+.sidebar-footer-avatar {
+  width:34px; height:34px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),var(--orange2));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:0.82rem; color:#fff;
+}
+.sidebar-footer-info { flex:1; overflow:hidden; min-width:0; transition:var(--transition); }
+.sidebar-footer-name { font-size:.82rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar-footer-role { font-size:.68rem; color:var(--text3); font-family:var(--mono); }
+.sidebar-footer-icon { color:var(--text3); font-size:.8rem; flex-shrink:0; transition:var(--transition); }
+.sidebar-toggle {
+  position:absolute; top:14px; right:-12px; z-index:910;
+  width:24px; height:24px; border-radius:50%;
+  background:var(--card); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:.65rem; color:var(--text3);
+  transition:var(--transition); box-shadow:var(--shadow);
+}
+.sidebar-toggle:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.sidebar.collapsed { width:62px; }
+.sidebar.collapsed .nav-label { opacity:0; pointer-events:none; }
+.sidebar.collapsed .nav-section-arrow { opacity:0; }
+.sidebar.collapsed .nav-section.collapsed .nav-section-items { max-height:500px; opacity:1; }
+.sidebar.collapsed .nav-item { justify-content:center; padding:10px; gap:0; }
+.sidebar.collapsed .nav-item span.label { width:0; overflow:hidden; opacity:0; margin:0; }
+.sidebar.collapsed .nav-item .nav-badge { position:absolute; top:4px; right:4px; padding:1px 4px; }
+.sidebar.collapsed .nav-item:hover .nav-tooltip { display:block; }
+.sidebar.collapsed .nav-section-header { justify-content:center; padding:4px 0; }
+.sidebar.collapsed .sidebar-footer-info,
+.sidebar.collapsed .sidebar-footer-icon { width:0; overflow:hidden; opacity:0; }
+.sidebar.collapsed .sidebar-footer { justify-content:center; }
+.sidebar.collapsed .sidebar-toggle i { transform:rotate(180deg); }
 
 /* ── MAIN ── */
-.main { margin-left:220px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); }
+.main { margin-left:240px; margin-top:60px; padding:28px; min-height:calc(100vh - 60px); transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+.sidebar.collapsed ~ main.main { margin-left:62px; }
 
 /* ── PAGES ── */
 .page { display:none; animation:fadeIn 0.3s ease; }
@@ -278,11 +369,19 @@ tr:hover td { background:var(--bg); }
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  .sidebar { width:60px; }
-  .nav-item span:not(.nav-badge) { display:none; }
-  .nav-item i { margin:0 auto; }
-  .nav-label { display:none; }
-  .main { margin-left:60px; }
+  .sidebar { width:62px; }
+  .sidebar .nav-label { opacity:0; pointer-events:none; }
+  .sidebar .nav-section-arrow { opacity:0; }
+  .sidebar .nav-section.collapsed .nav-section-items { max-height:500px; opacity:1; }
+  .sidebar .nav-item { justify-content:center; padding:10px; gap:0; }
+  .sidebar .nav-item span.label { width:0; overflow:hidden; opacity:0; margin:0; }
+  .sidebar .nav-item .nav-badge { position:absolute; top:4px; right:4px; padding:1px 4px; }
+  .sidebar .nav-item:hover .nav-tooltip { display:block; }
+  .sidebar .nav-section-header { justify-content:center; padding:4px 0; }
+  .sidebar .sidebar-footer-info,
+  .sidebar .sidebar-footer-icon { width:0; overflow:hidden; opacity:0; }
+  .sidebar .sidebar-footer { justify-content:center; }
+  .main { margin-left:62px; }
   .grid4 { grid-template-columns:1fr 1fr; }
   .grid3 { grid-template-columns:1fr 1fr; }
 }
@@ -506,76 +605,155 @@ tr:hover td { background:var(--bg); }
 </div>
 
 <!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="nav-section">
-    <div class="nav-label" data-fr="Principal" data-en="Main">Principal</div>
-    <div class="nav-item active" onclick="showPage('dashboard')">
-      <i class="fa-solid fa-chart-pie fa-fw"></i><span data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
-    </div>
-    <div class="nitem" onclick="showPage('calendrier')">
-      <i class="fa-solid fa-calendar-days fa-fw"></i><span>Calendrier</span><span class="nav-badge" id="bdgCal" style="display:none">0</span>
-    </div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire/Agrandir">
+    <i class="fa-solid fa-chevron-left fa-fw"></i>
   </div>
-  <div class="nav-section">
-    <div class="nav-label" data-fr="Maison" data-en="Home">Maison</div>
-    <div class="nav-item" onclick="showPage('stocks')">
-      <i class="fa-solid fa-box fa-fw"></i><span data-fr="Stocks & Courses" data-en="Stock & Shopping">Stocks & Courses</span>
-      <span class="nav-badge" id="badgeStock">0</span>
+  <div class="sidebar-scroll">
+
+    <!-- Principal -->
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleNavSection(this)">
+        <div class="nav-label" data-fr="Principal" data-en="Main">Principal</div>
+        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+      </div>
+      <div class="nav-section-items">
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          <i class="fa-solid fa-chart-pie fa-fw"></i>
+          <span class="label" data-fr="Tableau de bord" data-en="Dashboard">Tableau de bord</span>
+          <span class="nav-tooltip">Tableau de bord</span>
+        </div>
+        <div class="nav-item" onclick="showPage('calendrier')">
+          <i class="fa-solid fa-calendar-days fa-fw"></i>
+          <span class="label">Calendrier</span>
+          <span class="nav-badge" id="bdgCal" style="display:none">0</span>
+          <span class="nav-tooltip">Calendrier</span>
+        </div>
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('courses')">
-      <i class="fa-solid fa-basket-shopping fa-fw"></i><span>Liste de Courses</span>
-      <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
+
+    <!-- Maison -->
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleNavSection(this)">
+        <div class="nav-label" data-fr="Maison" data-en="Home">Maison</div>
+        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+      </div>
+      <div class="nav-section-items">
+        <div class="nav-item" onclick="showPage('stocks')">
+          <i class="fa-solid fa-box fa-fw"></i>
+          <span class="label" data-fr="Stocks & Courses" data-en="Stocks">Stocks & Courses</span>
+          <span class="nav-badge" id="badgeStock">0</span>
+          <span class="nav-tooltip">Stocks & Courses</span>
+        </div>
+        <div class="nav-item" onclick="showPage('courses')">
+          <i class="fa-solid fa-basket-shopping fa-fw"></i>
+          <span class="label">Liste de Courses</span>
+          <span class="nav-badge" id="badgeCourses" style="display:none">0</span>
+          <span class="nav-tooltip">Liste de Courses</span>
+        </div>
+        <div class="nav-item" onclick="showPage('budget')">
+          <i class="fa-solid fa-wallet fa-fw"></i>
+          <span class="label" data-fr="Budget Maison" data-en="Budget">Budget Maison</span>
+          <span class="nav-tooltip">Budget Maison</span>
+        </div>
+        <div class="nav-item" onclick="showPage('taches')">
+          <i class="fa-solid fa-list-check fa-fw"></i>
+          <span class="label" data-fr="Tâches" data-en="Tasks">Tâches</span>
+          <span class="nav-badge" id="badgeTaches">0</span>
+          <span class="nav-tooltip">Tâches</span>
+        </div>
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('budget')">
-      <i class="fa-solid fa-wallet fa-fw"></i><span data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
+
+    <!-- Immobilier -->
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleNavSection(this)">
+        <div class="nav-label" data-fr="Immobilier" data-en="Real Estate">Immobilier</div>
+        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+      </div>
+      <div class="nav-section-items">
+        <div class="nav-item" onclick="showPage('locatifs')">
+          <i class="fa-solid fa-building fa-fw"></i>
+          <span class="label" data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
+          <span class="nav-tooltip">Biens Locatifs</span>
+        </div>
+        <div class="nav-item" onclick="showPage('chantiers')">
+          <i class="fa-solid fa-helmet-safety fa-fw"></i>
+          <span class="label" data-fr="Chantiers" data-en="Projects">Chantiers</span>
+          <span class="nav-tooltip">Chantiers</span>
+        </div>
+        <div class="nav-item" onclick="showPage('maintenance')">
+          <i class="fa-solid fa-screwdriver-wrench fa-fw"></i>
+          <span class="label">Maintenance</span>
+          <span class="nav-badge" id="badgeMaint" style="display:none">0</span>
+          <span class="nav-tooltip">Maintenance</span>
+        </div>
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('taches')">
-      <i class="fa-solid fa-list-check fa-fw"></i><span data-fr="Tâches" data-en="Tasks">Tâches</span>
-      <span class="nav-badge" id="badgeTaches">0</span>
+
+    <!-- Finances -->
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleNavSection(this)">
+        <div class="nav-label">Finances</div>
+        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+      </div>
+      <div class="nav-section-items">
+        <div class="nav-item" onclick="showPage('ressources')">
+          <i class="fa-solid fa-sack-dollar fa-fw"></i>
+          <span class="label">Ressources</span>
+          <span class="nav-tooltip">Ressources</span>
+        </div>
+        <div class="nav-item" onclick="showPage('creances')">
+          <i class="fa-solid fa-file-invoice-dollar fa-fw"></i>
+          <span class="label">Créances</span>
+          <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
+          <span class="nav-tooltip">Créances</span>
+        </div>
+        <div class="nav-item" onclick="showPage('dettes')">
+          <i class="fa-solid fa-credit-card fa-fw"></i>
+          <span class="label">Dettes</span>
+          <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
+          <span class="nav-tooltip">Dettes</span>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label" data-fr="Immobilier" data-en="Real Estate">Immobilier</div>
-    <div class="nav-item" onclick="showPage('locatifs')">
-      <i class="fa-solid fa-building fa-fw"></i><span data-fr="Biens Locatifs" data-en="Rentals">Biens Locatifs</span>
+
+    <!-- Famille -->
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleNavSection(this)">
+        <div class="nav-label" data-fr="Famille" data-en="Family">Famille</div>
+        <i class="fa-solid fa-chevron-down nav-section-arrow"></i>
+      </div>
+      <div class="nav-section-items">
+        <div class="nav-item" onclick="showPage('enfant')">
+          <i class="fa-solid fa-child fa-fw"></i>
+          <span class="label" data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
+          <span class="nav-tooltip">Mon Enfant</span>
+        </div>
+        <div class="nav-item" onclick="showPage('objectifs')">
+          <i class="fa-solid fa-bullseye fa-fw"></i>
+          <span class="label" data-fr="Objectifs" data-en="Goals">Objectifs</span>
+          <span class="nav-tooltip">Objectifs</span>
+        </div>
+        <div class="nav-item" onclick="showPage('engagements')">
+          <i class="fa-solid fa-handshake fa-fw"></i>
+          <span class="label">Engagements</span>
+          <span class="nav-badge" id="badgeEng" style="display:none">0</span>
+          <span class="nav-tooltip">Engagements</span>
+        </div>
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('chantiers')">
-      <i class="fa-solid fa-helmet-safety fa-fw"></i><span data-fr="Chantiers" data-en="Projects">Chantiers</span>
+
+  </div><!-- /sidebar-scroll -->
+
+  <!-- Footer profil -->
+  <div class="sidebar-footer" id="sidebar-footer" onclick="toggleUserMenu()">
+    <div class="sidebar-footer-avatar" id="sf-avatar">?</div>
+    <div class="sidebar-footer-info">
+      <div class="sidebar-footer-name" id="sf-name">—</div>
+      <div class="sidebar-footer-role" id="sf-role">Connexion requise</div>
     </div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label">Finances</div>
-    <div class="nav-item" onclick="showPage('ressources')">
-      <i class="fa-solid fa-sack-dollar fa-fw"></i><span>Ressources</span>
-    </div>
-    <div class="nav-item" onclick="showPage('creances')">
-      <i class="fa-solid fa-file-invoice-dollar fa-fw"></i><span>Créances</span>
-      <span class="nav-badge" id="badgeCreances" style="display:none">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('dettes')">
-      <i class="fa-solid fa-credit-card fa-fw"></i><span>Dettes</span>
-      <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
-    </div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label">Immobilier+</div>
-    <div class="nav-item" onclick="showPage('maintenance')">
-      <i class="fa-solid fa-screwdriver-wrench fa-fw"></i><span>Maintenance</span>
-      <span class="nav-badge" id="badgeMaint" style="display:none">0</span>
-    </div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label" data-fr="Famille" data-en="Family">Famille</div>
-    <div class="nav-item" onclick="showPage('enfant')">
-      <i class="fa-solid fa-child fa-fw"></i><span data-fr="Mon Enfant" data-en="My Child">Mon Enfant</span>
-    </div>
-    <div class="nav-item" onclick="showPage('objectifs')">
-      <i class="fa-solid fa-bullseye fa-fw"></i><span data-fr="Objectifs" data-en="Goals">Objectifs</span>
-    </div>
-    <div class="nav-item" onclick="showPage('engagements')">
-      <i class="fa-solid fa-handshake fa-fw"></i><span>Engagements</span>
-      <span class="nav-badge" id="badgeEng" style="display:none">0</span>
-    </div>
+    <i class="fa-solid fa-ellipsis-vertical sidebar-footer-icon"></i>
   </div>
 </nav>
 
@@ -689,7 +867,7 @@ tr:hover td { background:var(--bg); }
     <button class="filter-chip" data-alerte="critique" onclick="setStockFilter(this)">🔴 Critique</button>
   </div>
 
-  <div class="grid3" id="stock-sections" style="align-items:start"></div>
+  <div class="grid3" id="stock-sections"></div>
 </div>
 
 <!-- ═══════════════════ BUDGET ═══════════════════ -->
@@ -2976,6 +3154,7 @@ async function doLogin() {
   sessionStorage.setItem('hb_user', JSON.stringify({id:user.id,username:user.username,nom:user.nom,role:user.role,avatar:user.avatar,color:user.color}));
   hideAuthScreen();
   updateTopbarUser();
+  updateSidebarFooter();
   applyRolePermissions();
   showToast(`Bienvenue ${user.nom} ! 👋`);
 }
@@ -3010,6 +3189,41 @@ document.addEventListener('click', e=>{
     if(dd) dd.classList.remove('open');
   }
 });
+
+// ── SIDEBAR TOGGLE & SECTIONS ──
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  sb.classList.toggle('collapsed');
+  const isCollapsed = sb.classList.contains('collapsed');
+  localStorage.setItem('hb_sidebar_collapsed', isCollapsed ? '1' : '0');
+}
+
+function toggleNavSection(header) {
+  const section = header.closest('.nav-section');
+  const sb = document.getElementById('sidebar');
+  if(sb && sb.classList.contains('collapsed')) return; // pas de collapse en mode réduit
+  section.classList.toggle('collapsed');
+}
+
+function initSidebar() {
+  const sb = document.getElementById('sidebar');
+  if(!sb) return;
+  if(localStorage.getItem('hb_sidebar_collapsed') === '1') sb.classList.add('collapsed');
+}
+
+function updateSidebarFooter() {
+  if(!currentUser) return;
+  const av = document.getElementById('sf-avatar');
+  const nm = document.getElementById('sf-name');
+  const rl = document.getElementById('sf-role');
+  if(av){ av.textContent = currentUser.avatar || (currentUser.nom||'?')[0]; av.style.background = currentUser.color||'var(--gold)'; }
+  if(nm) nm.textContent = currentUser.nom || '—';
+  if(rl){
+    const roleLabels={admin:'👑 Administrateur',member:'👤 Membre',viewer:'👁️ Lecteur'};
+    rl.textContent = roleLabels[currentUser.role] || currentUser.role;
+  }
+}
 
 function updateTopbarUser() {
   if(!currentUser) return;
@@ -3169,6 +3383,7 @@ function checkSession() {
       currentUser = JSON.parse(saved);
       hideAuthScreen();
       updateTopbarUser();
+      updateSidebarFooter();
       applyRolePermissions();
     } catch{ sessionStorage.removeItem('hb_user'); }
   }
@@ -4062,6 +4277,7 @@ function filterLocatifs() {
 
 // ══ INIT ══
 checkSession();
+initSidebar();
 initDate();
 loadAll();
 </script>
