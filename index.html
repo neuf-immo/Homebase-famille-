@@ -870,6 +870,22 @@ tr:hover td { background:var(--bg); }
       </div>
     </div>
 
+    <!-- Routines -->
+    <div class="nav-section" id="ns-routines">
+      <div class="nav-section-hd" onclick="sidebarToggleSection('ns-routines')">
+        <div class="nav-label">Routines</div>
+        <i class="fa-solid fa-chevron-down nav-section-chevron"></i>
+      </div>
+      <div class="nav-section-body">
+        <div class="nav-item" onclick="showPage('routines')">
+          <i class="fa-solid fa-repeat fa-fw"></i>
+          <span class="nav-lbl">Routines & Habitudes</span>
+          <span class="nav-badge" id="badgeRoutines" style="display:none">0</span>
+          <span class="nav-tip">Routines</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Trésorerie -->
     <div class="nav-section" id="ns-tresor">
       <div class="nav-section-hd" onclick="sidebarToggleSection('ns-tresor')">
@@ -1456,9 +1472,95 @@ tr:hover td { background:var(--bg); }
   <div id="tresorerie-list"></div>
 </div>
 
+
+<!-- ═══════════════════ ROUTINES ═══════════════════ -->
+<div id="page-routines" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🔁 Routines & Habitudes</div>
+      <div class="page-sub">Tes rituels quotidiens, hebdo et mensuels</div>
+    </div>
+    <button class="btn btn-primary" onclick="openRoutineModal()">+ Ajouter</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="rtn-done-today">0</div><div class="kpi-label">Faites aujourd'hui</div></div>
+    <div class="kpi gold"><div class="kpi-icon">⏳</div><div class="kpi-val" id="rtn-pending">0</div><div class="kpi-label">Restantes</div></div>
+    <div class="kpi blue"><div class="kpi-icon">🔥</div><div class="kpi-val" id="rtn-best-streak">0j</div><div class="kpi-label">Meilleur streak</div></div>
+    <div class="kpi red"><div class="kpi-icon">📋</div><div class="kpi-val" id="rtn-total">0</div><div class="kpi-label">Total routines</div></div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filter-row" style="margin-bottom:16px">
+    <button class="filter-chip active" data-rfilter="all"     onclick="setRtnFilter(this)">Toutes</button>
+    <button class="filter-chip"        data-rfilter="daily"   onclick="setRtnFilter(this)">🌅 Quotidien</button>
+    <button class="filter-chip"        data-rfilter="weekly"  onclick="setRtnFilter(this)">📅 Hebdo</button>
+    <button class="filter-chip"        data-rfilter="monthly" onclick="setRtnFilter(this)">📆 Mensuel</button>
+    <button class="filter-chip"        data-rfilter="pending" onclick="setRtnFilter(this)">⏳ Restantes</button>
+  </div>
+
+  <div id="routines-grid" class="grid2" style="align-items:start"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- ROUTINE MODAL -->
+<div id="modal-routine" class="modal-overlay" onclick="closeModalOut(event,'modal-routine')">
+<div class="modal">
+  <div class="modal-title" id="rtn-modal-title">🔁 Nouvelle routine <span class="modal-close" onclick="closeModal('modal-routine')">✕</span></div>
+  <input type="hidden" id="rtn-edit-id">
+  <div class="form-group">
+    <label class="form-label">Nom de la routine</label>
+    <input class="form-input" id="rtn-nom" placeholder="Ex: Méditer 10 min">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Catégorie</label>
+      <select class="form-select" id="rtn-cat">
+        <option value="matin">🌅 Matin</option>
+        <option value="soir">🌙 Soir</option>
+        <option value="sante">💪 Santé & Sport</option>
+        <option value="maison">🏠 Maison</option>
+        <option value="finances">💰 Finances</option>
+        <option value="enfant">👦 Enfant</option>
+        <option value="immobilier">🏢 Immobilier</option>
+        <option value="perso">🧠 Perso & Bien-être</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fréquence</label>
+      <select class="form-select" id="rtn-freq">
+        <option value="daily">🌅 Quotidien</option>
+        <option value="weekly">📅 Hebdomadaire</option>
+        <option value="monthly">📆 Mensuel</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Assigné à</label>
+      <select class="form-select" id="rtn-qui">
+        <option>Papa</option><option>Maman</option><option>Ensemble</option><option>Tous</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Heure cible (optionnel)</label>
+      <input class="form-input" type="time" id="rtn-heure">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Note / description</label>
+    <input class="form-input" id="rtn-note" placeholder="Détails optionnels…">
+  </div>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveRoutine()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-routine')">Annuler</button>
+  </div>
+</div>
+</div>
+
 <!-- TRÉSORERIE MODAL -->
 <div id="modal-tresor" class="modal-overlay" onclick="closeModalOut(event,'modal-tresor')">
 <div class="modal">
@@ -2172,7 +2274,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: [], cryptos: []
+  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: []
 };
 
 // ══ FIREBASE ══
@@ -2180,7 +2282,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','cryptos'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2341,6 +2443,7 @@ function renderPage(id) {
   if (id==='creances') renderCreances();
   if (id==='courses') renderCourses();
   if (id==='tresorerie') renderTresorerie();
+  if (id==='routines') renderRoutines();
 }
 
 function renderAll() {
@@ -2359,6 +2462,7 @@ function renderAll() {
   renderCreances();
   renderCourses();
   renderTresorerie();
+  renderRoutines();
   updateBadges();
 }
 
@@ -5126,6 +5230,268 @@ function renderCryptoSection() {
   }).join('');
 }
 // ════════════════════════════════════════════════════════════
+
+// ══ ROUTINES & HABITUDES ════════════════════════════════════════════
+
+const RTN_CATS = {
+  matin:      { lbl:'🌅 Matin',           col:'var(--gold)' },
+  soir:       { lbl:'🌙 Soir',            col:'var(--purple)' },
+  sante:      { lbl:'💪 Santé & Sport',   col:'var(--accent)' },
+  maison:     { lbl:'🏠 Maison',          col:'var(--blue)' },
+  finances:   { lbl:'💰 Finances',        col:'var(--orange)' },
+  enfant:     { lbl:'👦 Enfant',          col:'var(--accent2)' },
+  immobilier: { lbl:'🏢 Immobilier',      col:'var(--blue2)' },
+  perso:      { lbl:'🧠 Perso & Bien-être',col:'var(--red)' },
+};
+const RTN_FREQ = { daily:'Quotidien', weekly:'Hebdo', monthly:'Mensuel' };
+const RTN_FREQ_ICON = { daily:'🌅', weekly:'📅', monthly:'📆' };
+
+let rtnFilter = 'all';
+function setRtnFilter(btn) {
+  document.querySelectorAll('[data-rfilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rtnFilter = btn.dataset.rfilter;
+  renderRoutines();
+}
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function rtnIsDueToday(r) {
+  const today = new Date();
+  const dow = today.getDay(); // 0=dim
+  if (r.freq === 'daily') return true;
+  if (r.freq === 'weekly') return (r.dayOfWeek ?? 1) === dow;
+  if (r.freq === 'monthly') return (r.dayOfMonth ?? 1) === today.getDate();
+  return false;
+}
+
+function rtnDoneToday(r) {
+  return (r.completions || []).includes(todayStr());
+}
+
+function rtnStreak(r) {
+  const completions = new Set(r.completions || []);
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const s = d.toISOString().split('T')[0];
+    if (completions.has(s)) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function loadDefaultRoutines() {
+  const today = todayStr();
+  state.routines = [
+    // ── MATIN ──
+    {id:1, nom:'Se lever à heure fixe',          cat:'matin',      freq:'daily',   qui:'Ensemble', heure:'06:00', note:'Régularité = énergie', completions:[]},
+    {id:2, nom:"Verre d'eau + étirements 5 min",cat:'matin',      freq:'daily',   qui:'Ensemble', heure:'06:10', note:'Hydrater avant le café', completions:[]},
+    {id:3, nom:'Petit-déjeuner en famille',       cat:'matin',      freq:'daily',   qui:'Tous',     heure:'06:30', note:'', completions:[]},
+    {id:4, nom:"Préparer le sac de l'enfant",    cat:'matin',      freq:'daily',   qui:'Maman',    heure:'07:00', note:"Vérifier cahier, agenda, tenue", completions:[]},
+    {id:5, nom:'Consulter agenda du jour',        cat:'matin',      freq:'daily',   qui:'Papa',     heure:'07:15', note:'Tâches prioritaires du jour', completions:[]},
+    // ── SOIR ──
+    {id:6, nom:'Rangement cuisine après dîner',   cat:'soir',       freq:'daily',   qui:'Ensemble', heure:'20:00', note:'Vaisselle + plans de travail', completions:[]},
+    {id:7, nom:'Bain / douche enfant',            cat:'soir',       freq:'daily',   qui:'Maman',    heure:'20:30', note:'', completions:[]},
+    {id:8, nom:'Lecture ou histoire enfant',      cat:'soir',       freq:'daily',   qui:'Papa',     heure:'21:00', note:'15-20 min minimum', completions:[]},
+    {id:9, nom:'Préparer tenues du lendemain',    cat:'soir',       freq:'daily',   qui:'Ensemble', heure:'21:30', note:'Évite le stress matinal', completions:[]},
+    {id:10,nom:'Éteindre écrans 30 min avant lit',cat:'soir',       freq:'daily',   qui:'Tous',     heure:'22:00', note:'Meilleur sommeil', completions:[]},
+    // ── SANTÉ & SPORT ──
+    {id:11,nom:'Marche ou sport 30 min',          cat:'sante',      freq:'daily',   qui:'Papa',     heure:'07:30', note:'Avant le travail idéalement', completions:[]},
+    {id:12,nom:'Fruits ou légumes à chaque repas',cat:'sante',      freq:'daily',   qui:'Tous',     heure:'',      note:'', completions:[]},
+    {id:13,nom:'Pesée hebdomadaire',              cat:'sante',      freq:'weekly',  qui:'Ensemble', heure:'08:00', dayOfWeek:1, note:'Lundi matin à jeun', completions:[]},
+    {id:14,nom:'Contrôle médicaments enfant',     cat:'sante',      freq:'daily',   qui:'Maman',    heure:'08:00', note:'Vérifier stock trousse à pharmacie', completions:[]},
+    {id:15,nom:'Nettoyage salle de bain complète',cat:'sante',      freq:'weekly',  qui:'Ensemble', heure:'',      dayOfWeek:6, note:'Samedi', completions:[]},
+    // ── MAISON ──
+    {id:16,nom:'Balayage + serpillère salon',     cat:'maison',     freq:'daily',   qui:'Maman',    heure:'09:00', note:'', completions:[]},
+    {id:17,nom:'Vidange poubelles',               cat:'maison',     freq:'weekly',  qui:'Papa',     heure:'',      dayOfWeek:2, note:'Mardi soir avant ramassage', completions:[]},
+    {id:18,nom:'Vérifier stocks cuisine',         cat:'maison',     freq:'weekly',  qui:'Maman',    heure:'10:00', dayOfWeek:0, note:'Dimanche = liste de courses', completions:[]},
+    {id:19,nom:'Nettoyage réfrigérateur',         cat:'maison',     freq:'monthly', qui:'Ensemble', heure:'',      dayOfMonth:1, note:'1er du mois', completions:[]},
+    {id:20,nom:'Vérifier ampoules / prises',      cat:'maison',     freq:'monthly', qui:'Papa',     heure:'',      dayOfMonth:15, note:'Maintenance préventive', completions:[]},
+    // ── FINANCES ──
+    {id:21,nom:'Consulter solde comptes',         cat:'finances',   freq:'daily',   qui:'Papa',     heure:'08:00', note:'Visa + Moov + Épargne', completions:[]},
+    {id:22,nom:'Noter dépenses de la semaine',    cat:'finances',   freq:'weekly',  qui:'Ensemble', heure:'20:00', dayOfWeek:0, note:'Dimanche soir = bilan', completions:[]},
+    {id:23,nom:'Virement épargne projet',         cat:'finances',   freq:'monthly', qui:'Papa',     heure:'',      dayOfMonth:5, note:'5 du mois après salaire', completions:[]},
+    {id:24,nom:'Vérifier créances en attente',    cat:'finances',   freq:'weekly',  qui:'Papa',     heure:'',      dayOfWeek:1, note:'Relancer si nécessaire', completions:[]},
+    {id:25,nom:'Revue budget mensuel',            cat:'finances',   freq:'monthly', qui:'Ensemble', heure:'',      dayOfMonth:1, note:'1er du mois : prévu vs réel', completions:[]},
+    // ── ENFANT ──
+    {id:26,nom:'Vérifier cahier de liaison',      cat:'enfant',     freq:'daily',   qui:'Maman',    heure:'17:00', note:"Dès retour de l'école", completions:[]},
+    {id:27,nom:'Suivi devoirs',                   cat:'enfant',     freq:'daily',   qui:'Papa',     heure:'17:30', note:"30-45 min avec l'enfant", completions:[]},
+    {id:28,nom:'Activité créative ou jeu',        cat:'enfant',     freq:'daily',   qui:'Ensemble', heure:'19:00', note:'Dessin, Lego, jeu de société…', completions:[]},
+    {id:29,nom:'Point santé enfant',              cat:'enfant',     freq:'weekly',  qui:'Maman',    heure:'',      dayOfWeek:0, note:'Poids, humeur, symptômes', completions:[]},
+    {id:30,nom:'Bilan scolaire mensuel',          cat:'enfant',     freq:'monthly', qui:'Ensemble', heure:'',      dayOfMonth:1, note:'Notes, comportement, besoins', completions:[]},
+    // ── IMMOBILIER ──
+    {id:31,nom:'Vérifier loyers perçus',          cat:'immobilier', freq:'monthly', qui:'Papa',     heure:'',      dayOfMonth:5, note:'Comparer avec liste locatifs', completions:[]},
+    {id:32,nom:'Inspection visuelle chantiers',   cat:'immobilier', freq:'weekly',  qui:'Papa',     heure:'',      dayOfWeek:6, note:'Samedi : avancement travaux', completions:[]},
+    {id:33,nom:'Relance locataires impayés',      cat:'immobilier', freq:'weekly',  qui:'Papa',     heure:'',      dayOfWeek:1, note:"Lundi : appel ou SMS", completions:[]},
+    {id:34,nom:'Maintenance préventive biens',    cat:'immobilier', freq:'monthly', qui:'Papa',     heure:'',      dayOfMonth:10, note:'Électricité, plomberie, serrures', completions:[]},
+    // ── PERSO & BIEN-ÊTRE ──
+    {id:35,nom:'Méditation ou respiration 10 min',cat:'perso',      freq:'daily',   qui:'Ensemble', heure:'06:15', note:'App Calm ou silence', completions:[]},
+    {id:36,nom:'Lecture 20 min',                  cat:'perso',      freq:'daily',   qui:'Papa',     heure:'21:30', note:'Livre physique, pas écran', completions:[]},
+    {id:37,nom:'Appel famille élargie',           cat:'perso',      freq:'weekly',  qui:'Maman',    heure:'',      dayOfWeek:0, note:'Dimanche = nouvelles de la famille', completions:[]},
+    {id:38,nom:'Activité couple sans enfant',     cat:'perso',      freq:'weekly',  qui:'Ensemble', heure:'',      dayOfWeek:6, note:'Sortie, film, jeu…', completions:[]},
+    {id:39,nom:'Bilan mensuel famille',           cat:'perso',      freq:'monthly', qui:'Tous',     heure:'',      dayOfMonth:1, note:"Ce qui a bien marché, ce qu'on améliore", completions:[]},
+  ];
+  save('routines');
+}
+
+function renderRoutines() {
+  if (!state.routines || state.routines.length === 0) {
+    loadDefaultRoutines();
+    return;
+  }
+
+  const today = todayStr();
+  const dueToday = state.routines.filter(r => rtnIsDueToday(r));
+  const doneToday = dueToday.filter(r => rtnDoneToday(r));
+  const pending = dueToday.filter(r => !rtnDoneToday(r));
+  const bestStreak = state.routines.reduce((max,r) => Math.max(max, rtnStreak(r)), 0);
+
+  // KPIs
+  const el = id => document.getElementById(id);
+  if(el('rtn-done-today')) el('rtn-done-today').textContent = doneToday.length + '/' + dueToday.length;
+  if(el('rtn-pending'))    el('rtn-pending').textContent = pending.length;
+  if(el('rtn-best-streak'))el('rtn-best-streak').textContent = bestStreak + 'j';
+  if(el('rtn-total'))      el('rtn-total').textContent = state.routines.length;
+
+  // Badge sidebar
+  const badge = document.getElementById('badgeRoutines');
+  if (badge) {
+    badge.textContent = pending.length;
+    badge.style.display = pending.length > 0 ? 'inline-block' : 'none';
+  }
+
+  // Filtrer
+  let items = [...state.routines];
+  if (rtnFilter === 'daily')   items = items.filter(r => r.freq === 'daily');
+  if (rtnFilter === 'weekly')  items = items.filter(r => r.freq === 'weekly');
+  if (rtnFilter === 'monthly') items = items.filter(r => r.freq === 'monthly');
+  if (rtnFilter === 'pending') items = items.filter(r => rtnIsDueToday(r) && !rtnDoneToday(r));
+
+  // Grouper par catégorie
+  const groups = {};
+  items.forEach(r => {
+    if (!groups[r.cat]) groups[r.cat] = [];
+    groups[r.cat].push(r);
+  });
+
+  const grid = document.getElementById('routines-grid');
+  if (!grid) return;
+
+  if (items.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)">Aucune routine dans ce filtre.</div>';
+    return;
+  }
+
+  grid.innerHTML = Object.entries(groups).map(([cat, routines]) => {
+    const catInfo = RTN_CATS[cat] || {lbl:cat, col:'var(--text3)'};
+    const dueInCat = routines.filter(r => rtnIsDueToday(r));
+    const doneInCat = dueInCat.filter(r => rtnDoneToday(r));
+    return `<div class="card" style="margin-bottom:0">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:${catInfo.col}">${catInfo.lbl}</span>
+        ${dueInCat.length ? `<span style="font-size:.68rem;font-family:var(--mono);color:var(--text3)">${doneInCat.length}/${dueInCat.length} aujourd'hui</span>` : ''}
+      </div>
+      ${routines.sort((a,b)=>(a.heure||'99:99').localeCompare(b.heure||'99:99')).map(r => {
+        const done = rtnDoneToday(r);
+        const streak = rtnStreak(r);
+        const due = rtnIsDueToday(r);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);opacity:${done?'0.55':'1'}">
+          <div onclick="toggleRoutine(${r.id})" style="width:24px;height:24px;border-radius:50%;border:2px solid ${done?catInfo.col:'var(--border)'};
+            background:${done?catInfo.col:'transparent'};display:flex;align-items:center;justify-content:center;
+            cursor:pointer;flex-shrink:0;transition:all .2s;font-size:.7rem;color:#fff">
+            ${done?'✓':''}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:.84rem;${done?'text-decoration:line-through':''}">${r.nom}</div>
+            <div style="font-size:.7rem;color:var(--text3);margin-top:2px">
+              ${RTN_FREQ_ICON[r.freq]} ${RTN_FREQ[r.freq]}
+              ${r.heure ? '· ' + r.heure : ''}
+              ${r.qui ? '· ' + r.qui : ''}
+              ${streak > 1 ? '· 🔥 ' + streak + 'j' : ''}
+            </div>
+            ${r.note ? `<div style="font-size:.68rem;color:var(--text3);font-style:italic;margin-top:2px">${r.note}</div>` : ''}
+          </div>
+          <div style="display:flex;gap:3px;flex-shrink:0">
+            ${due && !done ? `<button class="btn btn-primary btn-sm" onclick="toggleRoutine(${r.id})" style="padding:4px 8px;font-size:.68rem">✓ Fait</button>` : ''}
+            <button class="btn btn-outline btn-icon btn-sm" onclick="editRoutine(${r.id})" title="Modifier">✏️</button>
+            <button class="btn btn-outline btn-icon btn-sm" onclick="deleteRoutine(${r.id})" title="Supprimer">🗑️</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleRoutine(id) {
+  const r = state.routines.find(x=>x.id===id); if(!r) return;
+  if (!r.completions) r.completions = [];
+  const today = todayStr();
+  const idx = r.completions.indexOf(today);
+  if (idx >= 0) r.completions.splice(idx, 1);
+  else r.completions.push(today);
+  save('routines'); renderRoutines();
+  showToast(idx < 0 ? '🔥 Routine accomplie !' : '↩️ Marquée comme non-faite');
+}
+
+function openRoutineModal() {
+  document.getElementById('rtn-modal-title').innerHTML = '🔁 Nouvelle routine <span class="modal-close" onclick="closeModal(\'modal-routine\')">✕</span>';
+  document.getElementById('rtn-edit-id').value = '';
+  document.getElementById('rtn-nom').value = '';
+  document.getElementById('rtn-cat').value = 'matin';
+  document.getElementById('rtn-freq').value = 'daily';
+  document.getElementById('rtn-qui').value = 'Ensemble';
+  document.getElementById('rtn-heure').value = '';
+  document.getElementById('rtn-note').value = '';
+  openModal('modal-routine');
+}
+
+function editRoutine(id) {
+  const r = state.routines.find(x=>x.id===id); if(!r) return;
+  document.getElementById('rtn-modal-title').innerHTML = '✏️ Modifier routine <span class="modal-close" onclick="closeModal(\'modal-routine\')">✕</span>';
+  document.getElementById('rtn-edit-id').value = id;
+  document.getElementById('rtn-nom').value = r.nom;
+  document.getElementById('rtn-cat').value = r.cat;
+  document.getElementById('rtn-freq').value = r.freq;
+  document.getElementById('rtn-qui').value = r.qui || 'Ensemble';
+  document.getElementById('rtn-heure').value = r.heure || '';
+  document.getElementById('rtn-note').value = r.note || '';
+  openModal('modal-routine');
+}
+
+function saveRoutine() {
+  const nom = document.getElementById('rtn-nom').value.trim();
+  if (!nom) return showToast('❌ Nom requis');
+  const editId = +document.getElementById('rtn-edit-id').value || 0;
+  const obj = {
+    id: editId || Date.now(),
+    nom,
+    cat:   document.getElementById('rtn-cat').value,
+    freq:  document.getElementById('rtn-freq').value,
+    qui:   document.getElementById('rtn-qui').value,
+    heure: document.getElementById('rtn-heure').value,
+    note:  document.getElementById('rtn-note').value.trim(),
+    completions: editId ? (state.routines.find(x=>x.id===editId)?.completions || []) : [],
+  };
+  if (!state.routines) state.routines = [];
+  if (editId) {
+    const idx = state.routines.findIndex(x=>x.id===editId);
+    if (idx>=0) state.routines[idx] = obj;
+  } else {
+    state.routines.push(obj);
+  }
+  save('routines'); closeModal('modal-routine'); renderRoutines();
+  showToast(editId ? '✅ Routine modifiée' : '✅ Routine ajoutée');
+}
+
+function deleteRoutine(id) {
+  if (!confirm('Supprimer cette routine ?')) return;
+  state.routines = state.routines.filter(x=>x.id!==id);
+  save('routines'); renderRoutines();
+  showToast('🗑️ Routine supprimée');
+}
+// ════════════════════════════════════════════════════════════
+
 checkSession();
 sidebarInit();
 initDate();
