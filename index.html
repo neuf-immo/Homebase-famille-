@@ -368,25 +368,78 @@ tr:hover td { background:var(--bg); }
 .sep { border:none; border-top:1px solid var(--border); margin:20px 0; }
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .sidebar { width:62px; }
-  .sidebar .nav-label { opacity:0; pointer-events:none; }
-  .sidebar .nav-section-arrow { opacity:0; }
-  .sidebar .nav-section.collapsed .nav-section-items { max-height:500px; opacity:1; }
-  .sidebar .nav-item { justify-content:center; padding:10px; gap:0; }
-  .sidebar .nav-item span.label { width:0; overflow:hidden; opacity:0; margin:0; }
-  .sidebar .nav-item .nav-badge { position:absolute; top:4px; right:4px; padding:1px 4px; }
-  .sidebar .nav-item:hover .nav-tooltip { display:block; }
-  .sidebar .nav-section-header { justify-content:center; padding:4px 0; }
+/* ── HAMBURGER & DRAWER ── */
+.hamburger-btn {
+  display:none; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:10px; border:none;
+  background:transparent; cursor:pointer; color:var(--text);
+  font-size:1.1rem; transition:var(--transition); flex-shrink:0;
+}
+.hamburger-btn:hover { background:var(--bg2); }
+
+.drawer-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
+  z-index:1100; backdrop-filter:blur(2px);
+  animation:fadeIn .2s ease;
+}
+.drawer-overlay.open { display:block; }
+
+@media(max-width:768px){
+  /* Masquer sidebar fixe, afficher hamburger */
+  .sidebar { 
+    position:fixed; top:0; left:0; bottom:0; width:280px; z-index:1200;
+    transform:translateX(-100%);
+    transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    padding-top:0;
+  }
+  .sidebar.drawer-open { transform:translateX(0); }
+  .sidebar .sidebar-toggle { display:none; }
+  
+  /* Header drawer */
+  .sidebar::before {
+    content:""; display:block; height:56px; flex-shrink:0;
+  }
+  .sidebar-drawer-header {
+    position:absolute; top:0; left:0; right:0; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 16px; border-bottom:1px solid var(--border);
+    background:var(--card); z-index:1;
+  }
+  .sidebar-drawer-logo { 
+    display:flex; align-items:center; gap:9px; 
+    font-weight:800; font-size:1rem;
+  }
+  .sidebar-drawer-logo-icon {
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center; font-size:.95rem;
+  }
+  .sidebar-drawer-close {
+    width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    background:transparent; cursor:pointer; color:var(--text2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:.85rem; transition:var(--transition);
+  }
+  .sidebar-drawer-close:hover { background:var(--red); color:#fff; border-color:var(--red); }
+
+  /* Sidebar pleine largeur en drawer */
+  .sidebar .nav-item { justify-content:flex-start; padding:10px 14px; gap:11px; }
+  .sidebar .nav-item span.label { width:auto; overflow:visible; opacity:1; margin:0; flex:1; }
+  .sidebar .nav-label { opacity:1; pointer-events:auto; }
+  .sidebar .nav-section-arrow { opacity:0.6; }
+  .sidebar .nav-section-header { justify-content:space-between; padding:6px 10px 4px; }
   .sidebar .sidebar-footer-info,
-  .sidebar .sidebar-footer-icon { width:0; overflow:hidden; opacity:0; }
-  .sidebar .sidebar-footer { justify-content:center; }
-  .main { margin-left:62px; }
+  .sidebar .sidebar-footer-icon { width:auto; overflow:visible; opacity:1; }
+  .sidebar .sidebar-footer { justify-content:flex-start; }
+  .sidebar .nav-item .nav-tooltip { display:none !important; }
+  .sidebar .nav-item .nav-badge { position:static; }
+
+  .hamburger-btn { display:flex; }
+  .main { margin-left:0 !important; padding:16px; }
   .grid4 { grid-template-columns:1fr 1fr; }
   .grid3 { grid-template-columns:1fr 1fr; }
 }
 @media(max-width:600px){
-  .main { padding:16px; }
   .grid2,.grid3,.grid4 { grid-template-columns:1fr; }
   .form-row { grid-template-columns:1fr; }
 }
@@ -571,6 +624,9 @@ tr:hover td { background:var(--bg); }
 
 <!-- TOPBAR -->
 <div class="topbar">
+  <button class="hamburger-btn" onclick="openDrawer()" title="Menu" id="hamburger-btn">
+    <i class="fa-solid fa-bars"></i>
+  </button>
   <div class="logo">
     <div class="logo-icon">🏠</div>
     <span>HomeBase</span>
@@ -604,10 +660,23 @@ tr:hover td { background:var(--bg); }
   </div>
 </div>
 
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire/Agrandir">
     <i class="fa-solid fa-chevron-left fa-fw"></i>
+  </div>
+  <!-- Header visible uniquement en mode drawer (mobile) -->
+  <div class="sidebar-drawer-header" id="sidebar-drawer-header">
+    <div class="sidebar-drawer-logo">
+      <div class="sidebar-drawer-logo-icon">🏠</div>
+      <span>HomeBase</span>
+    </div>
+    <button class="sidebar-drawer-close" onclick="closeDrawer()" title="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
   </div>
   <div class="sidebar-scroll">
 
@@ -1978,6 +2047,8 @@ function loadExcelData() {
 
 // ══ NAVIGATION ══
 function showPage(id) {
+  // Fermer le drawer si ouvert (mobile)
+  if(window.innerWidth <= 768) closeDrawer();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -3191,6 +3262,23 @@ document.addEventListener('click', e=>{
 });
 
 // ── SIDEBAR TOGGLE & SECTIONS ──
+
+// Drawer mobile
+function openDrawer() {
+  document.getElementById('sidebar').classList.add('drawer-open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('sidebar').classList.remove('drawer-open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Auto-fermer le drawer quand on change de page sur mobile
+const _origShowPage = window.showPage;
+
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const main = document.querySelector('.main');
@@ -3210,6 +3298,13 @@ function initSidebar() {
   const sb = document.getElementById('sidebar');
   if(!sb) return;
   if(localStorage.getItem('hb_sidebar_collapsed') === '1') sb.classList.add('collapsed');
+  // Gérer swipe gauche->droite pour fermer le drawer
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(dx < -60 && sb.classList.contains('drawer-open')) closeDrawer();
+  }, {passive:true});
 }
 
 function updateSidebarFooter() {
