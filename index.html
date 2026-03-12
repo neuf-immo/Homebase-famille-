@@ -446,8 +446,36 @@ tr:hover td { background:var(--bg); }
 /* ── SEPARATOR ── */
 .sep { border:none; border-top:1px solid var(--border); margin:20px 0; }
 
+/* ── HAMBURGER BTN (mobile only) ── */
+.hamburger-btn {
+  display:none; align-items:center; justify-content:center;
+  width:40px; height:40px; border-radius:10px; border:none;
+  background:transparent; cursor:pointer; color:var(--text);
+  font-size:1.15rem; transition:var(--transition); flex-shrink:0;
+}
+.hamburger-btn:hover { background:var(--bg2); }
+
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
+@media(max-width:768px){
+  /* Cacher sidebar fixe + toggle flottant sur mobile */
+  .sidebar { transform:translateX(-100%); width:280px !important; z-index:1400; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .sidebar.drawer-open { transform:translateX(0); }
+  /* Quand drawer ouvert: montrer textes */
+  .sidebar.drawer-open .sidebar-logo-text { opacity:1; width:auto; }
+  .sidebar.drawer-open .nav-label { opacity:1; }
+  .sidebar.drawer-open .nav-section-chevron { opacity:.5; }
+  .sidebar.drawer-open .nav-section-hd { justify-content:space-between; }
+  .sidebar.drawer-open .nav-item { justify-content:flex-start; padding:9px 14px; gap:11px; }
+  .sidebar.drawer-open .nav-item .nav-lbl { width:auto; overflow:visible; opacity:1; }
+  .sidebar.drawer-open .nav-item .nav-badge { position:static; }
+  .sidebar.drawer-open .nav-item:hover .nav-tip { display:none; }
+  .sidebar.drawer-open .sidebar-profile-info,
+  .sidebar.drawer-open .sidebar-profile-icon { width:auto; opacity:1; overflow:visible; }
+  .sidebar.drawer-open .sidebar-profile { justify-content:flex-start; }
+  /* Cacher le toggle flottant, montrer hamburger */
+  .sidebar-toggle { display:none !important; }
+  .hamburger-btn { display:flex; }
+  .main { margin-left:0 !important; }
   .grid4 { grid-template-columns:1fr 1fr; }
   .grid3 { grid-template-columns:1fr 1fr; }
 }
@@ -637,6 +665,9 @@ tr:hover td { background:var(--bg); }
 
 <!-- TOPBAR -->
 <div class="topbar">
+  <button class="hamburger-btn" id="hamburger-btn" onclick="drawerOpen()" title="Menu">
+    <i class="fa-solid fa-bars"></i>
+  </button>
   <div class="logo">
     <div class="logo-icon">🏠</div>
     <span>HomeBase</span>
@@ -943,6 +974,16 @@ tr:hover td { background:var(--bg); }
     <div class="chart-card">
       <div class="card-title">🏢 Biens locatifs</div>
       <canvas id="chart-locatifs"></canvas>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="chart-card">
+      <div class="card-title">₿ Portefeuille crypto</div>
+      <canvas id="chart-crypto"></canvas>
+    </div>
+    <div class="chart-card" id="tresor-chart-card" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="card-title">🏦 Soldes trésorerie</div>
+      <div id="dash-tresor-soldes" style="font-size:.82rem"></div>
     </div>
   </div>
 </div>
@@ -1366,24 +1407,32 @@ tr:hover td { background:var(--bg); }
   <div class="page-header-row">
     <div class="page-header">
       <div class="page-title">🏦 Trésorerie</div>
-      <div class="page-sub">Carte Visa · Moov Money · Épargne projets</div>
+      <div class="page-sub">Carte Visa · Moov Money · Épargne · Crypto</div>
     </div>
-    <button class="btn btn-primary" onclick="openTresorModal()">+ Ajouter</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" id="btn-add-crypto" onclick="openCryptoModal()" style="display:none">₿ Ajouter crypto</button>
+      <button class="btn btn-primary" id="btn-add-tresor" onclick="openTresorModal()">+ Ajouter</button>
+    </div>
   </div>
 
-  <!-- KPIs -->
-  <div class="grid3" style="margin-bottom:20px" id="tresor-kpis">
+  <!-- KPIs comptes -->
+  <div class="grid4" style="margin-bottom:16px" id="tresor-kpis">
     <div class="kpi blue"><div class="kpi-icon">💳</div><div class="kpi-val" id="tresor-visa">0</div><div class="kpi-label">Carte Visa (XAF)</div></div>
     <div class="kpi gold"><div class="kpi-icon">📱</div><div class="kpi-val" id="tresor-moov">0</div><div class="kpi-label">Moov Money (XAF)</div></div>
     <div class="kpi green"><div class="kpi-icon">🎯</div><div class="kpi-val" id="tresor-epargne">0</div><div class="kpi-label">Épargne projets (XAF)</div></div>
+    <div class="kpi" style="background:linear-gradient(135deg,rgba(247,147,26,.12),rgba(247,147,26,.04));border-color:rgba(247,147,26,.3)">
+      <div class="kpi-icon">₿</div><div class="kpi-val" id="tresor-crypto-pnl" style="font-size:.95rem">$0</div>
+      <div class="kpi-label">Crypto P&amp;L</div>
+    </div>
   </div>
 
-  <!-- Onglets par compte -->
+  <!-- Onglets -->
   <div class="filter-row" style="margin-bottom:16px">
     <button class="filter-chip active" data-tfilter="all" onclick="setTresorFilter(this)">Tous</button>
     <button class="filter-chip" data-tfilter="visa" onclick="setTresorFilter(this)">💳 Carte Visa</button>
     <button class="filter-chip" data-tfilter="moov" onclick="setTresorFilter(this)">📱 Moov Money</button>
     <button class="filter-chip" data-tfilter="epargne" onclick="setTresorFilter(this)">🎯 Épargne</button>
+    <button class="filter-chip" data-tfilter="crypto" onclick="setTresorFilter(this)">₿ Crypto</button>
   </div>
 
   <div id="tresorerie-list"></div>
@@ -1436,6 +1485,93 @@ tr:hover td { background:var(--bg); }
 </div>
 
 
+<!-- CRYPTO MODAL -->
+<div id="modal-crypto" class="modal-overlay" onclick="closeModalOut(event,'modal-crypto')">
+<div class="modal" style="max-width:520px">
+  <div class="modal-title" id="crypto-modal-title">₿ Ajouter un actif crypto <span class="modal-close" onclick="closeModal('modal-crypto')">✕</span></div>
+  <input type="hidden" id="crypto-edit-id">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Crypto</label>
+      <select class="form-select" id="crypto-symbol" onchange="cryptoSymbolChange()">
+        <option value="BTC">₿ Bitcoin (BTC)</option>
+        <option value="XRP">◈ XRP (XRP)</option>
+        <option value="XLM">✦ Stellar (XLM)</option>
+        <option value="ETH">Ξ Ethereum (ETH)</option>
+        <option value="BNB">⬡ BNB (BNB)</option>
+        <option value="SOL">◎ Solana (SOL)</option>
+        <option value="ADA">₳ Cardano (ADA)</option>
+        <option value="DOGE">Ð Dogecoin (DOGE)</option>
+        <option value="OTHER">✦ Autre…</option>
+      </select>
+    </div>
+    <div class="form-group" id="crypto-nom-group" style="display:none">
+      <label class="form-label">Nom personnalisé</label>
+      <input class="form-input" id="crypto-nom-custom" placeholder="Ex: PEPE, SHIB…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Statut</label>
+      <select class="form-select" id="crypto-statut">
+        <option value="détenu">📦 Détenu</option>
+        <option value="vendu-partiel">📤 Vendu partiellement</option>
+        <option value="vendu">✅ Vendu</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Quantité</label>
+      <input class="form-input" type="number" step="any" id="crypto-qty" placeholder="Ex: 150.5" oninput="cryptoCalcMontant()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prix d'achat (USD)</label>
+      <input class="form-input" type="number" step="any" id="crypto-prix-achat" placeholder="Ex: 0.52" oninput="cryptoCalcMontant()">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Prix actuel (USD)</label>
+      <input class="form-input" type="number" step="any" id="crypto-prix-actuel" placeholder="Ex: 0.78" oninput="cryptoCalcMontant()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date d'achat</label>
+      <input class="form-input" type="date" id="crypto-date">
+    </div>
+  </div>
+
+  <!-- Calcul automatique -->
+  <div id="crypto-calc-preview" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin:8px 0">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+      <div>
+        <div style="font-size:.68rem;color:var(--text3);margin-bottom:3px">Investi</div>
+        <div style="font-family:var(--mono);font-weight:700;font-size:.88rem" id="crypto-preview-investi">$0</div>
+      </div>
+      <div>
+        <div style="font-size:.68rem;color:var(--text3);margin-bottom:3px">Valeur actuelle</div>
+        <div style="font-family:var(--mono);font-weight:700;font-size:.88rem" id="crypto-preview-valeur">$0</div>
+      </div>
+      <div>
+        <div style="font-size:.68rem;color:var(--text3);margin-bottom:3px">P&amp;L</div>
+        <div style="font-family:var(--mono);font-weight:700;font-size:.88rem" id="crypto-preview-pnl">$0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:4px">
+    <label class="form-label">Note (optionnel)</label>
+    <input class="form-input" id="crypto-note" placeholder="Ex: Achat DCA, staking, transfert…">
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button class="btn btn-primary" style="flex:1" onclick="saveCrypto()">💾 Enregistrer</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-crypto')">Annuler</button>
+  </div>
+</div>
+</div>
+
 <!-- STOCK -->
 <div id="modal-stock" class="modal-overlay" onclick="closeModalOut(event,'modal-stock')">
 <div class="modal">
@@ -1452,7 +1588,9 @@ tr:hover td { background:var(--bg); }
         <option value="Var-Assaison">🧄 Variable — Assaisonnement</option>
         <option value="Var-AutreCuisine">🥜 Variable — Autre cuisine</option>
         <option value="Var-ProjCuisine">🍳 Variable — Projet cuisine</option>
-        <option value="Var-ProjMaison">🏠 Variable — Projet maison</option>
+        <option value="Var-Deco">🖼️ Variable — Déco</option>
+        <option value="Var-Equipement">🔌 Variable — Équipement</option>
+        <option value="Var-Meuble">🪑 Variable — Meuble</option>
         <option value="Sante">💊 Santé</option>
         <option value="Autre">📦 Autre</option>
       </select>
@@ -2016,7 +2154,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: []
+  ressources: [], creances: [], courses: [], tresorerie: [], cryptos: []
 };
 
 // ══ FIREBASE ══
@@ -2024,7 +2162,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','cryptos'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2034,6 +2172,15 @@ async function loadAll() {
   }
   // Charger les données Excel par défaut si stocks vides
   if (state.stocks.length === 0) loadDefaultStocks();
+
+  // ── MIGRATION Var-ProjMaison → Déco/Équipement/Meuble ──
+  const _migMap = {32:'Var-Deco',33:'Var-Equipement',34:'Var-Meuble',35:'Var-Deco',36:'Var-Deco',37:'Var-Deco',38:'Var-Meuble'};
+  let _migrated = false;
+  state.stocks.forEach(s => {
+    if (s.cat === 'Var-ProjMaison') { s.cat = _migMap[s.id] || 'Var-Deco'; _migrated = true; }
+  });
+  if (_migrated) save('stocks');
+
   renderAll();
 }
 
@@ -2084,13 +2231,13 @@ function loadExcelData() {
     {id:30, nom:'Louche en silicone',cat:'Var-ProjCuisine',   qty:'1',       prix:10000, prixr:0, alerte:'ok'},
     {id:31, nom:'Fuoir',             cat:'Var-ProjCuisine',   qty:'1',       prix:5000,  prixr:0, alerte:'ok'},
     // VARIABLE — PROJET DE MAISON
-    {id:32, nom:'Tringles',          cat:'Var-ProjMaison',    qty:'1',       prix:15000, prixr:0, alerte:'ok'},
-    {id:33, nom:'Faire un salon',    cat:'Var-ProjMaison',    qty:'1',       prix:60000, prixr:0, alerte:'ok'},
-    {id:34, nom:'Tablette',          cat:'Var-ProjMaison',    qty:'1',       prix:20000, prixr:0, alerte:'ok'},
-    {id:35, nom:'Tasseau de déco',   cat:'Var-ProjMaison',    qty:'6',       prix:30000, prixr:0, alerte:'ok'},
-    {id:36, nom:'PVC déco',          cat:'Var-ProjMaison',    qty:'1',       prix:10000, prixr:0, alerte:'ok'},
-    {id:37, nom:'Tapis',             cat:'Var-ProjMaison',    qty:'1',       prix:25000, prixr:0, alerte:'ok'},
-    {id:38, nom:'Terminer meuble TV',cat:'Var-ProjMaison',    qty:'1',       prix:25000, prixr:0, alerte:'ok'},
+    {id:32, nom:'Tringles',          cat:'Var-Deco',          qty:'1',       prix:15000, prixr:0, alerte:'ok'},
+    {id:35, nom:'Tasseau de déco',   cat:'Var-Deco',          qty:'6',       prix:30000, prixr:0, alerte:'ok'},
+    {id:36, nom:'PVC déco',          cat:'Var-Deco',          qty:'1',       prix:10000, prixr:0, alerte:'ok'},
+    {id:37, nom:'Tapis',             cat:'Var-Deco',          qty:'1',       prix:25000, prixr:0, alerte:'ok'},
+    {id:33, nom:'Faire un salon',    cat:'Var-Equipement',    qty:'1',       prix:60000, prixr:0, alerte:'ok'},
+    {id:34, nom:'Tablette',          cat:'Var-Meuble',        qty:'1',       prix:20000, prixr:0, alerte:'ok'},
+    {id:38, nom:'Terminer meuble TV',cat:'Var-Meuble',        qty:'1',       prix:25000, prixr:0, alerte:'ok'},
     // FIX — HYGIÈNE DE LA MAISON
     {id:39, nom:'Savons',            cat:'Fix-Hygiene',       qty:'4',       prix:1200,  prixr:0, alerte:'ok'},
     {id:40, nom:'Savon en poudre',   cat:'Fix-Hygiene',       qty:'1kg',     prix:1500,  prixr:0, alerte:'ok'},
@@ -2285,7 +2432,9 @@ function renderStocks() {
     {k:'Var-Assaison',      lbl:'🧄 Variable — Assaisonnement',         bud:3100,   col:'var(--orange)'},
     {k:'Var-AutreCuisine',  lbl:'🥜 Variable — Autre cuisine',          bud:8700,   col:'var(--orange2)'},
     {k:'Var-ProjCuisine',   lbl:'🍳 Variable — Projet acquisition cuisine', bud:255000, col:'var(--purple)'},
-    {k:'Var-ProjMaison',    lbl:'🏠 Variable — Projet de maison',       bud:185000, col:'var(--gold)'},
+    {k:'Var-Deco',          lbl:'🖼️ Variable — Déco',                   bud:80000,  col:'var(--gold)'},
+    {k:'Var-Equipement',    lbl:'🔌 Variable — Équipement',               bud:60000,  col:'var(--orange)'},
+    {k:'Var-Meuble',        lbl:'🪑 Variable — Meuble',                   bud:45000,  col:'var(--blue2)'},
     {k:'Sante',             lbl:'💊 Santé / Pharmacie',                 bud:0,      col:'var(--red)'},
     {k:'Autre',             lbl:'📦 Autre',                             bud:0,      col:'var(--text3)'},
   ];
@@ -3368,17 +3517,40 @@ document.addEventListener('click', e=>{
 });
 
 // ── SIDEBAR PRO ──────────────────────────────────────
+
+// DRAWER (mobile)
+function drawerOpen() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.add('drawer-open');
+  if (ov) { ov.classList.add('open'); }
+  document.body.style.overflow = 'hidden';
+}
+function drawerClose() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.remove('drawer-open');
+  if (ov) ov.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function isMobile() { return window.innerWidth <= 768; }
+
 function sidebarOpen() {
   document.getElementById('sidebar').classList.add('expanded');
-  document.getElementById('sidebar-overlay').classList.add('open');
+  // Overlay flou uniquement sur mobile (drawer)
+  if (isMobile()) document.getElementById('sidebar-overlay').classList.add('open');
 }
 
 function sidebarClose() {
   document.getElementById('sidebar').classList.remove('expanded');
-  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.getElementById('sidebar').classList.remove('drawer-open');
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov) ov.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function sidebarToggleCompact() {
+  if (isMobile()) { drawerOpen(); return; }
   const sb = document.getElementById('sidebar');
   if (sb.classList.contains('expanded')) { sidebarClose(); }
   else { sidebarOpen(); }
@@ -3391,7 +3563,13 @@ function sidebarToggleSection(id) {
 }
 
 function sidebarInit() {
-  // Sidebar toujours compact au démarrage — s'étend au clic
+  // Sidebar compact par défaut — swipe pour fermer le drawer sur mobile
+  let _tx = 0;
+  document.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _tx;
+    if (dx < -50 && document.getElementById('sidebar').classList.contains('drawer-open')) drawerClose();
+  }, {passive:true});
 }
 
 function sidebarUpdateProfile() {
@@ -3806,8 +3984,38 @@ function renderCharts() {
     }
   }
 
+  // ── Chart Crypto : Répartition portefeuille ──
+  destroyChart('crypto');
+  const cryptoCtx = document.getElementById('chart-crypto');
+  if (cryptoCtx && (state.cryptos || []).length > 0) {
+    const grouped = {};
+    (state.cryptos || []).forEach(cr => {
+      const key = cr.symbol === 'OTHER' ? (cr.nomCustom || 'Autre') : cr.symbol;
+      grouped[key] = (grouped[key] || 0) + (cr.qty * (cr.prixActuel || cr.prixAchat));
+    });
+    const palCrypto = Object.entries(grouped).map(([sym]) => {
+      const found = Object.values(CRYPTO_META).find((_, i) => Object.keys(CRYPTO_META)[i] === sym);
+      return found ? found.color : '#888';
+    });
+    _charts['crypto'] = new Chart(cryptoCtx, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(grouped).map(s => `${s}`),
+        datasets: [{ data: Object.values(grouped), backgroundColor: palCrypto, borderWidth: 2, borderColor: c.bg }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: c.text, font: { family: 'Sora', size: 11 }, padding: 10 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: $${ctx.raw.toFixed(2)}` } }
+        }
+      }
+    });
+  }
+
   // ── Chart 4 : Biens locatifs (Doughnut) ──
   destroyChart('locatifs');
+  destroyChart('crypto');
   const locCtx = document.getElementById('chart-locatifs');
   if (locCtx && state.locatifs.length > 0) {
     const occ   = state.locatifs.filter(l => l.statut === 'occupé').length;
@@ -4559,26 +4767,38 @@ const TRESOR_COLORS = { visa:'var(--blue2)', moov:'var(--gold)', epargne:'var(--
 function renderTresorerie() {
   const items = state.tresorerie || [];
 
-  // KPIs par compte
+  // KPIs comptes
   const solde = (compte) => items.filter(x=>x.compte===compte)
     .reduce((s,x)=> x.type==='credit' ? s+(+x.montant||0) : s-(+x.montant||0), 0);
   const fmtK = v => fmtXAF(Math.abs(v)) + (v<0?' ⚠️':'');
   const el = id => document.getElementById(id);
-  if(el('tresor-visa')) el('tresor-visa').textContent = fmtK(solde('visa'));
-  if(el('tresor-moov')) el('tresor-moov').textContent = fmtK(solde('moov'));
+  if(el('tresor-visa'))    el('tresor-visa').textContent    = fmtK(solde('visa'));
+  if(el('tresor-moov'))    el('tresor-moov').textContent    = fmtK(solde('moov'));
   if(el('tresor-epargne')) el('tresor-epargne').textContent = fmtK(solde('epargne'));
+
+  // Boutons selon onglet
+  const btnTresor = document.getElementById('btn-add-tresor');
+  const btnCrypto = document.getElementById('btn-add-crypto');
+  if (btnTresor) btnTresor.style.display = tresorFilter === 'crypto' ? 'none' : '';
+  if (btnCrypto) btnCrypto.style.display = tresorFilter === 'crypto' ? '' : 'none';
+
+  const list = document.getElementById('tresorerie-list');
+  if (!list) return;
+
+  // Onglet crypto
+  if (tresorFilter === 'crypto') {
+    list.innerHTML = renderCryptoSection();
+    return;
+  }
 
   const filtered = tresorFilter==='all' ? items : items.filter(x=>x.compte===tresorFilter);
   const sorted = [...filtered].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
 
-  const list = document.getElementById('tresorerie-list');
-  if (!list) return;
   if (sorted.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune opération. Cliquez sur <b>+ Ajouter</b> pour commencer.</div>';
     return;
   }
 
-  // Grouper par compte si filtre = all
   if (tresorFilter === 'all') {
     const groups = { visa:[], moov:[], epargne:[] };
     sorted.forEach(x => { if(groups[x.compte]) groups[x.compte].push(x); });
@@ -4595,6 +4815,19 @@ function renderTresorerie() {
         ${ops.map(op => tresorRow(op)).join('')}
       </div>`;
     }).filter(Boolean).join('');
+    // Ajouter un aperçu crypto si des actifs existent
+    if ((state.cryptos||[]).length > 0) {
+      const totalInvesti = (state.cryptos||[]).reduce((s,c) => s+(c.qty*c.prixAchat),0);
+      const totalActuel  = (state.cryptos||[]).reduce((s,c) => s+(c.qty*(c.prixActuel||c.prixAchat)),0);
+      const pnl = totalActuel - totalInvesti;
+      list.innerHTML += `<div class="card" style="margin-bottom:16px;border-left:3px solid #F7931A;cursor:pointer" onclick="setTresorFilterById('crypto')">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>₿ Portefeuille Crypto <span style="color:var(--text3)">(${(state.cryptos||[]).length} actifs)</span></span>
+          <span style="font-family:var(--mono);font-size:.78rem;color:${pnl>=0?'var(--accent)':'var(--red)'};font-weight:700">${pnl>=0?'+':''}$${pnl.toFixed(2)} P&L</span>
+        </div>
+        <div style="font-size:.75rem;color:var(--text3);margin-top:4px">Cliquer pour voir le détail →</div>
+      </div>`;
+    }
   } else {
     const sol = solde(tresorFilter);
     list.innerHTML = `<div class="card">
@@ -4604,6 +4837,11 @@ function renderTresorerie() {
       ${sorted.map(op => tresorRow(op)).join('')}
     </div>`;
   }
+}
+
+function setTresorFilterById(val) {
+  const btn = document.querySelector(`[data-tfilter="${val}"]`);
+  if (btn) setTresorFilter(btn);
 }
 
 function tresorRow(op) {
@@ -4684,6 +4922,192 @@ function deleteTresor(id) {
 }
 // ════════════════════════════════════════════════════════════
 
+
+// ══ CRYPTOS ═════════════════════════════════════════════════
+const CRYPTO_META = {
+  BTC:   { nom:'Bitcoin',   icon:'₿',  color:'#F7931A' },
+  XRP:   { nom:'XRP',       icon:'◈',  color:'#346AA9' },
+  XLM:   { nom:'Stellar',   icon:'✦',  color:'#7B61FF' },
+  ETH:   { nom:'Ethereum',  icon:'Ξ',  color:'#627EEA' },
+  BNB:   { nom:'BNB',       icon:'⬡',  color:'#F3BA2F' },
+  SOL:   { nom:'Solana',    icon:'◎',  color:'#9945FF' },
+  ADA:   { nom:'Cardano',   icon:'₳',  color:'#0D1E2D' },
+  DOGE:  { nom:'Dogecoin',  icon:'Ð',  color:'#C2A633' },
+  OTHER: { nom:'Autre',     icon:'✦',  color:'#888' },
+};
+const USD_TO_XAF = 655.957; // taux fixe CFA
+
+function cryptoSymbolChange() {
+  const val = document.getElementById('crypto-symbol').value;
+  const grp = document.getElementById('crypto-nom-group');
+  grp.style.display = val === 'OTHER' ? 'block' : 'none';
+}
+
+function cryptoCalcMontant() {
+  const qty       = parseFloat(document.getElementById('crypto-qty').value) || 0;
+  const prixAchat = parseFloat(document.getElementById('crypto-prix-achat').value) || 0;
+  const prixActuel= parseFloat(document.getElementById('crypto-prix-actuel').value) || 0;
+  const preview   = document.getElementById('crypto-calc-preview');
+  if (qty > 0 && (prixAchat > 0 || prixActuel > 0)) {
+    const investi = qty * prixAchat;
+    const valeur  = qty * prixActuel;
+    const pnl     = valeur - investi;
+    const pnlPct  = investi > 0 ? ((pnl / investi) * 100).toFixed(1) : '—';
+    preview.style.display = 'block';
+    document.getElementById('crypto-preview-investi').textContent = '$' + investi.toFixed(2);
+    document.getElementById('crypto-preview-valeur').textContent  = '$' + valeur.toFixed(2);
+    const pnlEl = document.getElementById('crypto-preview-pnl');
+    pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' (' + pnlPct + '%)';
+    pnlEl.style.color = pnl >= 0 ? 'var(--accent)' : 'var(--red)';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function openCryptoModal(id) {
+  document.getElementById('crypto-edit-id').value = '';
+  document.getElementById('crypto-symbol').value = 'XRP';
+  document.getElementById('crypto-nom-group').style.display = 'none';
+  document.getElementById('crypto-statut').value = 'détenu';
+  document.getElementById('crypto-qty').value = '';
+  document.getElementById('crypto-prix-achat').value = '';
+  document.getElementById('crypto-prix-actuel').value = '';
+  document.getElementById('crypto-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('crypto-note').value = '';
+  document.getElementById('crypto-calc-preview').style.display = 'none';
+  document.getElementById('crypto-modal-title').innerHTML = "₿ Ajouter un actif crypto <span class='modal-close' onclick=\"closeModal('modal-crypto')\">✕</span>";
+  if (id) {
+    const cr = (state.cryptos || []).find(x => x.id === id);
+    if (cr) {
+      document.getElementById('crypto-modal-title').innerHTML = "✏️ Modifier l'actif <span class='modal-close' onclick=\"closeModal('modal-crypto')\">✕</span>";
+      document.getElementById('crypto-edit-id').value = id;
+      document.getElementById('crypto-symbol').value = cr.symbol || 'OTHER';
+      cryptoSymbolChange();
+      if (cr.symbol === 'OTHER') document.getElementById('crypto-nom-custom').value = cr.nomCustom || '';
+      document.getElementById('crypto-statut').value = cr.statut || 'détenu';
+      document.getElementById('crypto-qty').value = cr.qty;
+      document.getElementById('crypto-prix-achat').value = cr.prixAchat;
+      document.getElementById('crypto-prix-actuel').value = cr.prixActuel || '';
+      document.getElementById('crypto-date').value = cr.date || '';
+      document.getElementById('crypto-note').value = cr.note || '';
+      cryptoCalcMontant();
+    }
+  }
+  openModal('modal-crypto');
+}
+
+function saveCrypto() {
+  const symbol    = document.getElementById('crypto-symbol').value;
+  const nomCustom = document.getElementById('crypto-nom-custom').value.trim();
+  const statut    = document.getElementById('crypto-statut').value;
+  const qty       = parseFloat(document.getElementById('crypto-qty').value) || 0;
+  const prixAchat = parseFloat(document.getElementById('crypto-prix-achat').value) || 0;
+  const prixActuel= parseFloat(document.getElementById('crypto-prix-actuel').value) || 0;
+  const date      = document.getElementById('crypto-date').value;
+  const note      = document.getElementById('crypto-note').value.trim();
+  if (!qty)      return showToast('❌ Quantité requise');
+  if (!prixAchat)return showToast("❌ Prix d'achat requis");
+  if (!date)     return showToast('❌ Date requise');
+  const editId = +document.getElementById('crypto-edit-id').value || 0;
+  const obj = { id: editId || Date.now(), symbol, nomCustom, statut, qty, prixAchat, prixActuel, date, note };
+  if (!state.cryptos) state.cryptos = [];
+  if (editId) {
+    const idx = state.cryptos.findIndex(x => x.id === editId);
+    if (idx >= 0) state.cryptos[idx] = obj;
+  } else {
+    state.cryptos.push(obj);
+  }
+  save('cryptos');
+  closeModal('modal-crypto');
+  renderTresorerie();
+  setTimeout(renderCharts, 80);
+  showToast('✅ Actif enregistré');
+}
+
+function deleteCrypto(id) {
+  if (!confirm('Supprimer cet actif ?')) return;
+  state.cryptos = (state.cryptos || []).filter(x => x.id !== id);
+  save('cryptos');
+  renderTresorerie();
+  setTimeout(renderCharts, 80);
+  showToast('🗑️ Supprimé');
+}
+
+function renderCryptoSection() {
+  const cryptos = state.cryptos || [];
+  // KPI global P&L
+  const totalInvesti = cryptos.reduce((s, c) => s + (c.qty * c.prixAchat), 0);
+  const totalActuel  = cryptos.reduce((s, c) => s + (c.qty * (c.prixActuel || c.prixAchat)), 0);
+  const pnl = totalActuel - totalInvesti;
+  const pnlEl = document.getElementById('tresor-crypto-pnl');
+  if (pnlEl) {
+    const pnlPct = totalInvesti > 0 ? ((pnl / totalInvesti) * 100).toFixed(1) : '0';
+    pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2) + ' (' + pnlPct + '%)';
+    pnlEl.style.color = pnl >= 0 ? 'var(--accent)' : 'var(--red)';
+  }
+  if (cryptos.length === 0) {
+    return '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun actif. Cliquez sur <b>₿ Ajouter crypto</b> pour commencer.</div>';
+  }
+  // Grouper par symbol
+  const groups = {};
+  cryptos.forEach(cr => {
+    if (!groups[cr.symbol]) groups[cr.symbol] = [];
+    groups[cr.symbol].push(cr);
+  });
+  return Object.entries(groups).map(([symbol, items]) => {
+    const meta = CRYPTO_META[symbol] || CRYPTO_META.OTHER;
+    const totalQty  = items.reduce((s, x) => s + x.qty, 0);
+    const totalInv  = items.reduce((s, x) => s + (x.qty * x.prixAchat), 0);
+    const totalVal  = items.reduce((s, x) => s + (x.qty * (x.prixActuel || x.prixAchat)), 0);
+    const groupPnl  = totalVal - totalInv;
+    const pnlPct    = totalInv > 0 ? ((groupPnl / totalInv) * 100).toFixed(1) : '0';
+    return `<div class="card" style="margin-bottom:16px;border-left:3px solid ${meta.color}">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:${meta.color}22;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:${meta.color}">${meta.icon}</div>
+          <div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--text)">${symbol === 'OTHER' ? (items[0].nomCustom || 'Autre') : meta.nom} <span style="font-size:.7rem;color:var(--text3)">${symbol !== 'OTHER' ? symbol : ''}</span></div>
+            <div style="font-size:.68rem;color:var(--text3);font-family:var(--mono)">Qté totale : ${totalQty.toLocaleString('fr')} · Investi : $${totalInv.toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-weight:700;font-size:.82rem;color:${groupPnl >= 0 ? 'var(--accent)' : 'var(--red)'}">${groupPnl >= 0 ? '+' : ''}$${groupPnl.toFixed(2)}</div>
+          <div style="font-size:.65rem;color:var(--text3)">${pnlPct}% · Val: $${totalVal.toFixed(2)}</div>
+        </div>
+      </div>
+      ${items.map(cr => {
+        const meta2 = CRYPTO_META[cr.symbol] || CRYPTO_META.OTHER;
+        const investi = cr.qty * cr.prixAchat;
+        const valeur  = cr.qty * (cr.prixActuel || cr.prixAchat);
+        const pnl2    = valeur - investi;
+        const pct2    = investi > 0 ? ((pnl2 / investi) * 100).toFixed(1) : '0';
+        const statutColors = { 'détenu':'badge-green', 'vendu-partiel':'badge-gold', 'vendu':'badge-blue' };
+        const statutLabels = { 'détenu':'📦 Détenu', 'vendu-partiel':'📤 Partiel', 'vendu':'✅ Vendu' };
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-family:var(--mono);font-weight:700;font-size:.85rem">${cr.qty.toLocaleString('fr')} ${cr.symbol !== 'OTHER' ? cr.symbol : (cr.nomCustom || '')}</span>
+              <span class="badge ${statutColors[cr.statut] || 'badge-blue'}" style="font-size:.58rem">${statutLabels[cr.statut] || cr.statut}</span>
+            </div>
+            <div style="font-size:.7rem;color:var(--text3);font-family:var(--mono);margin-top:2px">
+              Achat: $${cr.prixAchat} · ${cr.prixActuel ? 'Actuel: $' + cr.prixActuel + ' · ' : ''}${cr.date}
+              ${cr.note ? ' · ' + cr.note : ''}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:var(--mono);font-weight:700;font-size:.82rem;color:${pnl2 >= 0 ? 'var(--accent)' : 'var(--red)'}">${pnl2 >= 0 ? '+' : ''}$${pnl2.toFixed(2)}</div>
+            <div style="font-size:.65rem;color:var(--text3)">${pct2}%</div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="btn btn-outline btn-icon btn-sm" onclick="openCryptoModal(${cr.id})" title="Modifier">✏️</button>
+            <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCrypto(${cr.id})" title="Supprimer">🗑️</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+// ════════════════════════════════════════════════════════════
 checkSession();
 sidebarInit();
 initDate();
