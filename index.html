@@ -815,6 +815,12 @@ tr:hover td { background:var(--bg); }
           <span class="nav-lbl">Développement du Foyer</span>
           <span class="nav-tip">Dev. Foyer</span>
         </div>
+        <div class="nav-item" onclick="showPage('hygiene')">
+          <i class="fa-solid fa-pump-soap fa-fw"></i>
+          <span class="nav-lbl">Hygiène Parentale</span>
+          <span class="nav-badge" id="badgeHygiene" style="display:none">0</span>
+          <span class="nav-tip">Hygiène</span>
+        </div>
         <div class="nav-item" onclick="showPage('budget')">
           <i class="fa-solid fa-wallet fa-fw"></i>
           <span class="nav-lbl" data-fr="Budget Maison" data-en="Home Budget">Budget Maison</span>
@@ -1614,9 +1620,102 @@ tr:hover td { background:var(--bg); }
   <div id="charges-list"></div>
 </div>
 
+
+<!-- ═══════════════════ HYGIÈNE PARENTALE ═══════════════════ -->
+<div id="page-hygiene" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">🧴 Hygiène Parentale</div>
+      <div class="page-sub">Suivi des besoins en hygiène par personne — synchronisé avec Stocks & Courses</div>
+    </div>
+  </div>
+
+  <!-- Onglets père / mère / enfant -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="filter-chip active" data-hpanel="pere"   onclick="setHPanel(this)">👨 Père</button>
+    <button class="filter-chip"        data-hpanel="mere"   onclick="setHPanel(this)">👩 Mère</button>
+    <button class="filter-chip"        data-hpanel="enfant" onclick="setHPanel(this)">🧒 Enfant</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="hyg-ok">0</div><div class="kpi-label">En stock</div></div>
+    <div class="kpi gold"><div class="kpi-icon">⚠️</div><div class="kpi-val" id="hyg-faible">0</div><div class="kpi-label">Stock faible</div></div>
+    <div class="kpi red"><div class="kpi-icon">🔴</div><div class="kpi-val" id="hyg-critique">0</div><div class="kpi-label">Critique / épuisé</div></div>
+    <div class="kpi blue"><div class="kpi-icon">💸</div><div class="kpi-val" id="hyg-budget">0</div><div class="kpi-label">Budget estimé</div></div>
+  </div>
+
+  <div id="hygiene-content"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- MODAL PRODUIT HYGIÈNE -->
+<div id="modal-hygiene" class="modal-overlay" onclick="closeModalOut(event,'modal-hygiene')">
+<div class="modal">
+  <div class="modal-title" id="hyg-modal-title">🧴 Ajouter un produit
+    <span class="modal-close" onclick="closeModal('modal-hygiene')">✕</span>
+  </div>
+  <input type="hidden" id="hyg-edit-id">
+  <input type="hidden" id="hyg-panel-ctx">
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Nom du produit</label>
+      <input class="form-input" id="hyg-nom" placeholder="Ex: Savonette, Shampoing…">
+    </div>
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-select" id="hyg-cat">
+        <option value="Corps">🧼 Corps</option>
+        <option value="Cheveux">💆 Cheveux</option>
+        <option value="Visage">🧖 Visage</option>
+        <option value="Dentaire">🦷 Dentaire</option>
+        <option value="Intime">🌸 Intime</option>
+        <option value="Rasage">🪒 Rasage / Barbe</option>
+        <option value="Parfum">🌺 Parfum / Déodorant</option>
+        <option value="Serviette">🛁 Serviette / Linge</option>
+        <option value="Autre">📦 Autre</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Quantité disponible</label>
+      <input class="form-input" id="hyg-qty" placeholder="Ex: 2">
+    </div>
+    <div class="form-group"><label class="form-label">Unité</label>
+      <select class="form-select" id="hyg-unite">
+        <option value="pcs">pièce(s)</option>
+        <option value="flacon">flacon(s)</option>
+        <option value="tube">tube(s)</option>
+        <option value="sachet">sachet(s)</option>
+        <option value="litre">litre(s)</option>
+        <option value="ml">ml</option>
+        <option value="paire">paire(s)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Prix estimé (XAF)</label>
+      <input class="form-input" type="number" id="hyg-prix" placeholder="0">
+    </div>
+    <div class="form-group"><label class="form-label">Niveau de stock</label>
+      <select class="form-select" id="hyg-alerte">
+        <option value="ok">✅ OK</option>
+        <option value="faible">⚠️ Faible</option>
+        <option value="critique">🔴 Critique / Épuisé</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group"><label class="form-label">Note (optionnel)</label>
+    <input class="form-input" id="hyg-note" placeholder="Marque préférée, remarque…">
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="saveHygieneProduct()">💾 Enregistrer</button>
+</div></div>
+
 <!-- CHARGE EXTERNE MODAL -->
 <div id="modal-charge" class="modal-overlay" onclick="closeModalOut(event,'modal-charge')">
 <div class="modal">
@@ -1982,12 +2081,18 @@ tr:hover td { background:var(--bg); }
         <option value="Fix-PetitDej">☕ Fix — Petit déjeuner</option>
         <option value="Fix-Repas">🥩 Fix — Repas</option>
         <option value="Fix-Hygiene">🧴 Fix — Hygiène maison</option>
+        <option value="Hygiene-Pere">👨 Hygiène — Père</option>
+        <option value="Hygiene-Mere">👩 Hygiène — Mère</option>
+        <option value="Hygiene-Enfant">🧒 Hygiène — Enfant</option>
         <option value="Var-Assaison">🧄 Variable — Assaisonnement</option>
         <option value="Var-AutreCuisine">🥜 Variable — Autre cuisine</option>
         <!-- Déco/Équipement/Meuble/Cuisine → Développement du Foyer -->
         <option value="Sante">💊 Santé</option>
         <option value="Autre">📦 Autre</option>
       <option value="Foyer">🏗️ Développement du Foyer</option>
+      <option value="Hygiène Père">👨 Hygiène Père</option>
+      <option value="Hygiène Mère">👩 Hygiène Mère</option>
+      <option value="Hygiène Enfant">🧒 Hygiène Enfant</option>
       </select>
     </div>
     <div class="form-group"><label class="form-label">Quantité</label><input class="form-input" id="s-qty" placeholder="Ex: 10kg"></div>
@@ -2655,7 +2760,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: [], charges: []
+  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: [], charges: [], hygieneParentale: {}
 };
 
 // ══ FIREBASE ══
@@ -2663,7 +2768,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges','hygieneParentale'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2834,6 +2939,7 @@ function renderPage(id) {
   if (id==='routines') renderRoutines();
   if (id==='projetsmaison') renderProjetsMailson();
   if (id==='charges') renderCharges();
+  if (id==='hygiene') renderHygiene();
 }
 
 function renderAll() {
@@ -2855,6 +2961,7 @@ function renderAll() {
   renderRoutines();
   renderProjetsMailson();
   renderCharges();
+  renderHygiene();
   updateBadges();
 }
 
@@ -2943,6 +3050,9 @@ function renderStocks() {
     {k:'Fix-PetitDej',      lbl:'☕ Fix — Petit déjeuner',              bud:17000,  col:'var(--accent2)'},
     {k:'Fix-Repas',         lbl:'🥩 Fix — Repas',                       bud:25000,  col:'var(--blue2)'},
     {k:'Fix-Hygiene',       lbl:'🧴 Fix — Hygiène maison',              bud:21200,  col:'var(--blue)'},
+    {k:'Hygiene-Pere',      lbl:'👨 Hygiène — Père',                    bud:0,      col:'#3B82F6'},
+    {k:'Hygiene-Mere',      lbl:'👩 Hygiène — Mère',                    bud:0,      col:'#EC4899'},
+    {k:'Hygiene-Enfant',    lbl:'🧒 Hygiène — Enfant',                  bud:0,      col:'#F59E0B'},
     {k:'Var-Assaison',      lbl:'🧄 Variable — Assaisonnement',         bud:3100,   col:'var(--orange)'},
     {k:'Var-AutreCuisine',  lbl:'🥜 Variable — Autre cuisine',          bud:8700,   col:'var(--orange2)'},
     // Var-ProjCuisine, Var-Deco, Var-Equipement, Var-Meuble → déplacés vers Développement du Foyer
@@ -5283,7 +5393,8 @@ function setCrsFilter(btn) {
 
 const CAT_EMOJI = {
   'Fruits & Légumes':'🥦','Viande & Poisson':'🥩','Épicerie':'🥫',
-  'Produits laitiers':'🥛','Hygiène':'🧴','Entretien':'🧹','Boissons':'🥤','Autre':'📦'
+  'Produits laitiers':'🥛','Hygiène':'🧴','Entretien':'🧹','Boissons':'🥤','Autre':'📦',
+  'Foyer':'🏗️', 'Hygiène Père':'👨', 'Hygiène Mère':'👩', 'Hygiène Enfant':'🧒',
 };
 
 function renderCourses() {
@@ -5322,10 +5433,11 @@ function renderCourses() {
           <div style="flex:1">
             <div style="font-size:.85rem;${c.done?'text-decoration:line-through':''}">${c.nom}</div>
             ${c.projetNom?`<div style="font-size:.68rem;color:var(--accent);font-weight:600">🏗️ ${c.projetNom}</div>`:''}
-            ${(!c.projetNom&&c.qty)?`<div style="font-size:.72rem;color:var(--text3)">${c.qty}</div>`:''}
+            ${c.origine?`<div style="font-size:.68rem;color:#EC4899;font-weight:600">${c.origine}</div>`:''}
+            ${(!c.projetNom&&!c.origine&&c.qty)?`<div style="font-size:.72rem;color:var(--text3)">${c.qty}</div>`:''}
           </div>
           ${c.prix?`<span style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">${fmtXAF(c.prix)}</span>`:''}
-          ${!c.projetDepId?`<button class="btn btn-outline btn-icon btn-sm" onclick="deleteCourse(${idx})" style="padding:2px 6px">🗑️</button>`:'<span style="font-size:.65rem;color:var(--text3);padding:2px 4px" title="Géré depuis Développement du Foyer">🔗</span>'}
+          ${(c.projetDepId||c.hygieneId)?`<span style="font-size:.65rem;color:var(--text3);padding:2px 4px" title="${c.hygieneId?'Géré depuis Hygiène Parentale':'Géré depuis Développement du Foyer'}">🔗</span>`:`<button class="btn btn-outline btn-icon btn-sm" onclick="deleteCourse(${idx})" style="padding:2px 6px">🗑️</button>`}
         </div>`;
       }).join('')}
     </div>`).join('');
@@ -5341,9 +5453,20 @@ function toggleCourse(i) {
       dep.statut = crs.done ? 'payé' : 'à acheter';
       save('depensesProjets');
       recalcProjet(dep.projetId);
-      // Rafraîchir page projetsmaison si visible
       if (document.getElementById('page-projetsmaison')?.classList.contains('active')) renderProjetsMailson();
       showToast(crs.done ? '✅ Payé · Projet mis à jour 🏗️' : '↩️ Remis en liste');
+    }
+  }
+  // ── Retour vers Hygiène Parentale ──
+  if (crs.hygieneId && crs.hygienePanel) {
+    ensureHygieneDefaults();
+    const prod = (state.hygieneParentale[crs.hygienePanel]||[]).find(p=>p.id==crs.hygieneId);
+    if (prod) {
+      prod.alerte = crs.done ? 'ok' : 'faible';
+      save('hygieneParentale');
+      syncHygieneToStock(crs.hygienePanel, prod);
+      if (document.getElementById('page-hygiene')?.classList.contains('active')) renderHygiene();
+      showToast(crs.done ? '✅ Acheté · Hygiène mise à jour 🧴' : '↩️ Remis en liste');
     }
   }
   save('courses'); renderCourses();
@@ -6798,6 +6921,325 @@ function renderCharges() {
 }
 // ════════════════════════════════════════════════════════════
 
+
+// ═══════════════════════════════════════════════════════════════
+// ══ HYGIÈNE PARENTALE ══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+
+const HYG_PANELS = {
+  pere:   { lbl:'Père',   icon:'👨', sexe:'M', stockCat:'Hygiene-Pere',   col:'#3B82F6' },
+  mere:   { lbl:'Mère',   icon:'👩', sexe:'F', stockCat:'Hygiene-Mere',   col:'#EC4899' },
+  enfant: { lbl:'Enfant', icon:'🧒', sexe:'?', stockCat:'Hygiene-Enfant', col:'#F59E0B' },
+};
+
+const HYG_CAT_ICON = {
+  Corps:'🧼', Cheveux:'💆', Visage:'🧖', Dentaire:'🦷',
+  Intime:'🌸', Rasage:'🪒', Parfum:'🌺', Serviette:'🛁', Autre:'📦',
+};
+
+// Produits par défaut selon le panel
+const HYG_DEFAULTS = {
+  pere: [
+    {id:1e9+1,  nom:'Savonette',         cat:'Corps',   qty:'2', unite:'pcs',    prix:500,   alerte:'ok',      note:''},
+    {id:1e9+2,  nom:'Savon douche',       cat:'Corps',   qty:'1', unite:'flacon', prix:3500,  alerte:'ok',      note:''},
+    {id:1e9+3,  nom:'Shampoing',          cat:'Cheveux', qty:'1', unite:'flacon', prix:3000,  alerte:'ok',      note:''},
+    {id:1e9+4,  nom:'Dentifrice',         cat:'Dentaire',qty:'1', unite:'tube',   prix:1500,  alerte:'ok',      note:''},
+    {id:1e9+5,  nom:'Brosse à dents',     cat:'Dentaire',qty:'1', unite:'pcs',    prix:500,   alerte:'faible',  note:'À renouveler tous les 3 mois'},
+    {id:1e9+6,  nom:'Déodorant',          cat:'Parfum',  qty:'1', unite:'flacon', prix:2500,  alerte:'ok',      note:''},
+    {id:1e9+7,  nom:'Parfum',             cat:'Parfum',  qty:'1', unite:'flacon', prix:15000, alerte:'ok',      note:''},
+    {id:1e9+8,  nom:'Rasoir',             cat:'Rasage',  qty:'1', unite:'pcs',    prix:3000,  alerte:'ok',      note:''},
+    {id:1e9+9,  nom:'Mousse à raser',     cat:'Rasage',  qty:'1', unite:'flacon', prix:2000,  alerte:'ok',      note:''},
+    {id:1e9+10, nom:'Serviette de bain',  cat:'Serviette',qty:'2',unite:'pcs',    prix:5000,  alerte:'ok',      note:''},
+    {id:1e9+11, nom:'Crème hydratante',   cat:'Visage',  qty:'1', unite:'tube',   prix:4000,  alerte:'ok',      note:''},
+  ],
+  mere: [
+    {id:2e9+1,  nom:'Savonette',          cat:'Corps',   qty:'2', unite:'pcs',    prix:500,   alerte:'ok',      note:''},
+    {id:2e9+2,  nom:'Gel douche',         cat:'Corps',   qty:'1', unite:'flacon', prix:3500,  alerte:'ok',      note:''},
+    {id:2e9+3,  nom:'Shampoing',          cat:'Cheveux', qty:'1', unite:'flacon', prix:4500,  alerte:'ok',      note:''},
+    {id:2e9+4,  nom:'Après-shampoing',    cat:'Cheveux', qty:'1', unite:'flacon', prix:3000,  alerte:'faible',  note:''},
+    {id:2e9+5,  nom:'Dentifrice',         cat:'Dentaire',qty:'1', unite:'tube',   prix:1500,  alerte:'ok',      note:''},
+    {id:2e9+6,  nom:'Brosse à dents',     cat:'Dentaire',qty:'1', unite:'pcs',    prix:500,   alerte:'ok',      note:''},
+    {id:2e9+7,  nom:'Déodorant',          cat:'Parfum',  qty:'1', unite:'flacon', prix:2500,  alerte:'ok',      note:''},
+    {id:2e9+8,  nom:'Parfum',             cat:'Parfum',  qty:'1', unite:'flacon', prix:20000, alerte:'ok',      note:''},
+    {id:2e9+9,  nom:'Serviettes hygiéniques', cat:'Intime', qty:'2', unite:'sachet', prix:2500, alerte:'ok',   note:''},
+    {id:2e9+10, nom:'Savon intime',       cat:'Intime',  qty:'1', unite:'flacon', prix:3000,  alerte:'ok',      note:''},
+    {id:2e9+11, nom:'Crème hydratante',   cat:'Visage',  qty:'1', unite:'tube',   prix:5000,  alerte:'ok',      note:''},
+    {id:2e9+12, nom:'Serviette de bain',  cat:'Serviette',qty:'2',unite:'pcs',    prix:5000,  alerte:'ok',      note:''},
+    {id:2e9+13, nom:'Coton-tige',         cat:'Autre',   qty:'1', unite:'sachet', prix:500,   alerte:'faible',  note:''},
+    {id:2e9+14, nom:'Lime à ongles',      cat:'Autre',   qty:'1', unite:'pcs',    prix:500,   alerte:'ok',      note:''},
+  ],
+  enfant: [
+    {id:3e9+1,  nom:'Savon doux enfant',  cat:'Corps',   qty:'1', unite:'flacon', prix:2000,  alerte:'ok',      note:''},
+    {id:3e9+2,  nom:'Shampoing enfant',   cat:'Cheveux', qty:'1', unite:'flacon', prix:2500,  alerte:'ok',      note:''},
+    {id:3e9+3,  nom:'Dentifrice enfant',  cat:'Dentaire',qty:'1', unite:'tube',   prix:1000,  alerte:'ok',      note:''},
+    {id:3e9+4,  nom:'Brosse à dents',     cat:'Dentaire',qty:'1', unite:'pcs',    prix:300,   alerte:'ok',      note:''},
+    {id:3e9+5,  nom:'Serviette de bain',  cat:'Serviette',qty:'2',unite:'pcs',    prix:3000,  alerte:'ok',      note:''},
+    {id:3e9+6,  nom:'Crème hydratante',   cat:'Visage',  qty:'1', unite:'tube',   prix:2500,  alerte:'faible',  note:''},
+    {id:3e9+7,  nom:'Coton-tige',         cat:'Autre',   qty:'1', unite:'sachet', prix:500,   alerte:'ok',      note:''},
+    {id:3e9+8,  nom:'Eau de cologne',     cat:'Parfum',  qty:'1', unite:'flacon', prix:3000,  alerte:'ok',      note:''},
+  ],
+};
+
+let hPanel = 'pere';
+function setHPanel(btn) {
+  document.querySelectorAll('[data-hpanel]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  hPanel = btn.dataset.hpanel;
+  renderHygiene();
+}
+
+function ensureHygieneDefaults() {
+  if (!state.hygieneParentale || typeof state.hygieneParentale !== 'object') {
+    state.hygieneParentale = {};
+  }
+  let changed = false;
+  ['pere','mere','enfant'].forEach(p => {
+    if (!state.hygieneParentale[p]) {
+      state.hygieneParentale[p] = JSON.parse(JSON.stringify(HYG_DEFAULTS[p]));
+      changed = true;
+    }
+  });
+  if (changed) save('hygieneParentale');
+}
+
+function renderHygiene() {
+  ensureHygieneDefaults();
+  const hp = state.hygieneParentale;
+  const allItems = ['pere','mere','enfant'].flatMap(p => (hp[p]||[]));
+  const okCt   = allItems.filter(x=>x.alerte==='ok').length;
+  const fblCt  = allItems.filter(x=>x.alerte==='faible').length;
+  const critCt = allItems.filter(x=>x.alerte==='critique').length;
+  const budget = allItems.reduce((s,x)=>s+(+x.prix||0),0);
+
+  const g = id=>document.getElementById(id);
+  if(g('hyg-ok'))      g('hyg-ok').textContent      = okCt;
+  if(g('hyg-faible'))  g('hyg-faible').textContent  = fblCt;
+  if(g('hyg-critique'))g('hyg-critique').textContent= critCt;
+  if(g('hyg-budget'))  g('hyg-budget').textContent  = fmtXAF(budget);
+
+  // Badge sidebar = produits critiques ou faibles
+  const badge = document.getElementById('badgeHygiene');
+  if(badge){ const nb=fblCt+critCt; badge.textContent=nb; badge.style.display=nb>0?'inline-block':'none'; }
+
+  const panel = HYG_PANELS[hPanel];
+  const items = hp[hPanel] || [];
+  const el = document.getElementById('hygiene-content');
+  if(!el) return;
+
+  // Grouper par catégorie
+  const grouped = {};
+  items.forEach(p => { if(!grouped[p.cat]) grouped[p.cat]=[]; grouped[p.cat].push(p); });
+
+  const ALERTE_COL = {ok:'var(--accent)',faible:'var(--gold)',critique:'var(--red)'};
+  const ALERTE_LBL = {ok:'✅ OK',faible:'⚠️ Faible',critique:'🔴 Épuisé'};
+
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:${panel.col}22;display:flex;align-items:center;justify-content:center;font-size:1.2rem">${panel.icon}</div>
+        <div>
+          <div style="font-weight:700;font-size:1rem;color:${panel.col}">${panel.lbl}</div>
+          <div style="font-size:.72rem;color:var(--text3)">${items.length} produit${items.length>1?'s':''}</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openHygieneModal()">+ Ajouter</button>
+    </div>
+
+    ${items.length===0?`<div style="color:var(--text3);text-align:center;padding:40px;background:var(--card);border-radius:var(--radius)">Aucun produit — cliquez "+ Ajouter"</div>`:''}
+
+    <div class="card" style="padding:0;overflow:hidden">
+      ${Object.keys(grouped).map((cat,ci)=>`
+        <!-- En-tête catégorie -->
+        <div style="padding:10px 16px;background:var(--bg2);border-top:${ci>0?'1px solid var(--border)':'none'};display:flex;align-items:center;gap:8px">
+          <span style="font-size:.9rem">${HYG_CAT_ICON[cat]||'📦'}</span>
+          <span style="font-weight:700;font-size:.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">${cat}</span>
+          <span style="font-size:.7rem;color:var(--text3);margin-left:auto">${grouped[cat].length} article${grouped[cat].length>1?'s':''}</span>
+        </div>
+        <!-- Lignes produits -->
+        ${grouped[cat].map((prod,pi)=>{
+          const alerteCol = ALERTE_COL[prod.alerte]||'var(--accent)';
+          const isLast = pi===grouped[cat].length-1;
+          return `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;${!isLast?'border-bottom:1px solid var(--border)':''}">
+            <!-- Pastille statut -->
+            <div style="width:10px;height:10px;border-radius:50%;background:${alerteCol};flex-shrink:0" title="${ALERTE_LBL[prod.alerte]}"></div>
+            <!-- Nom + note -->
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${prod.nom}</div>
+              ${prod.note?`<div style="font-size:.68rem;color:var(--text3);font-style:italic;margin-top:1px">${prod.note}</div>`:''}
+            </div>
+            <!-- Qty + unite -->
+            <div style="font-size:.75rem;color:var(--text3);text-align:center;flex-shrink:0;min-width:52px">
+              <span style="font-weight:700;color:var(--text)">${prod.qty||'—'}</span> <span>${prod.unite||''}</span>
+            </div>
+            <!-- Prix -->
+            <div style="font-family:var(--mono);font-size:.75rem;color:var(--gold);text-align:right;flex-shrink:0;min-width:68px">
+              ${prod.prix?fmtXAF(+prod.prix):'—'}
+            </div>
+            <!-- Badge statut -->
+            <div style="flex-shrink:0;min-width:64px;text-align:center">
+              <span style="padding:3px 8px;border-radius:20px;font-size:.62rem;font-weight:700;background:${alerteCol}20;color:${alerteCol};white-space:nowrap">${ALERTE_LBL[prod.alerte]}</span>
+            </div>
+            <!-- Actions -->
+            <div style="display:flex;gap:4px;flex-shrink:0">
+              <button class="btn btn-outline btn-icon btn-sm" title="Modifier" onclick="editHygiene('${hPanel}',${prod.id})" style="padding:4px 7px;font-size:.75rem">✏️</button>
+              <button class="btn btn-outline btn-icon btn-sm" title="Changer stock" onclick="cycleHygieneAlerte('${hPanel}',${prod.id})" style="padding:4px 7px;font-size:.75rem">${prod.alerte==='ok'?'⚠️':prod.alerte==='faible'?'🔴':'✅'}</button>
+              <button class="btn btn-outline btn-icon btn-sm" title="Supprimer" onclick="deleteHygiene('${hPanel}',${prod.id})" style="padding:4px 7px;font-size:.75rem;color:var(--red)">🗑️</button>
+            </div>
+          </div>`;
+        }).join('')}
+      `).join('')}
+    </div>
+  `;
+}
+
+function openHygieneModal() {
+  document.getElementById('hyg-modal-title').innerHTML = `🧴 Ajouter un produit — ${HYG_PANELS[hPanel].icon} ${HYG_PANELS[hPanel].lbl} <span class="modal-close" onclick="closeModal('modal-hygiene')">✕</span>`;
+  document.getElementById('hyg-edit-id').value = '';
+  document.getElementById('hyg-panel-ctx').value = hPanel;
+  clearForm(['hyg-nom','hyg-qty','hyg-prix','hyg-note']);
+  sv('hyg-cat','Corps'); sv('hyg-unite','pcs'); sv('hyg-alerte','ok');
+  openModal('modal-hygiene');
+}
+
+function editHygiene(panel, id) {
+  ensureHygieneDefaults();
+  const prod = (state.hygieneParentale[panel]||[]).find(x=>x.id==id);
+  if(!prod) return;
+  const ph = HYG_PANELS[panel];
+  document.getElementById('hyg-modal-title').innerHTML = `✏️ Modifier — ${ph.icon} ${ph.lbl} <span class="modal-close" onclick="closeModal('modal-hygiene')">✕</span>`;
+  document.getElementById('hyg-edit-id').value = id;
+  document.getElementById('hyg-panel-ctx').value = panel;
+  sv('hyg-nom', prod.nom); sv('hyg-cat', prod.cat);
+  sv('hyg-qty', prod.qty||''); sv('hyg-unite', prod.unite||'pcs');
+  sv('hyg-prix', prod.prix||0); sv('hyg-alerte', prod.alerte||'ok');
+  sv('hyg-note', prod.note||'');
+  openModal('modal-hygiene');
+}
+
+function saveHygieneProduct() {
+  const nom    = document.getElementById('hyg-nom').value.trim();
+  if(!nom) return showToast('❌ Nom du produit requis');
+  const panel  = document.getElementById('hyg-panel-ctx').value || hPanel;
+  const editId = +document.getElementById('hyg-edit-id').value||0;
+  ensureHygieneDefaults();
+
+  const obj = {
+    id:     editId || Date.now(),
+    nom,
+    cat:    document.getElementById('hyg-cat').value,
+    qty:    document.getElementById('hyg-qty').value.trim()||'1',
+    unite:  document.getElementById('hyg-unite').value,
+    prix:   +document.getElementById('hyg-prix').value||0,
+    alerte: document.getElementById('hyg-alerte').value,
+    note:   document.getElementById('hyg-note').value.trim(),
+  };
+
+  const list = state.hygieneParentale[panel] || [];
+  if(editId) {
+    const idx = list.findIndex(x=>x.id==editId);
+    if(idx>=0) list[idx]=obj; else list.push(obj);
+  } else {
+    list.push(obj);
+  }
+  state.hygieneParentale[panel] = list;
+  save('hygieneParentale');
+
+  // ── Sync → Stocks ──
+  syncHygieneToStock(panel, obj);
+  // ── Sync → Courses si faible/critique ──
+  if(obj.alerte==='faible'||obj.alerte==='critique') syncHygieneToCourses(panel, obj);
+
+  closeModal('modal-hygiene');
+  renderHygiene();
+  if(document.getElementById('page-stocks')?.classList.contains('active')) renderStocks();
+  if(document.getElementById('page-courses')?.classList.contains('active')) renderCourses();
+  showToast(editId?'✅ Produit modifié':'✅ Produit ajouté');
+}
+
+function deleteHygiene(panel, id) {
+  if(!confirm('Supprimer ce produit ?')) return;
+  ensureHygieneDefaults();
+  const prod = (state.hygieneParentale[panel]||[]).find(x=>x.id==id);
+  // Retirer du stock lié
+  if(prod) {
+    state.stocks = (state.stocks||[]).filter(s=>s.hygieneId!=id);
+    state.courses = (state.courses||[]).filter(c=>c.hygieneId!=id);
+    save('stocks'); save('courses');
+  }
+  state.hygieneParentale[panel] = (state.hygieneParentale[panel]||[]).filter(x=>x.id!=id);
+  save('hygieneParentale');
+  renderHygiene();
+  showToast('🗑️ Produit supprimé');
+}
+
+function cycleHygieneAlerte(panel, id) {
+  ensureHygieneDefaults();
+  const list = state.hygieneParentale[panel]||[];
+  const prod = list.find(x=>x.id==id); if(!prod) return;
+  const cycle = {ok:'faible',faible:'critique',critique:'ok'};
+  prod.alerte = cycle[prod.alerte]||'ok';
+  save('hygieneParentale');
+  // Sync stock
+  syncHygieneToStock(panel, prod);
+  // Ajouter aux courses si faible/critique
+  if(prod.alerte==='faible'||prod.alerte==='critique') syncHygieneToCourses(panel, prod);
+  else {
+    // Retirer des courses si redevenu OK
+    state.courses = (state.courses||[]).filter(c=>c.hygieneId!=prod.id);
+    save('courses');
+  }
+  renderHygiene();
+  if(document.getElementById('page-stocks')?.classList.contains('active')) renderStocks();
+  if(document.getElementById('page-courses')?.classList.contains('active')) renderCourses();
+  const lbl = {ok:'✅ OK',faible:'⚠️ Faible',critique:'🔴 Critique'}[prod.alerte];
+  showToast(`${prod.nom} → ${lbl}`);
+}
+
+function syncHygieneToStock(panel, prod) {
+  if(!state.stocks) state.stocks=[];
+  const ph = HYG_PANELS[panel];
+  const existing = state.stocks.find(s=>s.hygieneId==prod.id);
+  const stockObj = {
+    id:        existing ? existing.id : Date.now()+Math.floor(Math.random()*999),
+    nom:       `${ph.icon} ${prod.nom}`,
+    cat:       ph.stockCat,
+    qty:       prod.qty,
+    prix:      prod.prix,
+    prixr:     0,
+    alerte:    prod.alerte,
+    hygieneId: prod.id,
+  };
+  if(existing) { Object.assign(existing, stockObj); }
+  else { state.stocks.push(stockObj); }
+  save('stocks');
+}
+
+function syncHygieneToCourses(panel, prod) {
+  if(!state.courses) state.courses=[];
+  const ph = HYG_PANELS[panel];
+  const existing = state.courses.find(c=>c.hygieneId==prod.id);
+  if(existing) {
+    existing.nom  = prod.nom;
+    existing.prix = prod.prix;
+    existing.cat  = `Hygiène ${ph.lbl}`;
+    existing.done = false;
+  } else {
+    state.courses.push({
+      id:        Date.now()+Math.floor(Math.random()*9999),
+      nom:       prod.nom,
+      cat:       `Hygiène ${ph.lbl}`,
+      qty:       prod.qty+' '+prod.unite,
+      prix:      prod.prix,
+      done:      false,
+      note:      prod.note||'',
+      hygieneId: prod.id,
+      hygienePanel: panel,
+      origine:   `🧴 Hygiène ${ph.lbl}`,
+    });
+  }
+  save('courses');
+}
+// ═══════════════════════════════════════════════════════════════
 checkSession();
 sidebarInit();
 initDate();
