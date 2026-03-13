@@ -170,13 +170,13 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
 /* Toggle collapse */
 /* ── SIDEBAR TOGGLE FLOTTANT (logo clignotant) ── */
 @keyframes pulseRing {
-  0%   { box-shadow: 0 0 0 0 rgba(45,106,79,.65), 0 4px 16px rgba(45,106,79,.4); }
-  60%  { box-shadow: 0 0 0 9px rgba(45,106,79,0),  0 4px 16px rgba(45,106,79,.4); }
-  100% { box-shadow: 0 0 0 0 rgba(45,106,79,0),   0 4px 16px rgba(45,106,79,.3); }
+  0%   { box-shadow: 0 0 0 0 rgba(45,106,79,.45), 0 4px 16px rgba(45,106,79,.3); }
+  70%  { box-shadow: 0 0 0 7px rgba(45,106,79,0),  0 4px 16px rgba(45,106,79,.3); }
+  100% { box-shadow: 0 0 0 0 rgba(45,106,79,0),   0 4px 16px rgba(45,106,79,.2); }
 }
 @keyframes pulseDot {
   0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:.5; transform:scale(.8); }
+  50%      { opacity:.7; transform:scale(.85); }
 }
 .sidebar-toggle {
   position: fixed;
@@ -189,7 +189,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
   border: 2px solid var(--card);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 1.1rem;
-  animation: pulseRing 2.4s ease-out infinite;
+  animation: pulseRing 3.5s ease-out infinite;
   transition: left 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.18s;
 }
 .sidebar-toggle:hover { transform: scale(1.1); animation: none; box-shadow: 0 6px 22px rgba(45,106,79,.55); }
@@ -200,9 +200,9 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); min-hei
   top: -4px; right: -4px;
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: #3B82F6;
+  background: var(--red);
   border: 2px solid var(--card);
-  animation: pulseDot 1.6s ease-in-out infinite;
+  animation: pulseDot 2s ease-in-out infinite;
 }
 
 /* Profil bas */
@@ -484,20 +484,20 @@ tr:hover td { background:var(--bg); }
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   cursor: pointer; font-size: 1.1rem; color: #fff;
   position: relative; flex-shrink: 0;
-  animation: pulseRing 2.4s ease-out infinite;
+  animation: pulseRing 3.5s ease-out infinite;
   transition: transform 0.18s;
 }
 .hamburger-btn:hover { transform: scale(1.1); animation: none; box-shadow: 0 6px 22px rgba(45,106,79,.55); }
-/* Point bleu clignotant identique au toggle desktop */
+/* Point rouge clignotant */
 .hamburger-btn::after {
   content: '';
   position: absolute;
   top: -4px; right: -4px;
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: #3B82F6;
+  background: var(--red);
   border: 2px solid var(--card);
-  animation: pulseDot 1.6s ease-in-out infinite;
+  animation: pulseDot 2s ease-in-out infinite;
 }
 
 /* ── RESPONSIVE ── */
@@ -610,7 +610,8 @@ tr:hover td { background:var(--bg); }
 .user-menu { position:relative; }
 .user-dropdown { position:fixed; top:56px; right:8px; background:var(--card);
   border:1px solid var(--border); border-radius:var(--radius); padding:8px;
-  min-width:210px; box-shadow:var(--shadow2); z-index:1500; display:none; }
+  min-width:210px; box-shadow:var(--shadow2); z-index:9998; display:none;
+  isolation:isolate; }
 .user-dropdown.open { display:block; animation:fadeIn .2s ease; }
 .user-dd-item { padding:9px 14px; border-radius:var(--radius2); cursor:pointer;
   font-size:.84rem; transition:var(--transition); display:flex; align-items:center; gap:10px; }
@@ -622,6 +623,14 @@ tr:hover td { background:var(--bg); }
   #sync-indicator { display:none !important; }
   .search-wrap { max-width:120px; }
 }
+/* ══ RAPPORT ══ */
+.rapport-type-btn {
+  background:var(--card); border:2px solid var(--border); border-radius:var(--radius);
+  padding:12px 8px; cursor:pointer; text-align:center; transition:var(--transition);
+  color:var(--text);
+}
+.rapport-type-btn:hover { border-color:var(--accent); background:var(--bg2); }
+.rapport-type-btn.active { border-color:var(--accent); background:rgba(45,106,79,.1); }
 /* ══ ADMIN PANEL ══ */
 .admin-section { background:rgba(201,168,76,.06); border:1px solid rgba(201,168,76,.2);
   border-radius:var(--radius); padding:18px; margin-bottom:16px; }
@@ -732,6 +741,7 @@ tr:hover td { background:var(--bg); }
       <div class="search-results" id="search-results"></div>
     </div>
     <!-- BACKUP -->
+    <button class="btn btn-primary btn-sm" onclick="openRapportModal()" title="Générer un rapport" style="gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2))"><i class="fa-solid fa-file-chart-column"></i> <span class="hide-mobile">Rapport</span></button>
     <button class="btn btn-outline btn-sm" onclick="openModal('modal-backup')" title="Sauvegarde & Import" style="gap:6px"><i class="fa-solid fa-floppy-disk"></i> <span class="hide-mobile">Backup</span></button>
     <span id="sync-indicator" style="font-size:.72rem;font-family:var(--mono);color:var(--text3)">🟡 Chargement...</span>
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">FR → EN</button>
@@ -1094,6 +1104,26 @@ tr:hover td { background:var(--bg); }
   </div>
 
   <div class="grid3" id="stock-sections"></div>
+
+  <!-- ═══ PERFORMANCE HISTORIQUE ═══ -->
+  <div class="card" style="margin-top:20px" id="dash-historique-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0">📈 Performance historique</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="filter-chip active" data-hview="mensuel"     onclick="setHistView(this)">Mensuel</button>
+        <button class="filter-chip"        data-hview="trimestriel" onclick="setHistView(this)">Trimestriel</button>
+        <button class="filter-chip"        data-hview="annuel"      onclick="setHistView(this)">Annuel</button>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="ouvrirCloture()" title="Clôturer le cycle courant" style="font-size:.75rem">
+        🗂️ Clôturer le cycle
+      </button>
+    </div>
+    <canvas id="chart-historique" style="max-height:260px"></canvas>
+    <div id="dash-historique-empty" style="display:none;color:var(--text3);text-align:center;padding:30px;font-size:.82rem">
+      Aucune donnée historique — la première clôture de cycle créera les données.
+    </div>
+  </div>
+
 </div>
 
 <!-- ═══════════════════ BUDGET ═══════════════════ -->
@@ -1651,6 +1681,157 @@ tr:hover td { background:var(--bg); }
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- MODAL CLÔTURE DE CYCLE -->
+<div id="modal-cloture" class="modal-overlay" onclick="closeModalOut(event,'modal-cloture')">
+<div class="modal" style="max-width:540px">
+  <div class="modal-title">🗂️ Clôture de cycle
+    <span class="modal-close" onclick="closeModal('modal-cloture')">✕</span>
+  </div>
+
+  <div class="form-row" style="margin-bottom:16px">
+    <div class="form-group"><label class="form-label">Type de cycle</label>
+      <select class="form-select" id="clt-type">
+        <option value="mensuel">📅 Fin de mois</option>
+        <option value="trimestriel">📆 Fin de trimestre</option>
+        <option value="semestriel">🗓️ Fin de semestre</option>
+        <option value="annuel">🏆 Fin d'année</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Période</label>
+      <input class="form-input" type="month" id="clt-periode">
+    </div>
+  </div>
+
+  <!-- DONNÉES CYCLIQUES : se remettent à zéro -->
+  <div style="background:rgba(193,68,14,.07);border:1px solid rgba(193,68,14,.3);border-radius:10px;padding:12px;margin-bottom:12px">
+    <div style="font-size:.78rem;font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+      🔄 Données cycliques <span style="font-weight:400;color:var(--text3)">(réinitialisées au nouveau cycle)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:.78rem">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="clt-budget"   checked> 💰 Dépenses réelles du budget</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="clt-courses"  checked> 🛒 Articles achetés (courses)</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="clt-taches"   checked> ✅ Tâches terminées</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="clt-charges"  checked> ⚡ Charges externes payées</label>
+    </div>
+  </div>
+
+  <!-- DONNÉES PERMANENTES : ne se réinitialisent JAMAIS -->
+  <div style="background:rgba(45,106,79,.07);border:1px solid rgba(45,106,79,.3);border-radius:10px;padding:12px;margin-bottom:16px">
+    <div style="font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+      🔒 Données permanentes <span style="font-weight:400;color:var(--text3)">(conservées, jamais réinitialisées)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:.75rem;color:var(--text2)">
+      <div>💳 Trésorerie (solde cumulatif)</div>
+      <div>🎯 Objectifs non atteints</div>
+      <div>🏗️ Développement du Foyer</div>
+      <div>🏢 Chantiers en cours</div>
+      <div>📋 Créances non réglées</div>
+      <div>💸 Dettes non réglées</div>
+      <div>📦 Stocks & Hygiène</div>
+      <div>🏠 Biens locatifs</div>
+      <div>🔁 Routines</div>
+      <div>💰 Ressources</div>
+      <div>📅 Événements à venir</div>
+      <div>🔧 Maintenance en cours</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem">
+      <input type="checkbox" id="clt-generer-rapport" checked>
+      <span>📄 Générer le rapport Word automatiquement avant la clôture</span>
+    </label>
+  </div>
+
+  <div id="clt-progress" style="display:none;margin-bottom:12px">
+    <div style="height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:6px">
+      <div id="clt-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:3px;transition:width .4s"></div>
+    </div>
+    <div id="clt-progress-msg" style="font-size:.72rem;color:var(--text3);text-align:center">Préparation…</div>
+  </div>
+
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-primary" style="flex:1" id="clt-btn" onclick="executerCloture()">🗂️ Clôturer et démarrer nouveau cycle</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-cloture')">Annuler</button>
+  </div>
+</div></div>
+
+<!-- ═══ MODAL RAPPORT ═══ -->
+<div id="modal-rapport" class="modal-overlay" onclick="closeModalOut(event,'modal-rapport')">
+<div class="modal" style="max-width:520px">
+  <div class="modal-title">📊 Générer un Rapport
+    <span class="modal-close" onclick="closeModal('modal-rapport')">✕</span>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <div class="form-label" style="margin-bottom:8px">Type de rapport</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="rapport-type-btns">
+      <button class="rapport-type-btn active" data-type="mensuel" onclick="selectRapportType(this)">
+        <div style="font-size:1.3rem">📅</div>
+        <div style="font-weight:700;font-size:.88rem">Mensuel</div>
+        <div style="font-size:.68rem;color:var(--text3)">1 mois complet</div>
+      </button>
+      <button class="rapport-type-btn" data-type="trimestriel" onclick="selectRapportType(this)">
+        <div style="font-size:1.3rem">📆</div>
+        <div style="font-weight:700;font-size:.88rem">Trimestriel</div>
+        <div style="font-size:.68rem;color:var(--text3)">3 mois</div>
+      </button>
+      <button class="rapport-type-btn" data-type="semestriel" onclick="selectRapportType(this)">
+        <div style="font-size:1.3rem">🗓️</div>
+        <div style="font-weight:700;font-size:.88rem">Semestriel</div>
+        <div style="font-size:.68rem;color:var(--text3)">6 mois</div>
+      </button>
+      <button class="rapport-type-btn" data-type="annuel" onclick="selectRapportType(this)">
+        <div style="font-size:1.3rem">🏆</div>
+        <div style="font-weight:700;font-size:.88rem">Annuel</div>
+        <div style="font-size:.68rem;color:var(--text3)">12 mois</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-row" style="margin-bottom:16px">
+    <div class="form-group">
+      <label class="form-label">Période — Début</label>
+      <input class="form-input" type="month" id="rapp-debut">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Période — Fin</label>
+      <input class="form-input" type="month" id="rapp-fin">
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-bottom:16px">
+    <label class="form-label">Nom du foyer / famille</label>
+    <input class="form-input" id="rapp-famille" placeholder="Ex: Famille Dupont">
+  </div>
+
+  <div style="background:var(--bg2);border-radius:var(--radius);padding:12px;margin-bottom:16px;font-size:.78rem;color:var(--text2)">
+    <div style="font-weight:700;margin-bottom:6px">📋 Sections incluses dans le rapport :</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-budget"    checked> Budget & Dépenses</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-tresor"    checked> Trésorerie</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-loyers"    checked> Immobilier & Loyers</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-creances"  checked> Créances & Dettes</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-charges"   checked> Charges Externes</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-taches"    checked> Tâches & Projets</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-stocks"    checked> Stocks & Hygiène</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rs-objectifs" checked> Objectifs</label>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div id="rapp-progress" style="display:none;margin-bottom:14px">
+    <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:8px">
+      <div id="rapp-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s"></div>
+    </div>
+    <div id="rapp-progress-msg" style="font-size:.75rem;color:var(--text3);text-align:center">Préparation…</div>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%" id="rapp-generate-btn" onclick="genererRapport()">
+    <i class="fa-solid fa-wand-magic-sparkles"></i> Générer le rapport Word
+  </button>
+</div></div>
+
 <!-- MODAL PRODUIT HYGIÈNE -->
 <div id="modal-hygiene" class="modal-overlay" onclick="closeModalOut(event,'modal-hygiene')">
 <div class="modal">
@@ -2760,7 +2941,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: [], charges: [], hygieneParentale: {}
+  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: [], charges: [], hygieneParentale: {}, historique: []
 };
 
 // ══ FIREBASE ══
@@ -2768,7 +2949,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges','hygieneParentale'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges','hygieneParentale','historique'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2962,6 +3143,7 @@ function renderAll() {
   renderProjetsMailson();
   renderCharges();
   renderHygiene();
+  renderHistoriqueChart();
   updateBadges();
 }
 
@@ -7240,8 +7422,912 @@ function syncHygieneToCourses(panel, prod) {
   save('courses');
 }
 // ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// ══ SYSTÈME DE RAPPORTS HOMEBASE ═══════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+
+let rapportType = 'mensuel';
+
+function selectRapportType(btn) {
+  document.querySelectorAll('.rapport-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rapportType = btn.dataset.type;
+  // Ajuster les dates selon le type
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const fmt = (yr,mo) => `${yr}-${String(mo+1).padStart(2,'0')}`;
+  let debut, fin;
+  if(rapportType==='mensuel')     { debut=fmt(y,m-1); fin=fmt(y,m-1); }
+  else if(rapportType==='trimestriel') { debut=fmt(y,m-3); fin=fmt(y,m-1); }
+  else if(rapportType==='semestriel')  { debut=fmt(y,m-6); fin=fmt(y,m-1); }
+  else { debut=fmt(y-1,0); fin=fmt(y-1,11); }
+  document.getElementById('rapp-debut').value = debut;
+  document.getElementById('rapp-fin').value   = fin;
+}
+
+function openRapportModal() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const fmt = (yr,mo) => {
+    if(mo<0){ yr--; mo+=12; } if(mo>11){ yr++; mo-=12; }
+    return `${yr}-${String(mo+1).padStart(2,'0')}`;
+  };
+  document.getElementById('rapp-debut').value = fmt(y,m-1);
+  document.getElementById('rapp-fin').value   = fmt(y,m-1);
+  document.getElementById('rapp-famille').value = 'Famille HomeBase';
+  document.getElementById('rapp-progress').style.display = 'none';
+  openModal('modal-rapport');
+}
+
+function setRappProgress(pct, msg) {
+  document.getElementById('rapp-progress').style.display = 'block';
+  document.getElementById('rapp-progress-bar').style.width = pct+'%';
+  document.getElementById('rapp-progress-msg').textContent = msg;
+}
+
+function collectRapportData() {
+  const s = state;
+  const now = new Date();
+  const debut = document.getElementById('rapp-debut').value || '';
+  const fin   = document.getElementById('rapp-fin').value   || '';
+
+  // ── Budget ──
+  const budgetPrev = (s.budget||[]).reduce((a,b)=>a+(b.prev||0),0);
+  const budgetReel = (s.budget||[]).reduce((a,b)=>a+(b.reel||0),0);
+  const ecartBudget = budgetPrev - budgetReel;
+
+  // ── Trésorerie ──
+  const tresorerie = s.tresorerie||[];
+  const soldes = {};
+  tresorerie.forEach(t => {
+    if(!soldes[t.compte]) soldes[t.compte]=0;
+    soldes[t.compte] += t.type==='crédit' ? +(t.montant||0) : -(t.montant||0);
+  });
+  const soldeTotal = Object.values(soldes).reduce((a,b)=>a+b,0);
+
+  // ── Ressources ──
+  const ressources = s.ressources||[];
+  const totalRessources = ressources.reduce((a,b)=>a+(b.montant||0),0);
+
+  // ── Locatifs ──
+  const locatifs = s.locatifs||[];
+  const loyersTotal   = locatifs.filter(l=>l.statut==='occupé').reduce((a,b)=>a+(b.loyer||0),0);
+  const loyersImpayés = locatifs.filter(l=>l.paiement==='impayé').length;
+  const biensOccupés  = locatifs.filter(l=>l.statut==='occupé').length;
+
+  // ── Créances ──
+  const creances = s.creances||[];
+  const creancesTotal  = creances.filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
+  const creancesReglees= creances.filter(c=>c.regle).length;
+  const creancesEnCours= creances.filter(c=>!c.regle).length;
+
+  // ── Dettes ──
+  const dettes = s.dettes||[];
+  const dettesTotal = dettes.filter(d=>d.statut!=='réglé').reduce((a,b)=>a+(+b.montant-(+b.regle||0)),0);
+  const dettesReglees = dettes.filter(d=>d.statut==='réglé').length;
+
+  // ── Charges ──
+  const charges = s.charges||[];
+  const chargesTotal  = charges.reduce((a,b)=>a+(b.montant||0),0);
+  const chargesPayees = charges.filter(c=>c.statut==='payé').length;
+  const chargesImpayées = charges.filter(c=>c.statut!=='payé').length;
+
+  // ── Tâches ──
+  const taches = s.taches||[];
+  const tachesFaites = taches.filter(t=>t.done).length;
+  const tachesEnCours = taches.filter(t=>!t.done).length;
+
+  // ── Stocks ──
+  const stocks = s.stocks||[];
+  const stocksCrit = stocks.filter(s=>s.alerte==='critique').length;
+  const stocksFaib = stocks.filter(s=>s.alerte==='faible').length;
+
+  // ── Objectifs ──
+  const objectifs = s.objectifs||[];
+  const objAtteints = objectifs.filter(o=>o.atteint).length;
+
+  // ── Projets Maison ──
+  const projets = s.projetsMailson||[];
+  const projetsBudget = projets.reduce((a,b)=>a+(b.budget||0),0);
+
+  return {
+    periode: { debut, fin, type: rapportType },
+    famille: document.getElementById('rapp-famille').value || 'Famille',
+    date: now.toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'}),
+    budget: { previsionnel: budgetPrev, reel: budgetReel, ecart: ecartBudget, categories: (s.budget||[]).map(b=>({nom:b.nom||b.catCode||'',prev:b.prev||0,reel:b.reel||0})) },
+    tresorerie: { soldes, soldeTotal, nbMouvements: tresorerie.length },
+    ressources: { total: totalRessources, nb: ressources.length, sources: ressources.slice(-5).map(r=>({source:r.source||'',montant:r.montant||0,date:r.date||''})) },
+    immobilier: { total: locatifs.length, occupes: biensOccupés, loyersTotal, loyersImpayés, biens: locatifs.map(l=>({nom:l.nom||'',statut:l.statut||'',loyer:l.loyer||0,paiement:l.paiement||''})) },
+    creances: { total: creancesTotal, enCours: creancesEnCours, reglees: creancesReglees, liste: creances.filter(c=>!c.regle).map(c=>({nom:c.nom,montant:c.montant,date:c.date||''})) },
+    dettes: { total: dettesTotal, reglees: dettesReglees, enCours: dettes.filter(d=>d.statut!=='réglé').length, liste: dettes.filter(d=>d.statut!=='réglé').map(d=>({nom:d.nom,montant:+d.montant-(+d.regle||0),date:d.date||''})) },
+    charges: { total: chargesTotal, payees: chargesPayees, impayees: chargesImpayées, detail: charges.map(c=>({type:c.type,montant:c.montant||0,statut:c.statut||''})) },
+    taches: { total: taches.length, faites: tachesFaites, enCours: tachesEnCours },
+    stocks: { total: stocks.length, critiques: stocksCrit, faibles: stocksFaib },
+    objectifs: { total: objectifs.length, atteints: objAtteints },
+    projets: { total: projets.length, budget: projetsBudget },
+  };
+}
+
+async function genererRapport() {
+  const btn = document.getElementById('rapp-generate-btn');
+  btn.disabled = true; btn.textContent = '⏳ Génération en cours…';
+
+  try {
+    setRappProgress(5, '📊 Collecte des données HomeBase…');
+    const data = collectRapportData();
+
+    // Sections sélectionnées
+    const sections = {
+      budget:    document.getElementById('rs-budget')?.checked,
+      tresor:    document.getElementById('rs-tresor')?.checked,
+      loyers:    document.getElementById('rs-loyers')?.checked,
+      creances:  document.getElementById('rs-creances')?.checked,
+      charges:   document.getElementById('rs-charges')?.checked,
+      taches:    document.getElementById('rs-taches')?.checked,
+      stocks:    document.getElementById('rs-stocks')?.checked,
+      objectifs: document.getElementById('rs-objectifs')?.checked,
+    };
+
+    setRappProgress(20, '🤖 Analyse IA en cours…');
+
+    // ── Appel API Claude pour générer le texte analytique ──
+    const typeLabel = {mensuel:'mensuel',trimestriel:'trimestriel',semestriel:'semestriel',annuel:'annuel'}[rapportType];
+    const prompt = `Tu es un conseiller financier et gestionnaire de foyer expert. 
+Génère un rapport ${typeLabel} COMPLET et PROFESSIONNEL pour ${data.famille} couvrant la période ${data.periode.debut} à ${data.periode.fin}.
+
+Voici les données réelles du foyer :
+${JSON.stringify(data, null, 2)}
+
+Sections demandées : ${Object.entries(sections).filter(([,v])=>v).map(([k])=>k).join(', ')}
+
+Réponds UNIQUEMENT en JSON valide avec cette structure exacte :
+{
+  "presentation": "Texte d'introduction du rapport (3-4 phrases, professionnel)",
+  "situation_globale": "Analyse de la situation globale du foyer (4-5 phrases)",
+  "sections": [
+    {
+      "titre": "Titre de la section",
+      "situation": "Description de la situation actuelle (2-3 phrases)",
+      "analyse": "Analyse détaillée des données (3-4 phrases avec chiffres clés)",
+      "interpretation": "Interprétation et tendances (2-3 phrases)",
+      "conseils": ["Conseil actionnable 1", "Conseil actionnable 2", "Conseil actionnable 3"]
+    }
+  ],
+  "conclusion": "Conclusion générale et perspectives (3-4 phrases)",
+  "score_gestion": 75,
+  "points_forts": ["Point fort 1", "Point fort 2", "Point fort 3"],
+  "points_ameliorer": ["Point à améliorer 1", "Point à améliorer 2"]
+}`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const apiData = await resp.json();
+    const rawText = (apiData.content||[]).find(b=>b.type==='text')?.text||'{}';
+    const cleanJson = rawText.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+    const analyse = JSON.parse(cleanJson);
+
+    setRappProgress(55, '📝 Construction du document Word…');
+
+    // ── Générer le Word avec docx-js ──
+    await buildDocxRapport(data, analyse, sections, rapportType, data.famille);
+
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Erreur génération rapport : ' + (err.message||err));
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Générer le rapport Word';
+    document.getElementById('rapp-progress').style.display = 'none';
+  }
+}
+
+async function buildDocxRapport(data, analyse, sections, type, famille) {
+  // Charger docx depuis CDN
+  if(!window.docx) {
+    setRappProgress(60, '📦 Chargement de la bibliothèque Word…');
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/docx@8.5.0/build/index.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  setRappProgress(70, '🏗️ Mise en page du rapport…');
+
+  const {
+    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+    HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType,
+    VerticalAlign, LevelFormat, PageNumber, PageBreak, Header, Footer, TabStopType
+  } = window.docx;
+
+  const BLEU    = '1B4F72';
+  const VERT    = '1E8449';
+  const GRIS    = 'F2F3F4';
+  const ROUGE   = 'C0392B';
+  const OR      = 'D4AC0D';
+  const BLANC   = 'FFFFFF';
+  const TEXTE   = '2C3E50';
+
+  const typeLabel = {mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'}[type]||'';
+  const periodeStr = `${data.periode.debut} → ${data.periode.fin}`;
+
+  const mkBorder = (col='CCCCCC') => ({ style: BorderStyle.SINGLE, size:1, color:col });
+  const borders = (col='CCCCCC') => ({ top:mkBorder(col),bottom:mkBorder(col),left:mkBorder(col),right:mkBorder(col) });
+
+  const xaf = n => {
+    const v = Math.abs(Math.round(+n||0));
+    if(v>=1000000) return (v/1000000).toFixed(1)+'M XAF';
+    if(v>=1000)    return (v/1000).toFixed(0)+'K XAF';
+    return v+' XAF';
+  };
+
+  // ── Helpers paragraphes ──
+  const titre1 = (txt) => new Paragraph({
+    heading: HeadingLevel.HEADING_1,
+    children:[new TextRun({text:txt, bold:true, size:32, color:BLEU, font:'Arial'})],
+    spacing:{before:360,after:180},
+    border:{ bottom:{style:BorderStyle.SINGLE,size:6,color:BLEU,space:2} }
+  });
+  const titre2 = (txt) => new Paragraph({
+    heading: HeadingLevel.HEADING_2,
+    children:[new TextRun({text:txt, bold:true, size:26, color:VERT, font:'Arial'})],
+    spacing:{before:240,after:120}
+  });
+  const corps = (txt, bold=false, color=TEXTE) => new Paragraph({
+    children:[new TextRun({text:String(txt||''), bold, size:22, color, font:'Arial'})],
+    spacing:{after:120}, alignment:AlignmentType.JUSTIFIED
+  });
+  const bullet = (txt) => new Paragraph({
+    numbering:{reference:'bullets',level:0},
+    children:[new TextRun({text:String(txt||''),size:22,font:'Arial',color:TEXTE})],
+    spacing:{after:80}
+  });
+  const spacer = () => new Paragraph({children:[new TextRun({text:'',size:20})], spacing:{after:80}});
+  const pageBreak = () => new Paragraph({children:[new PageBreak()]});
+
+  // ── Table KPI 2x2 ──
+  const kpiCell = (label, val, color=BLEU) => new TableCell({
+    width:{size:4680,type:WidthType.DXA},
+    borders:borders(color),
+    shading:{fill:color+'15',type:ShadingType.CLEAR},
+    margins:{top:120,bottom:120,left:160,right:160},
+    children:[
+      new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:String(val),bold:true,size:36,color,font:'Arial'})]}),
+      new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:label,size:18,color:'888888',font:'Arial'})]}),
+    ]
+  });
+
+  const tableKPI = (kpis) => new Table({
+    width:{size:9360,type:WidthType.DXA},
+    columnWidths:[4680,4680],
+    rows: kpis.reduce((rows,_,i)=> {
+      if(i%2===0) rows.push(new TableRow({children:[kpiCell(kpis[i].label,kpis[i].val,kpis[i].col||BLEU), kpiCell((kpis[i+1]||kpis[i]).label,(kpis[i+1]||kpis[i]).val,(kpis[i+1]||kpis[i]).col||BLEU)]}));
+      return rows;
+    },[])
+  });
+
+  // ── Table de données ──
+  const mkTable = (headers, rows, colWidths) => {
+    const total = colWidths.reduce((a,b)=>a+b,0);
+    const hRow = new TableRow({
+      children: headers.map((h,i)=> new TableCell({
+        width:{size:colWidths[i],type:WidthType.DXA}, borders:borders(BLEU),
+        shading:{fill:BLEU,type:ShadingType.CLEAR},
+        margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:h,bold:true,size:20,color:BLANC,font:'Arial'})]})]
+      }))
+    });
+    const dRows = rows.map((row,ri)=> new TableRow({
+      children: row.map((cell,ci)=> new TableCell({
+        width:{size:colWidths[ci],type:WidthType.DXA}, borders:borders('DDDDDD'),
+        shading:{fill: ri%2===0?BLANC:GRIS, type:ShadingType.CLEAR},
+        margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({children:[new TextRun({text:String(cell||'—'),size:20,font:'Arial',color:TEXTE})]})]
+      }))
+    }));
+    return new Table({width:{size:total,type:WidthType.DXA}, columnWidths:colWidths, rows:[hRow,...dRows]});
+  };
+
+  // ══════════════════════════════════════════════════
+  // ── CONSTRUCTION DU DOCUMENT ──
+  // ══════════════════════════════════════════════════
+  const children = [];
+
+  // PAGE DE GARDE
+  children.push(
+    spacer(), spacer(), spacer(),
+    new Paragraph({ alignment:AlignmentType.CENTER,
+      children:[new TextRun({text:'RAPPORT '+typeLabel.toUpperCase(), bold:true, size:52, color:BLEU, font:'Arial'})],
+      spacing:{after:240}
+    }),
+    new Paragraph({ alignment:AlignmentType.CENTER,
+      children:[new TextRun({text:famille, size:36, color:VERT, font:'Arial', bold:true})],
+      spacing:{after:120}
+    }),
+    new Paragraph({ alignment:AlignmentType.CENTER,
+      children:[new TextRun({text:'Période : '+periodeStr, size:24, color:'888888', font:'Arial'})],
+      spacing:{after:80}
+    }),
+    new Paragraph({ alignment:AlignmentType.CENTER,
+      children:[new TextRun({text:'Généré le : '+data.date, size:22, color:'AAAAAA', font:'Arial'})],
+      spacing:{after:240}
+    }),
+  );
+
+  // Score de gestion (barre visuelle)
+  const score = analyse.score_gestion || 70;
+  const scoreCol = score>=80?VERT:score>=60?OR:ROUGE;
+  children.push(
+    new Paragraph({ alignment:AlignmentType.CENTER, spacing:{after:80},
+      children:[new TextRun({text:`Score de gestion du foyer : ${score}/100`, size:28, bold:true, color:scoreCol, font:'Arial'})]
+    }),
+    spacer(), pageBreak()
+  );
+
+  // PRÉSENTATION
+  children.push(titre1('1. Présentation'));
+  children.push(corps(analyse.presentation||''));
+  spacer();
+
+  // SITUATION GLOBALE
+  children.push(titre1('2. Situation Globale'));
+  children.push(corps(analyse.situation_globale||''));
+
+  // KPIs globaux
+  children.push(spacer());
+  children.push(tableKPI([
+    {label:'Budget Prévisionnel', val:xaf(data.budget.previsionnel), col:BLEU},
+    {label:'Dépenses Réelles',    val:xaf(data.budget.reel),         col:data.budget.ecart>=0?VERT:ROUGE},
+    {label:'Loyers Mensuels',     val:xaf(data.immobilier.loyersTotal), col:VERT},
+    {label:'Solde Trésorerie',    val:xaf(data.tresorerie.soldeTotal), col:data.tresorerie.soldeTotal>=0?VERT:ROUGE},
+  ]));
+  children.push(spacer());
+
+  let secIdx = 3;
+
+  // SECTIONS DYNAMIQUES
+  if(sections.budget) {
+    children.push(titre1(`${secIdx++}. Budget & Dépenses`));
+    const sec = (analyse.sections||[]).find(s=>s.titre?.toLowerCase().includes('budget')||s.titre?.toLowerCase().includes('dépens'));
+    if(sec) {
+      children.push(titre2('Situation')); children.push(corps(sec.situation||''));
+      children.push(titre2('Analyse'));   children.push(corps(sec.analyse||''));
+      children.push(titre2('Interprétation')); children.push(corps(sec.interpretation||''));
+      children.push(titre2('Conseils'));
+      (sec.conseils||[]).forEach(c=>children.push(bullet(c)));
+    }
+    if(data.budget.categories?.length) {
+      children.push(spacer());
+      children.push(mkTable(
+        ['Catégorie','Prévu (XAF)','Réel (XAF)','Écart (XAF)'],
+        data.budget.categories.slice(0,12).map(b=>[b.nom, xaf(b.prev), xaf(b.reel), xaf(b.prev-b.reel)]),
+        [3960, 1800, 1800, 1800]
+      ));
+    }
+    children.push(spacer());
+  }
+
+  if(sections.tresor) {
+    children.push(titre1(`${secIdx++}. Trésorerie`));
+    const sec = (analyse.sections||[]).find(s=>s.titre?.toLowerCase().includes('trésor'));
+    if(sec) {
+      children.push(titre2('Situation')); children.push(corps(sec.situation||''));
+      children.push(titre2('Analyse'));   children.push(corps(sec.analyse||''));
+      children.push(titre2('Conseils'));
+      (sec.conseils||[]).forEach(c=>children.push(bullet(c)));
+    }
+    if(Object.keys(data.tresorerie.soldes||{}).length) {
+      children.push(spacer());
+      children.push(mkTable(
+        ['Compte','Solde (XAF)'],
+        Object.entries(data.tresorerie.soldes).map(([k,v])=>[k, xaf(v)]),
+        [6360,3000]
+      ));
+    }
+    children.push(spacer());
+  }
+
+  if(sections.loyers) {
+    children.push(titre1(`${secIdx++}. Immobilier & Loyers`));
+    const sec = (analyse.sections||[]).find(s=>s.titre?.toLowerCase().includes('immob')||s.titre?.toLowerCase().includes('loyer'));
+    if(sec) {
+      children.push(titre2('Situation')); children.push(corps(sec.situation||''));
+      children.push(titre2('Analyse'));   children.push(corps(sec.analyse||''));
+      children.push(titre2('Conseils'));
+      (sec.conseils||[]).forEach(c=>children.push(bullet(c)));
+    }
+    if(data.immobilier.biens?.length) {
+      children.push(spacer());
+      children.push(mkTable(
+        ['Bien','Statut','Loyer (XAF)','Paiement'],
+        data.immobilier.biens.map(b=>[b.nom,b.statut,xaf(b.loyer),b.paiement||'—']),
+        [3360,1500,2000,2500]
+      ));
+    }
+    children.push(spacer());
+  }
+
+  if(sections.creances) {
+    children.push(titre1(`${secIdx++}. Créances & Dettes`));
+    const sec = (analyse.sections||[]).find(s=>s.titre?.toLowerCase().includes('créance')||s.titre?.toLowerCase().includes('dette'));
+    if(sec) {
+      children.push(titre2('Situation')); children.push(corps(sec.situation||''));
+      children.push(titre2('Analyse'));   children.push(corps(sec.analyse||''));
+      children.push(titre2('Conseils'));
+      (sec.conseils||[]).forEach(c=>children.push(bullet(c)));
+    }
+    children.push(spacer());
+    children.push(tableKPI([
+      {label:'Créances en cours',val:xaf(data.creances.total),col:OR},
+      {label:'Dettes en cours',  val:xaf(data.dettes.total), col:ROUGE},
+    ]));
+    children.push(spacer());
+  }
+
+  if(sections.charges) {
+    children.push(titre1(`${secIdx++}. Charges Externes`));
+    const sec = (analyse.sections||[]).find(s=>s.titre?.toLowerCase().includes('charge'));
+    if(sec) {
+      children.push(titre2('Situation')); children.push(corps(sec.situation||''));
+      children.push(titre2('Conseils'));
+      (sec.conseils||[]).forEach(c=>children.push(bullet(c)));
+    }
+    if(data.charges.detail?.length) {
+      children.push(spacer());
+      // Grouper par type
+      const chgGroups = {};
+      data.charges.detail.forEach(ch=>{ if(!chgGroups[ch.type]) chgGroups[ch.type]=0; chgGroups[ch.type]+=(ch.montant||0); });
+      children.push(mkTable(
+        ['Type de charge','Total (XAF)'],
+        Object.entries(chgGroups).map(([k,v])=>[k,xaf(v)]),
+        [6360,3000]
+      ));
+    }
+    children.push(spacer());
+  }
+
+  if(sections.taches) {
+    children.push(titre1(`${secIdx++}. Tâches & Projets`));
+    children.push(tableKPI([
+      {label:'Tâches accomplies', val:data.taches.faites,   col:VERT},
+      {label:'Tâches en cours',   val:data.taches.enCours,  col:OR},
+    ]));
+    children.push(spacer());
+  }
+
+  if(sections.objectifs) {
+    children.push(titre1(`${secIdx++}. Objectifs`));
+    children.push(tableKPI([
+      {label:'Objectifs atteints', val:data.objectifs.atteints, col:VERT},
+      {label:'Total objectifs',    val:data.objectifs.total,    col:BLEU},
+    ]));
+    children.push(spacer());
+  }
+
+  // POINTS FORTS / POINTS À AMÉLIORER
+  children.push(titre1(`${secIdx++}. Bilan`));
+  if((analyse.points_forts||[]).length) {
+    children.push(titre2('✅ Points forts'));
+    (analyse.points_forts||[]).forEach(p=>children.push(bullet(p)));
+  }
+  if((analyse.points_ameliorer||[]).length) {
+    children.push(spacer(), titre2('📈 Points à améliorer'));
+    (analyse.points_ameliorer||[]).forEach(p=>children.push(bullet(p)));
+  }
+  children.push(spacer());
+
+  // CONCLUSION
+  children.push(titre1(`${secIdx++}. Conclusion & Perspectives`));
+  children.push(corps(analyse.conclusion||''));
+  children.push(spacer(), spacer());
+  children.push(new Paragraph({ alignment:AlignmentType.CENTER,
+    children:[new TextRun({text:'— Rapport généré par HomeBase —', size:18, color:'AAAAAA', font:'Arial', italics:true})]
+  }));
+
+  setRappProgress(90, '💾 Finalisation du fichier…');
+
+  const doc = new window.docx.Document({
+    numbering: { config:[
+      { reference:'bullets', levels:[{ level:0, format:LevelFormat.BULLET, text:'•', alignment:AlignmentType.LEFT,
+          style:{paragraph:{indent:{left:720,hanging:360}}} }] }
+    ]},
+    styles: {
+      default: { document: { run:{ font:'Arial', size:22 } } },
+      paragraphStyles:[
+        { id:'Heading1', name:'Heading 1', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{size:32,bold:true,font:'Arial'}, paragraph:{spacing:{before:360,after:180},outlineLevel:0} },
+        { id:'Heading2', name:'Heading 2', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{size:26,bold:true,font:'Arial'}, paragraph:{spacing:{before:240,after:120},outlineLevel:1} },
+      ]
+    },
+    sections:[{
+      properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1134,right:1134,bottom:1134,left:1134} } },
+      headers:{ default: new window.docx.Header({ children:[
+        new Paragraph({ alignment:AlignmentType.RIGHT,
+          border:{bottom:{style:BorderStyle.SINGLE,size:4,color:BLEU,space:2}},
+          children:[new TextRun({text:`Rapport ${typeLabel} — ${famille}`, size:18, color:'888888', font:'Arial'})]
+        })
+      ]})},
+      footers:{ default: new window.docx.Footer({ children:[
+        new Paragraph({ alignment:AlignmentType.CENTER,
+          border:{top:{style:BorderStyle.SINGLE,size:4,color:'CCCCCC',space:2}},
+          children:[new TextRun({text:`HomeBase © ${new Date().getFullYear()} — Confidentiel`, size:16, color:'AAAAAA', font:'Arial'})]
+        })
+      ]})},
+      children
+    }]
+  });
+
+  const blob = await window.docx.Packer.toBlob(doc);
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const fname = `Rapport_${typeLabel}_${famille.replace(/\s+/g,'_')}_${data.periode.debut}_${data.periode.fin}.docx`.replace(/[^a-zA-Z0-9_\-\.]/g,'_');
+  a.href = url; a.download = fname; a.click();
+  URL.revokeObjectURL(url);
+
+  setRappProgress(100, '✅ Rapport téléchargé !');
+  setTimeout(()=>{ document.getElementById('rapp-progress').style.display='none'; closeModal('modal-rapport'); }, 1500);
+  showToast(`✅ Rapport ${typeLabel} généré avec succès !`);
+}
+// ═══════════════════════════════════════════════════════════════
+
+
+// ═══════════════════════════════════════════════════════════════
+// ══ SYSTÈME D'HISTORIQUE & CLÔTURE DE CYCLES ═══════════════════
+// ═══════════════════════════════════════════════════════════════
+
+let histView = 'mensuel';
+
+function setHistView(btn) {
+  document.querySelectorAll('[data-hview]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  histView = btn.dataset.hview;
+  renderHistoriqueChart();
+}
+
+// ── Prendre un snapshot léger du cycle courant ──
+function snapshotCycle(type, periode) {
+  const s = state;
+  const budgetPrev = (s.budget||[]).reduce((a,b)=>a+(b.prev||0),0);
+  const budgetReel = (s.budget||[]).reduce((a,b)=>a+(b.reel||0),0);
+  const loyersTotal = (s.locatifs||[]).filter(l=>l.statut==='occupé').reduce((a,b)=>a+(b.loyer||0),0);
+  const tresorSolde = (s.tresorerie||[]).reduce((a,b)=>a+(b.type==='crédit'?(+b.montant||0):-( +b.montant||0)),0);
+  const ressourcesTotal = (s.ressources||[]).reduce((a,b)=>a+(b.montant||0),0);
+  const creancesTotal = (s.creances||[]).filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
+  const dettesTotal = (s.dettes||[]).filter(d=>d.statut!=='réglé').reduce((a,b)=>a+(+d.montant-(+d.regle||0)),0);
+  const chargesTotal = (s.charges||[]).filter(c=>c.statut==='payé').reduce((a,b)=>a+(b.montant||0),0);
+  const tachesFaites = (s.taches||[]).filter(t=>t.done).length;
+  const objAtteints = (s.objectifs||[]).filter(o=>o.atteint).length;
+  const scoreGestion = calculerScore();
+
+  return {
+    id: Date.now(),
+    type,           // mensuel | trimestriel | semestriel | annuel
+    periode,        // ex: "2026-03"
+    date: new Date().toISOString(),
+    budgetPrev,
+    budgetReel,
+    ecart: budgetPrev - budgetReel,
+    loyersTotal,
+    tresorSolde,
+    ressourcesTotal,
+    creancesTotal,
+    dettesTotal,
+    chargesTotal,
+    tachesFaites,
+    objAtteints,
+    scoreGestion,
+  };
+}
+
+function calculerScore() {
+  let score = 100;
+  const s = state;
+  // Budget dépassé ?
+  const prev = (s.budget||[]).reduce((a,b)=>a+(b.prev||0),0);
+  const reel = (s.budget||[]).reduce((a,b)=>a+(b.reel||0),0);
+  if(reel > prev) score -= 15;
+  else if(reel > prev*0.9) score -= 5;
+  // Créances en retard
+  const today = new Date(); today.setHours(0,0,0,0);
+  const cretard = (s.creances||[]).filter(c=>!c.regle&&c.date&&new Date(c.date)<today).length;
+  score -= cretard * 5;
+  // Charges impayées
+  const cimp = (s.charges||[]).filter(c=>c.statut!=='payé').length;
+  score -= cimp * 4;
+  // Stocks critiques
+  const scrit = (s.stocks||[]).filter(x=>x.alerte==='critique').length;
+  score -= scrit * 2;
+  // Loyers impayés
+  const limp = (s.locatifs||[]).filter(l=>l.paiement==='impayé').length;
+  score -= limp * 8;
+  return Math.max(0, Math.min(100, score));
+}
+
+function ouvrirCloture() {
+  const now = new Date();
+  const periode = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('clt-periode').value = periode;
+  document.getElementById('clt-type').value = 'mensuel';
+  document.getElementById('clt-progress').style.display = 'none';
+  openModal('modal-cloture');
+}
+
+async function executerCloture() {
+  const btn = document.getElementById('clt-btn');
+  btn.disabled = true;
+  const type    = document.getElementById('clt-type').value;
+  const periode = document.getElementById('clt-periode').value;
+  const genRapport = document.getElementById('clt-generer-rapport')?.checked;
+
+  const setP = (pct,msg) => {
+    document.getElementById('clt-progress').style.display='block';
+    document.getElementById('clt-progress-bar').style.width=pct+'%';
+    document.getElementById('clt-progress-msg').textContent=msg;
+  };
+
+  try {
+    // 1. Snapshot de fin de cycle
+    setP(10, '📸 Capture du snapshot…');
+    const snap = snapshotCycle(type, periode);
+    if(!state.historique) state.historique = [];
+    state.historique = state.historique.filter(h=>!(h.periode===periode&&h.type===type));
+    state.historique.push(snap);
+    if(state.historique.length > 48) state.historique = state.historique.slice(-48);
+    await save('historique');
+    setP(25, '💾 Historique sauvegardé…');
+
+    // 2. Rapport Word si demandé
+    if(genRapport) {
+      setP(30, '📄 Génération du rapport Word…');
+      document.getElementById('rapp-debut').value = periode;
+      document.getElementById('rapp-fin').value   = periode;
+      rapportType = type;
+      try { await genererRapportSilent(type, periode); } catch(e) { console.warn('Rapport skipped:', e); }
+    }
+
+    setP(60, '🧹 Archivage du cycle…');
+    await new Promise(r=>setTimeout(r,400));
+
+    // ════════════════════════════════════════════════
+    // RÈGLES DE CLÔTURE
+    // ════════════════════════════════════════════════
+    // ✅ RÉINITIALISÉ si coché (données cycliques/consommables)
+    // 🔒 JAMAIS TOUCHÉ (données permanentes ou en cours)
+    // ════════════════════════════════════════════════
+
+    // ── Budget : remettre UNIQUEMENT le réel à 0, garder le prévisionnel intact ──
+    if(document.getElementById('clt-budget')?.checked) {
+      state.budget = (state.budget||[]).map(b=>({...b, reel:0}));
+      await save('budget');
+      setP(65,'💸 Budget réinitialisé…');
+    }
+
+    // ── Trésorerie : JAMAIS effacée — les soldes sont permanents et continus ──
+    // Le solde courant devient automatiquement le solde d'ouverture du nouveau cycle
+    // Rien à faire : state.tresorerie reste intact
+    setP(68,'💰 Trésorerie conservée (soldes reportés automatiquement)…');
+
+    // ── Courses : supprimer seulement les articles COCHÉS, garder les non-cochés ──
+    if(document.getElementById('clt-courses')?.checked) {
+      state.courses = (state.courses||[]).filter(c=>!c.done);
+      await save('courses');
+      setP(72,'🛒 Courses archivées…');
+    }
+
+    // ── Tâches : supprimer seulement les TERMINÉES, garder en cours + en attente ──
+    if(document.getElementById('clt-taches')?.checked) {
+      state.taches = (state.taches||[]).filter(t=>!t.done);
+      await save('taches');
+      setP(75,'✅ Tâches terminées archivées…');
+    }
+
+    // ── Charges : supprimer seulement les PAYÉES, garder les impayées ──
+    if(document.getElementById('clt-charges')?.checked) {
+      state.charges = (state.charges||[]).filter(c=>c.statut!=='payé');
+      await save('charges');
+      setP(78,'⚡ Charges payées archivées…');
+    }
+
+    // ── Créances & Dettes : JAMAIS supprimées automatiquement ──
+    // Les créances réglées et dettes réglées restent dans l'historique
+    // L'utilisateur gère manuellement via les pages dédiées
+    setP(81,'📋 Créances & dettes conservées…');
+
+    // ════════════════════════════════════════════════
+    // 🔒 DONNÉES PERMANENTES — AUCUNE ACTION (rappel)
+    // ════════════════════════════════════════════════
+    // state.locatifs          → biens & loyers : conservé
+    // state.ressources        → revenus : conservé
+    // state.objectifs         → tous conservés (atteints ET non atteints)
+    // state.projetsMailson    → développement du foyer : conservé
+    // state.depensesProjets   → dépenses projets : conservées
+    // state.stocks            → stocks physiques : conservés
+    // state.hygieneParentale  → hygiène : conservée
+    // state.chantiers         → chantiers en cours : conservés
+    // state.depensesChantier  → dépenses chantier : conservées
+    // state.child             → enfant : conservé
+    // state.childHealth       → santé enfant : conservée
+    // state.childMeds         → médicaments : conservés
+    // state.routines          → routines & habitudes : conservées
+    // state.events            → événements à venir : conservés
+    // state.engagements       → engagements : conservés
+    // state.maintenance       → maintenance : conservée
+    // state.cryptos           → cryptos : conservées
+    // state.tresorerie        → trésorerie : conservée (soldes continus)
+    // ════════════════════════════════════════════════
+
+    setP(90, '🔄 Rechargement…');
+    await new Promise(r=>setTimeout(r,300));
+    renderAll();
+    renderHistoriqueChart();
+
+    setP(100, '✅ Nouveau cycle démarré !');
+    setTimeout(()=>{
+      closeModal('modal-cloture');
+      document.getElementById('clt-progress').style.display='none';
+      showToast(`✅ Cycle ${type} ${periode} clôturé — Nouveau cycle propre démarré 🎉`);
+    }, 1200);
+
+    if(type==='annuel') {
+      setTimeout(()=>showToast('🏆 Bilan annuel archivé ! Bonne nouvelle année.'), 2200);
+    }
+
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Erreur clôture : '+(err.message||err));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Générer rapport sans ouvrir le modal (appelé depuis la clôture)
+async function genererRapportSilent(type, periode) {
+  rapportType = type;
+  document.getElementById('rapp-debut').value = periode;
+  document.getElementById('rapp-fin').value   = periode;
+  const data = collectRapportData();
+  const typeLabel = {mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'}[type]||'';
+
+  const prompt = `Tu es un conseiller financier. Génère un rapport ${typeLabel} PROFESSIONNEL en JSON valide.
+Données du foyer pour ${periode} :
+${JSON.stringify(data,null,2)}
+Structure JSON requise :
+{"presentation":"...","situation_globale":"...","sections":[{"titre":"...","situation":"...","analyse":"...","interpretation":"...","conseils":["...","...","..."]}],"conclusion":"...","score_gestion":75,"points_forts":["...","..."],"points_ameliorer":["...","..."]}`;
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})
+  });
+  const apiData = await resp.json();
+  const raw = (apiData.content||[]).find(b=>b.type==='text')?.text||'{}';
+  const analyse = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```/g,'').trim());
+  const famille = document.getElementById('rapp-famille')?.value||'Famille';
+  const sections = {budget:true,tresor:true,loyers:true,creances:true,charges:true,taches:true,stocks:true,objectifs:true};
+  await buildDocxRapport(data, analyse, sections, type, famille);
+}
+
+// ── Détection automatique fin de mois/année au chargement ──
+function checkAutoClose() {
+  if(!state.historique) state.historique=[];
+  const now = new Date();
+  const y=now.getFullYear(), m=now.getMonth(), d=now.getDate();
+  const lastDay = new Date(y,m+1,0).getDate();
+
+  // Dernier jour du mois ?
+  if(d === lastDay) {
+    const periode = `${y}-${String(m+1).padStart(2,'0')}`;
+    const alreadyDone = state.historique.some(h=>h.periode===periode&&h.type==='mensuel');
+    if(!alreadyDone) {
+      setTimeout(()=>{
+        const snap = snapshotCycle('mensuel', periode);
+        state.historique = [...(state.historique||[]).filter(h=>!(h.periode===periode&&h.type==='mensuel')), snap];
+        if(state.historique.length>48) state.historique=state.historique.slice(-48);
+        save('historique');
+        renderHistoriqueChart();
+        // Proposer la clôture complète
+        showToast(`📅 Fin de mois ${periode} détectée — Pensez à clôturer le cycle dans le tableau de bord`);
+      }, 3000);
+    }
+  }
+
+  // 31 décembre ?
+  if(m===11 && d===31) {
+    const periode = `${y}-12`;
+    const alreadyDone = state.historique.some(h=>h.periode===periode&&h.type==='annuel');
+    if(!alreadyDone) {
+      setTimeout(()=>{
+        const snap = snapshotCycle('annuel', String(y));
+        state.historique.push(snap);
+        save('historique');
+        showToast(`🏆 Fin d'année ${y} — Clôturez le cycle annuel depuis le tableau de bord`);
+      }, 4000);
+    }
+  }
+}
+
+// ── Graphique de performance historique ──
+function renderHistoriqueChart() {
+  const hist = (state.historique||[]).filter(h=>h.type===(histView==='trimestriel'?'trimestriel':histView==='annuel'?'annuel':'mensuel'));
+  const el   = document.getElementById('chart-historique');
+  const empty= document.getElementById('dash-historique-empty');
+  if(!el) return;
+
+  if(!hist.length) {
+    el.style.display='none';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  el.style.display='block';
+  if(empty) empty.style.display='none';
+
+  // Trier par période
+  hist.sort((a,b)=>(a.periode||a.date||'').localeCompare(b.periode||b.date||''));
+  const labels = hist.map(h=>h.periode||h.date?.slice(0,7)||'?');
+  const scoreData    = hist.map(h=>h.scoreGestion||0);
+  const budgetPrev   = hist.map(h=>Math.round((h.budgetPrev||0)/1000));
+  const budgetReel   = hist.map(h=>Math.round((h.budgetReel||0)/1000));
+  const loyers       = hist.map(h=>Math.round((h.loyersTotal||0)/1000));
+
+  if(_charts['historique']) { _charts['historique'].destroy(); delete _charts['historique']; }
+
+  _charts['historique'] = new Chart(el.getContext('2d'), {
+    data: {
+      labels,
+      datasets: [
+        {
+          type:'line', label:'Score gestion /100', data:scoreData,
+          borderColor:'#2D6A4F', backgroundColor:'rgba(45,106,79,.1)',
+          tension:.3, fill:true, yAxisID:'y2', pointRadius:5,
+          pointBackgroundColor: scoreData.map(s=>s>=80?'#2D6A4F':s>=60?'#D4AC0D':'#C0392B'),
+        },
+        {
+          type:'bar', label:'Budget prévu (K XAF)', data:budgetPrev,
+          backgroundColor:'rgba(59,130,246,.55)', borderRadius:4, yAxisID:'y',
+        },
+        {
+          type:'bar', label:'Dépenses réelles (K XAF)', data:budgetReel,
+          backgroundColor: budgetReel.map((v,i)=>v<=budgetPrev[i]?'rgba(45,106,79,.7)':'rgba(193,68,14,.75)'),
+          borderRadius:4, yAxisID:'y',
+        },
+        {
+          type:'line', label:'Loyers (K XAF)', data:loyers,
+          borderColor:'#FAB833', borderDash:[4,4], tension:.3, pointRadius:4, yAxisID:'y',
+        },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ position:'bottom', labels:{ font:{size:11}, boxWidth:12 } },
+        tooltip:{ callbacks:{
+          label: ctx => {
+            if(ctx.dataset.yAxisID==='y2') return ` Score : ${ctx.raw}/100`;
+            return ` ${ctx.dataset.label} : ${ctx.raw}K XAF`;
+          }
+        }}
+      },
+      scales:{
+        y:  { position:'left',  grid:{color:'rgba(128,128,128,.1)'}, ticks:{font:{size:10}, callback:v=>v+'K'} },
+        y2: { position:'right', min:0, max:100, grid:{display:false}, ticks:{font:{size:10}, callback:v=>v+'%'} }
+      }
+    }
+  });
+}
+// ═══════════════════════════════════════════════════════════════
+
 checkSession();
 sidebarInit();
+setTimeout(checkAutoClose, 5000);
 initDate();
 loadAll();
 </script>
