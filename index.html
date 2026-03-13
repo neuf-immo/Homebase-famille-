@@ -608,14 +608,20 @@ tr:hover td { background:var(--bg); }
 #sync-indicator { font-size:.72rem; font-family:var(--mono); transition:all .3s; }
 /* ══ USER MENU ══ */
 .user-menu { position:relative; }
-.user-dropdown { position:absolute; top:44px; right:0; background:var(--card);
+.user-dropdown { position:fixed; top:56px; right:8px; background:var(--card);
   border:1px solid var(--border); border-radius:var(--radius); padding:8px;
-  min-width:200px; box-shadow:var(--shadow2); z-index:500; display:none; }
+  min-width:210px; box-shadow:var(--shadow2); z-index:1500; display:none; }
 .user-dropdown.open { display:block; animation:fadeIn .2s ease; }
 .user-dd-item { padding:9px 14px; border-radius:var(--radius2); cursor:pointer;
   font-size:.84rem; transition:var(--transition); display:flex; align-items:center; gap:10px; }
 .user-dd-item:hover { background:var(--bg2); }
 .user-dd-sep { border:none; border-top:1px solid var(--border); margin:4px 0; }
+/* Masquer éléments topbar peu utiles sur petit écran */
+@media(max-width:480px){
+  .lang-btn { display:none !important; }
+  #sync-indicator { display:none !important; }
+  .search-wrap { max-width:120px; }
+}
 /* ══ ADMIN PANEL ══ */
 .admin-section { background:rgba(201,168,76,.06); border:1px solid rgba(201,168,76,.2);
   border-radius:var(--radius); padding:18px; margin-bottom:16px; }
@@ -872,6 +878,12 @@ tr:hover td { background:var(--bg); }
           <span class="nav-lbl">Dettes</span>
           <span class="nav-badge" id="badgeDettes" style="display:none">0</span>
           <span class="nav-tip">Dettes</span>
+        </div>
+        <div class="nav-item" onclick="showPage('charges')">
+          <i class="fa-solid fa-bolt fa-fw"></i>
+          <span class="nav-lbl">Charges externes</span>
+          <span class="nav-badge" id="badgeCharges" style="display:none">0</span>
+          <span class="nav-tip">Charges</span>
         </div>
       </div>
     </div>
@@ -1566,9 +1578,129 @@ tr:hover td { background:var(--bg); }
   <div id="pm-grid" class="grid2" style="align-items:start"></div>
 </div>
 
+
+<!-- ═══════════════════ CHARGES EXTERNES ═══════════════════ -->
+<div id="page-charges" class="page">
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-title">⚡ Charges Externes</div>
+      <div class="page-sub">Factures SEEG Eau, SEEG Électricité, Canal Box et autres abonnements</div>
+    </div>
+    <button class="btn btn-primary" onclick="openChargeModal()">+ Nouvelle facture</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi red"><div class="kpi-icon">🔴</div><div class="kpi-val" id="chg-retard">0</div><div class="kpi-label">En retard</div></div>
+    <div class="kpi gold"><div class="kpi-icon">⏳</div><div class="kpi-val" id="chg-attente">0</div><div class="kpi-label">À payer</div></div>
+    <div class="kpi blue"><div class="kpi-icon">💸</div><div class="kpi-val" id="chg-mois">0</div><div class="kpi-label">Ce mois</div></div>
+    <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val" id="chg-paye">0</div><div class="kpi-label">Payées</div></div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filter-row" style="margin-bottom:16px;flex-wrap:wrap;gap:6px">
+    <button class="filter-chip active" data-chgfilter="all"          onclick="setChgFilter(this)">Toutes</button>
+    <button class="filter-chip"        data-chgfilter="seeg-eau"     onclick="setChgFilter(this)">💧 SEEG Eau</button>
+    <button class="filter-chip"        data-chgfilter="seeg-elec"    onclick="setChgFilter(this)">⚡ SEEG Élec</button>
+    <button class="filter-chip"        data-chgfilter="canal"        onclick="setChgFilter(this)">📺 Canal Box</button>
+    <button class="filter-chip"        data-chgfilter="internet"     onclick="setChgFilter(this)">🌐 Internet</button>
+    <button class="filter-chip"        data-chgfilter="telephone"    onclick="setChgFilter(this)">📱 Téléphone</button>
+    <button class="filter-chip"        data-chgfilter="loyer"        onclick="setChgFilter(this)">🏠 Loyer</button>
+    <button class="filter-chip"        data-chgfilter="assurance"    onclick="setChgFilter(this)">🛡️ Assurance</button>
+    <button class="filter-chip"        data-chgfilter="autre"        onclick="setChgFilter(this)">📦 Autre</button>
+    <button class="filter-chip"        data-chgfilter="impaye"       onclick="setChgFilter(this)">🔴 Impayées</button>
+  </div>
+
+  <div id="charges-list"></div>
+</div>
+
 </main><!-- /main -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+<!-- CHARGE EXTERNE MODAL -->
+<div id="modal-charge" class="modal-overlay" onclick="closeModalOut(event,'modal-charge')">
+<div class="modal">
+  <div class="modal-title" id="chg-modal-title">⚡ Nouvelle facture <span class="modal-close" onclick="closeModal('modal-charge')">✕</span></div>
+  <input type="hidden" id="chg-edit-id">
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Type de charge</label>
+      <select class="form-select" id="chg-type" onchange="chgTypeChange()">
+        <option value="seeg-eau">💧 SEEG — Eau</option>
+        <option value="seeg-elec">⚡ SEEG — Électricité</option>
+        <option value="canal">📺 Canal Box</option>
+        <option value="internet">🌐 Internet</option>
+        <option value="telephone">📱 Téléphone / Mobile</option>
+        <option value="loyer">🏠 Loyer logement</option>
+        <option value="assurance">🛡️ Assurance</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Référence / N° contrat</label>
+      <input class="form-input" id="chg-ref" placeholder="Ex: N° abonné SEEG">
+    </div>
+  </div>
+
+  <!-- Champs SEEG spécifiques -->
+  <div id="chg-seeg-fields" style="display:none">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Index ancien (m³ ou kWh)</label>
+        <input class="form-input" type="number" id="chg-index-ancien" placeholder="0">
+      </div>
+      <div class="form-group"><label class="form-label">Index nouveau</label>
+        <input class="form-input" type="number" id="chg-index-nouveau" placeholder="0">
+      </div>
+    </div>
+    <div class="form-group" style="font-size:.72rem;color:var(--text3);padding:4px 0" id="chg-conso-affich"></div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Montant (XAF)</label>
+      <input class="form-input" type="number" id="chg-montant" placeholder="0">
+    </div>
+    <div class="form-group"><label class="form-label">Période</label>
+      <input class="form-input" type="month" id="chg-periode">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Date d'échéance</label>
+      <input class="form-input" type="date" id="chg-date">
+    </div>
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="chg-statut">
+        <option value="à payer">⏳ À payer</option>
+        <option value="payé">✅ Payé</option>
+        <option value="en retard">🔴 En retard</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Mode de paiement</label>
+      <select class="form-select" id="chg-mode">
+        <option value="espèces">💵 Espèces</option>
+        <option value="mobile money">📱 Mobile Money</option>
+        <option value="virement">🏦 Virement</option>
+        <option value="agence">🏢 Agence directe</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">🔔 Rappel avant (jours)</label>
+      <select class="form-select" id="chg-rappel">
+        <option value="3">3 jours avant</option>
+        <option value="5" selected>5 jours avant</option>
+        <option value="7">7 jours avant</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group"><label class="form-label">Note</label>
+    <input class="form-input" id="chg-note" placeholder="Observations…">
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="saveCharge()">💾 Enregistrer</button>
+</div></div>
+
 <!-- PROJET MAISON MODAL -->
 <div id="modal-projetmaison" class="modal-overlay" onclick="closeModalOut(event,'modal-projetmaison')">
 <div class="modal">
@@ -2523,7 +2655,7 @@ const state = {
   chantiers: [], child: {nom:'',age:9,classe:'CE2'},
   childHealth: [], childMeds: [], childNotes: [], childActivites: [],
   objectifs: [], dettes: [], maintenance: [], engagements: [], events: [],
-  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: []
+  ressources: [], creances: [], courses: [], tresorerie: [], routines: [], cryptos: [], depensesChantier: [], projetsMailson: [], depensesProjets: [], charges: []
 };
 
 // ══ FIREBASE ══
@@ -2531,7 +2663,7 @@ const state = {
 
 
 async function loadAll() {
-  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets'];
+  const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges'];
   for (const k of keys) {
     const d = await fbGet(k);
     if (d !== null) {
@@ -2701,6 +2833,7 @@ function renderPage(id) {
   if (id==='tresorerie') renderTresorerie();
   if (id==='routines') renderRoutines();
   if (id==='projetsmaison') renderProjetsMailson();
+  if (id==='charges') renderCharges();
 }
 
 function renderAll() {
@@ -2721,6 +2854,7 @@ function renderAll() {
   renderTresorerie();
   renderRoutines();
   renderProjetsMailson();
+  renderCharges();
   updateBadges();
 }
 
@@ -3970,6 +4104,16 @@ function checkRappels() {
     const restedu = cr.montant - (cr.montantRegle||0);
     if(diff<0)       alerts.push({type:'danger',  msg:`📋 Créance en retard : ${cr.nom} doit ${fmtXAF(restedu)} (${Math.abs(Math.round(diff))}j de retard)`});
     else if(diff<=3) alerts.push({type:'warning', msg:`📋 Créance J-${Math.round(diff)} : ${cr.nom} — ${fmtXAF(restedu)} attendus`});
+  });
+
+  // ── Charges externes en retard ou proches ──
+  (state.charges||[]).filter(ch=>ch.statut!=='payé').forEach(ch=>{
+    if(!ch.date) return;
+    const diff = (new Date(ch.date)-today)/(1000*60*60*24);
+    const lbl  = {'seeg-eau':'💧 SEEG Eau','seeg-elec':'⚡ SEEG Élec','canal':'📺 Canal Box'}[ch.type]||'⚡ Charge';
+    const rappelJ = +(ch.rappel||5);
+    if(diff<0)           alerts.push({type:'danger',  msg:`${lbl} en retard de ${Math.abs(Math.round(diff))}j — ${fmtXAF(ch.montant)}`});
+    else if(diff<=rappelJ) alerts.push({type:'warning', msg:`${lbl} à payer dans ${Math.round(diff)}j — ${fmtXAF(ch.montant)}`});
   });
 
   return alerts;
@@ -6414,6 +6558,243 @@ function deleteDepPm(depId, projetId) {
   recalcProjet(projetId); renderProjetsMailson();
   if (document.getElementById('page-courses')?.classList.contains('active')) renderCourses();
   showToast('🗑️ Dépense supprimée');
+}
+// ════════════════════════════════════════════════════════════
+
+
+// ═══════════════════════════════════════════════════════
+// ══ CHARGES EXTERNES ════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+
+const CHG_INFO = {
+  'seeg-eau':   { lbl:'💧 SEEG Eau',          col:'#5DADE2', unite:'m³',  icon:'💧' },
+  'seeg-elec':  { lbl:'⚡ SEEG Électricité',  col:'#FAB833', unite:'kWh', icon:'⚡' },
+  'canal':      { lbl:'📺 Canal Box',          col:'#BB8FCE', unite:'',   icon:'📺' },
+  'internet':   { lbl:'🌐 Internet',           col:'#52B788', unite:'',   icon:'🌐' },
+  'telephone':  { lbl:'📱 Téléphone',          col:'#2D6A4F', unite:'',   icon:'📱' },
+  'loyer':      { lbl:'🏠 Loyer',              col:'#CA6702', unite:'',   icon:'🏠' },
+  'assurance':  { lbl:'🛡️ Assurance',         col:'#C1440E', unite:'',   icon:'🛡️' },
+  'autre':      { lbl:'📦 Autre',              col:'#888',    unite:'',   icon:'📦' },
+};
+
+let chgFilter = 'all';
+function setChgFilter(btn) {
+  document.querySelectorAll('[data-chgfilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  chgFilter = btn.dataset.chgfilter;
+  renderCharges();
+}
+
+function chgTypeChange() {
+  const type = document.getElementById('chg-type').value;
+  const seeg = type === 'seeg-eau' || type === 'seeg-elec';
+  document.getElementById('chg-seeg-fields').style.display = seeg ? 'block' : 'none';
+  if(seeg) {
+    ['chg-index-ancien','chg-index-nouveau'].forEach(id => {
+      document.getElementById(id).oninput = () => {
+        const a = +document.getElementById('chg-index-ancien').value||0;
+        const n = +document.getElementById('chg-index-nouveau').value||0;
+        const u = CHG_INFO[document.getElementById('chg-type').value]?.unite||'';
+        document.getElementById('chg-conso-affich').textContent = n>a ? `Consommation : ${n-a} ${u}` : '';
+      };
+    });
+  }
+}
+
+function openChargeModal() {
+  document.getElementById('chg-modal-title').innerHTML = '⚡ Nouvelle facture <span class="modal-close" onclick="closeModal(\'modal-charge\')">✕</span>';
+  document.getElementById('chg-edit-id').value = '';
+  clearForm(['chg-ref','chg-montant','chg-note','chg-index-ancien','chg-index-nouveau']);
+  document.getElementById('chg-type').value    = 'seeg-eau';
+  document.getElementById('chg-statut').value  = 'à payer';
+  document.getElementById('chg-mode').value    = 'agence';
+  document.getElementById('chg-rappel').value  = '5';
+  document.getElementById('chg-conso-affich').textContent = '';
+  // Période = mois courant
+  const now = new Date();
+  document.getElementById('chg-periode').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  // Date échéance = fin du mois courant
+  const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  document.getElementById('chg-date').value = lastDay.toISOString().split('T')[0];
+  chgTypeChange();
+  openModal('modal-charge');
+}
+
+function editCharge(id) {
+  const ch = (state.charges||[]).find(x=>x.id==id); if(!ch) return;
+  document.getElementById('chg-modal-title').innerHTML = '✏️ Modifier facture <span class="modal-close" onclick="closeModal(\'modal-charge\')">✕</span>';
+  document.getElementById('chg-edit-id').value = id;
+  sv('chg-type', ch.type); sv('chg-ref', ch.ref||'');
+  sv('chg-montant', ch.montant); sv('chg-periode', ch.periode||'');
+  sv('chg-date', ch.date||''); sv('chg-statut', ch.statut);
+  sv('chg-mode', ch.mode||'agence'); sv('chg-rappel', ch.rappel||'5');
+  sv('chg-note', ch.note||'');
+  sv('chg-index-ancien', ch.indexAncien||'');
+  sv('chg-index-nouveau', ch.indexNouveau||'');
+  document.getElementById('chg-conso-affich').textContent = '';
+  chgTypeChange();
+  openModal('modal-charge');
+}
+
+function saveCharge() {
+  const montant = +document.getElementById('chg-montant').value||0;
+  if(!montant) return showToast('❌ Montant requis');
+  const editId = document.getElementById('chg-edit-id').value;
+  const type   = document.getElementById('chg-type').value;
+  const seeg   = type==='seeg-eau'||type==='seeg-elec';
+  const obj = {
+    id:           editId ? +editId : Date.now(),
+    type,
+    ref:          document.getElementById('chg-ref').value.trim(),
+    montant,
+    periode:      document.getElementById('chg-periode').value,
+    date:         document.getElementById('chg-date').value,
+    statut:       document.getElementById('chg-statut').value,
+    mode:         document.getElementById('chg-mode').value,
+    rappel:       document.getElementById('chg-rappel').value,
+    note:         document.getElementById('chg-note').value.trim(),
+    indexAncien:  seeg ? (+document.getElementById('chg-index-ancien').value||0) : 0,
+    indexNouveau: seeg ? (+document.getElementById('chg-index-nouveau').value||0) : 0,
+    dateSaisie:   new Date().toISOString().split('T')[0],
+  };
+  if (!state.charges) state.charges = [];
+  if (editId) {
+    const idx = state.charges.findIndex(x=>x.id==editId);
+    if(idx>=0) state.charges[idx]=obj; else state.charges.push(obj);
+  } else {
+    state.charges.push(obj);
+  }
+  // Si payé → ajouter dans ressources comme charge réglée (pour le suivi budgétaire)
+  if(obj.statut==='payé') syncChargePaye(obj, editId ? 'update' : 'new');
+  save('charges'); closeModal('modal-charge'); renderCharges(); updateBadges();
+  showToast(editId?'✅ Facture modifiée':'✅ Facture ajoutée');
+}
+
+function payerCharge(id) {
+  const ch = (state.charges||[]).find(x=>x.id==id); if(!ch) return;
+  ch.statut = 'payé';
+  ch.datePaiement = new Date().toISOString().split('T')[0];
+  syncChargePaye(ch, 'new');
+  save('charges'); renderCharges(); renderDashboard(); updateBadges();
+  showToast(`✅ ${CHG_INFO[ch.type]?.lbl||ch.type} — ${fmtXAF(ch.montant)} marqué payé · Budget mis à jour`);
+}
+
+function syncChargePaye(ch, mode) {
+  // Éviter les doublons dans ressources : utiliser l'id charge comme référence
+  if(!state.ressources) state.ressources = [];
+  // Retirer l'ancienne entrée si update
+  if(mode==='update') state.ressources = state.ressources.filter(r=>r.chargeId!=ch.id);
+  // On n'ajoute PAS dans ressources (c'est une dépense, pas un revenu)
+  // On peut éventuellement ajouter dans budget si besoin — ici on ne fait que le suivi visuel
+}
+
+function deleteCharge(id) {
+  if(!confirm('Supprimer cette facture ?')) return;
+  state.charges = (state.charges||[]).filter(x=>x.id!=id);
+  save('charges'); renderCharges(); updateBadges();
+  showToast('🗑️ Facture supprimée');
+}
+
+function renderCharges() {
+  if(!state.charges) state.charges = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const now   = new Date();
+  const moisCourant = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // Filtrer
+  let items = [...state.charges];
+  const TYPES_PRINCIPAUX = ['seeg-eau','seeg-elec','canal','internet','telephone','loyer','assurance'];
+  if(chgFilter==='seeg-eau')   items = items.filter(c=>c.type==='seeg-eau');
+  else if(chgFilter==='seeg-elec')  items = items.filter(c=>c.type==='seeg-elec');
+  else if(chgFilter==='canal')      items = items.filter(c=>c.type==='canal');
+  else if(chgFilter==='internet')   items = items.filter(c=>c.type==='internet');
+  else if(chgFilter==='telephone')  items = items.filter(c=>c.type==='telephone');
+  else if(chgFilter==='loyer')      items = items.filter(c=>c.type==='loyer');
+  else if(chgFilter==='assurance')  items = items.filter(c=>c.type==='assurance');
+  else if(chgFilter==='autre')      items = items.filter(c=>c.type==='autre');
+  else if(chgFilter==='impaye')     items = items.filter(c=>c.statut!=='payé');
+  items.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+
+  const all = state.charges;
+  const retardCt  = all.filter(c=>c.statut!=='payé'&&c.date&&new Date(c.date)<today).length;
+  const attenteCt = all.filter(c=>c.statut==='à payer').length;
+  const moisMontant = all.filter(c=>c.periode===moisCourant).reduce((s,x)=>s+(+x.montant||0),0);
+  const payeCt    = all.filter(c=>c.statut==='payé').length;
+
+  const g = id=>document.getElementById(id);
+  if(g('chg-retard')) g('chg-retard').textContent = retardCt;
+  if(g('chg-attente'))g('chg-attente').textContent= attenteCt;
+  if(g('chg-mois'))   g('chg-mois').textContent   = fmtXAF(moisMontant);
+  if(g('chg-paye'))   g('chg-paye').textContent    = payeCt;
+
+  // Badge sidebar
+  const badge = document.getElementById('badgeCharges');
+  if(badge){ badge.textContent=retardCt; badge.style.display=retardCt>0?'inline-block':'none'; }
+
+  const el = document.getElementById('charges-list');
+  if(!el) return;
+  if(!items.length){ el.innerHTML=`<div style="color:var(--text3);text-align:center;padding:40px">Aucune facture${chgFilter!=='all'?' dans ce filtre':''}</div>`; return; }
+
+  el.innerHTML = items.map(ch=>{
+    const info  = CHG_INFO[ch.type]||CHG_INFO.autre;
+    const retard = ch.statut!=='payé' && ch.date && new Date(ch.date)<today;
+    const joursR = ch.date && ch.statut!=='payé'
+      ? Math.ceil((new Date(ch.date)-today)/(1000*60*60*24)) : null;
+    const rappelJ = +(ch.rappel||5);
+    const proche  = joursR!==null && joursR>=0 && joursR<=rappelJ;
+    const seeg    = ch.type==='seeg-eau'||ch.type==='seeg-elec';
+    const conso   = seeg&&ch.indexNouveau&&ch.indexAncien ? ch.indexNouveau-ch.indexAncien : 0;
+
+    // ── Bandeau alerte ──
+    const alerteHtml = ch.statut==='payé' ? '' : retard
+      ? `<div style="background:rgba(193,68,14,.12);border:1px solid var(--red);border-radius:8px;padding:7px 12px;font-size:.74rem;color:var(--red);font-weight:700;margin-bottom:10px">
+           🚨 Facture en retard de <strong>${Math.abs(joursR)}j</strong> — Paiement urgent
+         </div>`
+      : proche
+        ? `<div style="background:rgba(201,168,76,.1);border:1px solid var(--gold);border-radius:8px;padding:7px 12px;font-size:.74rem;color:var(--gold);font-weight:700;margin-bottom:10px">
+             ⚠️ À payer dans <strong>${joursR}j</strong>
+           </div>`
+        : '';
+
+    const statutBadge = ch.statut==='payé' ? 'badge-green'
+      : retard ? 'badge-red' : proche ? 'badge-gold' : 'badge-orange';
+
+    const periodeAffich = ch.periode ? (() => {
+      const [y,m] = ch.periode.split('-');
+      const mois = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+      return `${mois[+m-1]} ${y}`;
+    })() : '';
+
+    return `<div class="card" style="border-left:4px solid ${ch.statut==='payé'?'var(--accent)':retard?'var(--red)':proche?'var(--gold)':info.col};margin-bottom:10px">
+      ${alerteHtml}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:1.15rem">${info.icon}</span>
+            <span style="font-weight:700;font-size:.95rem">${info.lbl}</span>
+            ${periodeAffich?`<span class="badge" style="background:var(--bg2);color:var(--text2);font-size:.62rem">${periodeAffich}</span>`:''}
+            <span class="badge ${statutBadge}" style="font-size:.62rem">${ch.statut}</span>
+          </div>
+          ${ch.ref?`<div style="font-size:.72rem;color:var(--text3)">🔖 Réf : <strong>${ch.ref}</strong></div>`:''}
+          ${seeg&&conso?`<div style="font-size:.72rem;color:${info.col};font-weight:600;margin-top:2px">📊 Consommation : ${conso} ${info.unite} (${ch.indexAncien}→${ch.indexNouveau})</div>`:''}
+          <div style="font-size:.71rem;color:var(--text3);margin-top:3px">
+            ${ch.date?`📅 Échéance : <strong>${ch.date}</strong>`:''}
+            ${ch.statut==='payé'&&ch.datePaiement?` · ✅ Payé le ${ch.datePaiement}`:''}
+            ${ch.mode?` · ${ch.mode}`:''}
+          </div>
+          ${ch.note?`<div style="font-size:.72rem;color:var(--text2);margin-top:2px;font-style:italic">📝 ${ch.note}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--mono);font-weight:800;font-size:1.1rem;color:${ch.statut==='payé'?'var(--accent)':'var(--red)'}">${fmtXAF(ch.montant)}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${ch.statut!=='payé'?`<button class="btn btn-primary btn-sm" onclick="payerCharge(${ch.id})">✅ Marquer payée</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="editCharge(${ch.id})">✏️ Modifier</button>
+        <button class="btn btn-outline btn-icon btn-sm" onclick="deleteCharge(${ch.id})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 // ════════════════════════════════════════════════════════════
 
