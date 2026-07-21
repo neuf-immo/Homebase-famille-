@@ -8786,7 +8786,7 @@ function snapshotCycle(type, periode) {
   const tresorSolde = (s.tresorerie||[]).reduce((a,b)=>a+(b.type==='crédit'?(+b.montant||0):-( +b.montant||0)),0);
   const ressourcesTotal = (s.ressources||[]).reduce((a,b)=>a+(b.montant||0),0);
   const creancesTotal = (s.creances||[]).filter(c=>!c.regle).reduce((a,b)=>a+(b.montant||0),0);
-  const dettesTotal = (s.dettes||[]).filter(d=>d.statut!=='réglé').reduce((a,b)=>a+(+d.montant-(+d.regle||0)),0);
+  const dettesTotal = (s.dettes||[]).filter(d=>d.statut!=='réglé').reduce((a,b)=>a+(+b.montant-(+b.regle||0)),0);
   const chargesTotal = (s.charges||[]).filter(c=>c.statut==='payé').reduce((a,b)=>a+(b.montant||0),0);
   const tachesFaites = (s.taches||[]).filter(t=>t.done).length;
   const objAtteints = (s.objectifs||[]).filter(o=>o.atteint).length;
