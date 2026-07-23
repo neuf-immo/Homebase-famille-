@@ -8319,6 +8319,148 @@ function collectRapportData() {
   };
 }
 
+// ── Génération d'analyse locale (sans appel API — gratuit, aucun réseau externe) ──
+function genererAnalyseLocale(data, sections, score) {
+  const pct = (a,b) => b ? Math.round((a/b)*100) : 0;
+  const S = [];
+
+  // Présentation
+  const typeLabelMap = {mensuel:'mensuel',trimestriel:'trimestriel',semestriel:'semestriel',annuel:'annuel'};
+  const presentation = `Ce rapport ${typeLabelMap[data.periode.type]||''} présente un état des lieux complet de la gestion de ${data.famille} pour la période du ${data.periode.debut} au ${data.periode.fin}. Il s'appuie exclusivement sur les données réelles enregistrées dans l'application durant cette période.`;
+
+  // Situation globale
+  const ecartPct = pct(Math.abs(data.budget.ecart), data.budget.previsionnel);
+  let situationGlobale;
+  if(data.budget.ecart >= 0) {
+    situationGlobale = `Le foyer a maintenu ses dépenses dans les limites prévues, avec un solde budgétaire positif de ${fmtXAF(data.budget.ecart)} (soit ${ecartPct}% d'économie par rapport au prévisionnel). `;
+  } else {
+    situationGlobale = `Le foyer a dépassé son budget prévisionnel de ${fmtXAF(Math.abs(data.budget.ecart))} (soit ${ecartPct}% au-delà des prévisions). `;
+  }
+  situationGlobale += data.tresorerie.soldeTotal >= 0
+    ? `La trésorerie reste positive, avec un solde cumulé de ${fmtXAF(data.tresorerie.soldeTotal)} sur l'ensemble des comptes suivis.`
+    : `La trésorerie est actuellement négative (${fmtXAF(data.tresorerie.soldeTotal)}), un point à surveiller de près.`;
+
+  // Score → appréciation
+  const appreciation = score>=80 ? 'excellente' : score>=60 ? 'satisfaisante' : 'à améliorer';
+
+  // Section Budget
+  if(sections.budget) {
+    S.push({
+      titre: 'Budget & Dépenses',
+      situation: `Le budget prévisionnel s'élevait à ${fmtXAF(data.budget.previsionnel)}, pour des dépenses réelles de ${fmtXAF(data.budget.reel)}.`,
+      analyse: data.budget.ecart >= 0
+        ? `Un écart favorable de ${fmtXAF(data.budget.ecart)} a été constaté, traduisant une bonne maîtrise des dépenses courantes.`
+        : `Un dépassement de ${fmtXAF(Math.abs(data.budget.ecart))} a été enregistré par rapport aux prévisions, ce qui mérite une attention particulière sur les postes concernés.`,
+      interpretation: data.budget.categories?.length
+        ? `${data.budget.categories.length} catégorie(s) budgétaire(s) ont été suivies sur la période.`
+        : `Aucune catégorie budgétaire détaillée n'a été enregistrée sur cette période.`,
+      conseils: data.budget.ecart >= 0
+        ? ['Continuer le suivi rigoureux des dépenses par catégorie', 'Envisager d\'allouer l\'excédent à l\'épargne ou aux objectifs en cours']
+        : ['Identifier les catégories responsables du dépassement', 'Ajuster le budget prévisionnel du prochain cycle en conséquence']
+    });
+  }
+
+  // Section Trésorerie
+  if(sections.tresor) {
+    S.push({
+      titre: 'Trésorerie',
+      situation: `${data.tresorerie.nbMouvements} mouvement(s) de trésorerie ont été enregistrés, pour un solde cumulé de ${fmtXAF(data.tresorerie.soldeTotal)}.`,
+      analyse: data.tresorerie.soldeTotal >= 0
+        ? `La trésorerie du foyer demeure saine et permet d'absorber les dépenses courantes sans tension.`
+        : `Le solde négatif observé indique un déséquilibre entre entrées et sorties qu'il conviendra de corriger rapidement.`,
+      conseils: data.tresorerie.soldeTotal >= 0
+        ? ['Maintenir une réserve de précaution sur au moins un compte']
+        : ['Prioriser le réajustement des dépenses non essentielles', 'Vérifier les créances en attente pouvant renflouer la trésorerie']
+    });
+  }
+
+  // Section Immobilier & Loyers
+  if(sections.loyers) {
+    S.push({
+      titre: 'Immobilier & Loyers',
+      situation: `${data.immobilier.occupes} bien(s) occupé(s) sur ${data.immobilier.total}, générant ${fmtXAF(data.immobilier.loyersTotal)} de loyers mensuels.`,
+      analyse: data.immobilier.loyersImpayés > 0
+        ? `${data.immobilier.loyersImpayés} loyer(s) impayé(s) ont été recensés sur la période, représentant un manque à gagner à régulariser.`
+        : `L'ensemble des loyers dus ont été perçus sur la période, ce qui traduit une bonne gestion locative.`,
+      conseils: data.immobilier.loyersImpayés > 0
+        ? ['Relancer les locataires concernés par les impayés', 'Envisager une clause de pénalité de retard si récurrent']
+        : ['Poursuivre le suivi régulier des échéances de loyer']
+    });
+  }
+
+  // Section Créances & Dettes
+  if(sections.creances) {
+    S.push({
+      titre: 'Créances & Dettes',
+      situation: `Créances en cours : ${fmtXAF(data.creances.total)} (${data.creances.enCours} en attente). Dettes en cours : ${fmtXAF(data.dettes.total)} (${data.dettes.enCours} en attente).`,
+      analyse: `${data.creances.reglees} créance(s) et ${data.dettes.reglees} dette(s) ont été réglées depuis le début du suivi.`,
+      conseils: ['Relancer les créances en attente les plus anciennes', 'Prioriser le remboursement des dettes portant intérêt si applicable']
+    });
+  }
+
+  // Section Charges
+  if(sections.charges) {
+    S.push({
+      titre: 'Charges Externes',
+      situation: `${data.charges.payees} charge(s) payée(s) sur ${data.charges.payees+data.charges.impayees}, pour un total de ${fmtXAF(data.charges.total)}.`,
+      analyse: data.charges.impayees > 0
+        ? `${data.charges.impayees} charge(s) restent impayées sur la période, à régulariser pour éviter tout désagrément (coupures, pénalités).`
+        : `Toutes les charges externes ont été réglées à temps sur la période.`,
+      conseils: data.charges.impayees > 0
+        ? ['Planifier le règlement des charges impayées en priorité']
+        : ['Maintenir la régularité des paiements de charges']
+    });
+  }
+
+  // Section Tâches
+  if(sections.taches) {
+    S.push({
+      titre: 'Tâches & Projets',
+      situation: `${data.taches.faites} tâche(s) accomplie(s) sur ${data.taches.total} (${pct(data.taches.faites,data.taches.total)}%).`,
+      analyse: `${data.taches.enCours} tâche(s) restent en cours sur la période.`,
+      conseils: ['Prioriser les tâches en cours les plus anciennes']
+    });
+  }
+
+  // Section Objectifs
+  if(sections.objectifs) {
+    S.push({
+      titre: 'Objectifs',
+      situation: `${data.objectifs.atteints} objectif(s) atteint(s) sur ${data.objectifs.total} (${pct(data.objectifs.atteints,data.objectifs.total)}%).`,
+      analyse: data.objectifs.atteints === data.objectifs.total && data.objectifs.total>0
+        ? `Tous les objectifs fixés ont été atteints sur la période, un excellent résultat.`
+        : `Certains objectifs restent à concrétiser.`,
+      conseils: ['Réévaluer les objectifs non atteints pour le prochain cycle']
+    });
+  }
+
+  // Conclusion
+  const conclusion = `La gestion du foyer sur cette période est jugée ${appreciation}, avec un score de gestion de ${score}/100. `
+    + (data.budget.ecart>=0 && data.tresorerie.soldeTotal>=0
+        ? `Les indicateurs financiers restent globalement au vert ; la poursuite d'un suivi régulier permettra de consolider cette tendance.`
+        : `Une attention particulière sur le budget et la trésorerie permettra d'améliorer la situation lors du prochain cycle.`);
+
+  // Points forts / à améliorer
+  const pointsForts = [];
+  const pointsAmeliorer = [];
+  if(data.budget.ecart>=0) pointsForts.push('Budget maîtrisé sur la période'); else pointsAmeliorer.push('Dépassement du budget prévisionnel');
+  if(data.tresorerie.soldeTotal>=0) pointsForts.push('Trésorerie positive'); else pointsAmeliorer.push('Trésorerie négative à redresser');
+  if(data.immobilier.loyersImpayés===0 && data.immobilier.total>0) pointsForts.push('Aucun loyer impayé'); else if(data.immobilier.loyersImpayés>0) pointsAmeliorer.push('Loyers impayés à régulariser');
+  if(data.charges.impayees===0) pointsForts.push('Charges externes à jour'); else pointsAmeliorer.push('Charges externes impayées');
+  if(!pointsForts.length) pointsForts.push('Suivi régulier des finances du foyer');
+  if(!pointsAmeliorer.length) pointsAmeliorer.push('Continuer sur cette lancée lors du prochain cycle');
+
+  return {
+    presentation,
+    situation_globale: situationGlobale,
+    sections: S,
+    conclusion,
+    score_gestion: score,
+    points_forts: pointsForts,
+    points_ameliorer: pointsAmeliorer
+  };
+}
+
 async function genererRapport() {
   const btn = document.getElementById('rapp-generate-btn');
   btn.disabled = true; btn.textContent = '⏳ Génération en cours…';
@@ -8339,64 +8481,11 @@ async function genererRapport() {
       objectifs: document.getElementById('rs-objectifs')?.checked,
     };
 
-    setRappProgress(20, '🤖 Analyse IA en cours…');
+    setRappProgress(30, '📝 Analyse des données…');
 
-    // ── Appel API Claude pour générer le texte analytique ──
-    const typeLabel = {mensuel:'mensuel',trimestriel:'trimestriel',semestriel:'semestriel',annuel:'annuel'}[rapportType];
-    const prompt = `Tu es un conseiller financier et gestionnaire de foyer expert. 
-Génère un rapport ${typeLabel} COMPLET et PROFESSIONNEL pour ${data.famille} couvrant la période ${data.periode.debut} à ${data.periode.fin}.
-
-Voici les données réelles du foyer :
-${JSON.stringify(data, null, 2)}
-
-Sections demandées : ${Object.entries(sections).filter(([,v])=>v).map(([k])=>k).join(', ')}
-
-Réponds UNIQUEMENT en JSON valide avec cette structure exacte :
-{
-  "presentation": "Texte d'introduction du rapport (3-4 phrases, professionnel)",
-  "situation_globale": "Analyse de la situation globale du foyer (4-5 phrases)",
-  "sections": [
-    {
-      "titre": "Titre de la section",
-      "situation": "Description de la situation actuelle (2-3 phrases)",
-      "analyse": "Analyse détaillée des données (3-4 phrases avec chiffres clés)",
-      "interpretation": "Interprétation et tendances (2-3 phrases)",
-      "conseils": ["Conseil actionnable 1", "Conseil actionnable 2", "Conseil actionnable 3"]
-    }
-  ],
-  "conclusion": "Conclusion générale et perspectives (3-4 phrases)",
-  "score_gestion": 75,
-  "points_forts": ["Point fort 1", "Point fort 2", "Point fort 3"],
-  "points_ameliorer": ["Point à améliorer 1", "Point à améliorer 2"]
-}`;
-
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:4000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const apiData = await resp.json();
-    const rawText = (apiData.content||[]).find(b=>b.type==='text')?.text||'{}';
-    let analyse = {};
-    try {
-      const cleanJson = rawText.replace(/```json[\n]?/g,'').replace(/```/g,'').trim();
-      analyse = JSON.parse(cleanJson);
-    } catch(jsonErr) {
-      // Si le JSON échoue, créer un objet minimal valide
-      analyse = {
-        presentation: 'Rapport généré automatiquement.',
-        situation_globale: 'Analyse de la situation du foyer pour la période sélectionnée.',
-        sections: [],
-        conclusion: 'Bonne gestion globale du foyer.',
-        score_gestion: 70,
-        points_forts: ['Suivi régulier des finances'],
-        points_ameliorer: ['Continuer le suivi mensuel']
-      };
-    }
+    // ── Analyse générée localement (aucun appel réseau, 100% gratuit) ──
+    const score = Math.max(50, calculerScore());
+    const analyse = genererAnalyseLocale(data, sections, score);
 
     setRappProgress(55, '📝 Construction du document Word…');
 
@@ -8411,6 +8500,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte :
     document.getElementById('rapp-progress').style.display = 'none';
   }
 }
+
 
 async function buildDocxRapport(data, analyse, sections, type, famille) {
   // Charger docx depuis CDN
@@ -8988,23 +9078,13 @@ async function genererRapportSilent(type, periode) {
   document.getElementById('rapp-debut').value = periode;
   document.getElementById('rapp-fin').value   = periode;
   const data = collectRapportData();
-  const typeLabel = {mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'}[type]||'';
-
-  const prompt = `Tu es un conseiller financier. Génère un rapport ${typeLabel} PROFESSIONNEL en JSON valide.
-Données du foyer pour ${periode} :
-${JSON.stringify(data,null,2)}
-Structure JSON requise :
-{"presentation":"...","situation_globale":"...","sections":[{"titre":"...","situation":"...","analyse":"...","interpretation":"...","conseils":["...","...","..."]}],"conclusion":"...","score_gestion":75,"points_forts":["...","..."],"points_ameliorer":["...","..."]}`;
-
-  const resp = await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})
-  });
-  const apiData = await resp.json();
-  const raw = (apiData.content||[]).find(b=>b.type==='text')?.text||'{}';
-  const analyse = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```/g,'').trim());
   const famille = document.getElementById('rapp-famille')?.value||'Famille';
   const sections = {budget:true,tresor:true,loyers:true,creances:true,charges:true,taches:true,stocks:true,objectifs:true};
+
+  // ── Analyse générée localement (aucun appel réseau, 100% gratuit) ──
+  const score = Math.max(50, calculerScore());
+  const analyse = genererAnalyseLocale(data, sections, score);
+
   await buildDocxRapport(data, analyse, sections, type, famille);
 }
 
