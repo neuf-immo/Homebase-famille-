@@ -28629,7 +28629,7 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   const {
     Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
     HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType,
-    VerticalAlign, PageNumber, PageBreak, Header, Footer, TabStopType
+    VerticalAlign, PageNumber, PageBreak, Header, Footer, TabStopType, ImageRun
   } = window.docx;
 
   const BLEU    = '1B4F72';
@@ -28647,6 +28647,25 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
     const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
     const mix = (c) => Math.round(c + (255 - c) * amount);
     return [mix(r), mix(g), mix(b)].map(c => c.toString(16).padStart(2, '0')).join('').toUpperCase();
+  };
+
+  // Rend un graphique Chart.js hors-écran et retourne l'image (pour insertion dans le Word)
+  const chartToImage = (config, w=680, h=380) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, { ...config, options:{ ...(config.options||{}), responsive:false, animation:false } });
+    const dataUrl = canvas.toDataURL('image/png');
+    chart.destroy();
+    return dataUrl;
+  };
+
+  const chartImg = (config, w=680, h=380, dispW=430, dispH=null) => {
+    const dataUrl = chartToImage(config, w, h);
+    return new Paragraph({
+      alignment: AlignmentType.CENTER, spacing:{after:200},
+      children:[ new ImageRun({ data:dataUrl, transformation:{ width:dispW, height: dispH || Math.round(dispW*h/w) } }) ]
+    });
   };
 
   const typeLabel = {mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'}[type]||'';
@@ -28734,36 +28753,106 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   // ══════════════════════════════════════════════════
   const children = [];
 
-  // PAGE DE GARDE
+  // ══ PAGE DE GARDE ══
   children.push(
-    spacer(), spacer(), spacer(),
-    new Paragraph({ alignment:AlignmentType.CENTER,
-      children:[new TextRun({text:'RAPPORT '+typeLabel.toUpperCase(), bold:true, size:52, color:BLEU, font:'Arial'})],
-      spacing:{after:240}
+    spacer(), spacer(),
+    new Paragraph({
+      shading:{fill:BLEU, type:ShadingType.CLEAR},
+      alignment:AlignmentType.CENTER,
+      spacing:{before:280, after:280},
+      children:[new TextRun({text:'RAPPORT '+typeLabel.toUpperCase(), bold:true, size:56, color:BLANC, font:'Arial'})]
     }),
     new Paragraph({ alignment:AlignmentType.CENTER,
       children:[new TextRun({text:famille, size:36, color:VERT, font:'Arial', bold:true})],
-      spacing:{after:120}
+      spacing:{before:300, after:120}
     }),
     new Paragraph({ alignment:AlignmentType.CENTER,
-      children:[new TextRun({text:'Période : '+periodeStr, size:24, color:'888888', font:'Arial'})],
+      children:[new TextRun({text:'Période analysée : '+periodeStr, size:24, color:'666666', font:'Arial'})],
       spacing:{after:80}
     }),
     new Paragraph({ alignment:AlignmentType.CENTER,
-      children:[new TextRun({text:'Généré le : '+data.date, size:22, color:'AAAAAA', font:'Arial'})],
-      spacing:{after:240}
+      children:[new TextRun({text:'Document généré le '+data.date, size:20, color:'AAAAAA', font:'Arial', italics:true})],
+      spacing:{after:360}
     }),
   );
 
-  // Score de gestion — minimum 50
+  // Score de gestion — badge visuel (jauge en anneau)
   const score = Math.max(50, analyse.score_gestion || 70);
   const scoreCol = score>=80?VERT:score>=60?OR:ROUGE;
+  children.push(await chartImg({
+    type:'doughnut',
+    data:{ datasets:[{ data:[score, 100-score], backgroundColor:['#'+scoreCol, '#EEEEEE'], borderWidth:0 }] },
+    options:{ cutout:'75%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } },
+    plugins:[{
+      id:'scoreText',
+      afterDraw(c){
+        const {ctx:cx, chartArea:{width,height,left,top}} = c;
+        cx.save();
+        cx.font='bold 46px Arial'; cx.fillStyle='#'+scoreCol; cx.textAlign='center'; cx.textBaseline='middle';
+        cx.fillText(score, left+width/2, top+height/2-12);
+        cx.font='16px Arial'; cx.fillStyle='#888888';
+        cx.fillText('/ 100', left+width/2, top+height/2+22);
+        cx.restore();
+      }
+    }]
+  }, 300, 300, 180, 180));
   children.push(
     new Paragraph({ alignment:AlignmentType.CENTER, spacing:{after:80},
-      children:[new TextRun({text:`Score de gestion du foyer : ${score}/100`, size:28, bold:true, color:scoreCol, font:'Arial'})]
+      children:[new TextRun({text:'Score de gestion du foyer', size:22, bold:true, color:TEXTE, font:'Arial'})]
     }),
-    spacer(), pageBreak()
+    pageBreak()
   );
+
+  // ══ PAGE 2 — TABLEAU DE BORD ══
+  children.push(
+    new Paragraph({
+      shading:{fill:GRIS, type:ShadingType.CLEAR},
+      children:[new TextRun({text:'📊 TABLEAU DE BORD — '+periodeStr, bold:true, size:30, color:BLEU, font:'Arial'})],
+      spacing:{before:120, after:280}
+    })
+  );
+
+  children.push(tableKPI([
+    {label:'Budget Prévisionnel', val:xaf(data.budget.previsionnel), col:BLEU},
+    {label:'Dépenses Réelles',    val:xaf(data.budget.reel),         col:data.budget.ecart>=0?VERT:ROUGE},
+    {label:'Trésorerie',          val:xaf(data.tresorerie.soldeTotal), col:data.tresorerie.soldeTotal>=0?VERT:ROUGE},
+    {label:'Loyers Mensuels',     val:xaf(data.immobilier.loyersTotal), col:VERT},
+    {label:'Créances en cours',   val:xaf((data.creances.liste||[]).reduce((a,c)=>a+(c.montant||0),0)), col:OR},
+    {label:'Dettes en cours',     val:xaf((data.dettes.liste||[]).reduce((a,d)=>a+(d.montant||0),0)), col:ROUGE},
+  ]));
+  children.push(spacer());
+
+  // Graphique 1 — Budget prévisionnel vs réel
+  children.push(titre2('Budget : Prévisionnel vs Réel'));
+  children.push(await chartImg({
+    type:'bar',
+    data:{
+      labels:['Budget'],
+      datasets:[
+        {label:'Prévisionnel', data:[data.budget.previsionnel], backgroundColor:'#'+BLEU, borderRadius:4},
+        {label:'Réel', data:[data.budget.reel], backgroundColor:'#'+(data.budget.ecart>=0?VERT:ROUGE), borderRadius:4},
+      ]
+    },
+    options:{ indexAxis:'y', plugins:{legend:{position:'bottom', labels:{font:{size:13}}}}, scales:{x:{beginAtZero:true}} }
+  }, 680, 220, 460));
+
+  // Graphique 2 — Répartition des dépenses par catégorie (si dispo)
+  if(data.budget.categories?.length) {
+    children.push(spacer());
+    children.push(titre2('Répartition des dépenses par catégorie'));
+    const cats = data.budget.categories.filter(c=>c.reel>0).sort((a,b)=>b.reel-a.reel).slice(0,8);
+    const palette = [BLEU,VERT,OR,ROUGE,'8E44AD','16A085','D35400','7F8C8D'];
+    children.push(await chartImg({
+      type:'doughnut',
+      data:{
+        labels:cats.map(c=>c.nom),
+        datasets:[{ data:cats.map(c=>c.reel), backgroundColor:palette.map(p=>'#'+p), borderWidth:2, borderColor:'#fff' }]
+      },
+      options:{ plugins:{ legend:{ position:'right', labels:{ font:{size:12}, boxWidth:14 } } } }
+    }, 680, 340, 460));
+  }
+
+  children.push(spacer(), pageBreak());
 
   // PRÉSENTATION
   children.push(titre1('1. Présentation'));
@@ -28773,16 +28862,6 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   // SITUATION GLOBALE
   children.push(titre1('2. Situation Globale'));
   children.push(corps(analyse.situation_globale||''));
-
-  // KPIs globaux
-  children.push(spacer());
-  children.push(tableKPI([
-    {label:'Budget Prévisionnel', val:xaf(data.budget.previsionnel), col:BLEU},
-    {label:'Dépenses Réelles',    val:xaf(data.budget.reel),         col:data.budget.ecart>=0?VERT:ROUGE},
-    {label:'Loyers Mensuels',     val:xaf(data.immobilier.loyersTotal), col:VERT},
-    {label:'Solde Trésorerie',    val:xaf(data.tresorerie.soldeTotal), col:data.tresorerie.soldeTotal>=0?VERT:ROUGE},
-  ]));
-  children.push(spacer());
 
   let secIdx = 3;
 
