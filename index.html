@@ -28640,6 +28640,15 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   const BLANC   = 'FFFFFF';
   const TEXTE   = '2C3E50';
 
+  // Mélange une couleur hex avec du blanc pour obtenir une teinte claire (fond de cellule)
+  // ex: lighten('1B4F72', 0.9) -> une version très claire de ce bleu, en hex 6 chiffres valide
+  const lighten = (hex, amount=0.88) => {
+    const n = parseInt(hex, 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    const mix = (c) => Math.round(c + (255 - c) * amount);
+    return [mix(r), mix(g), mix(b)].map(c => c.toString(16).padStart(2, '0')).join('').toUpperCase();
+  };
+
   const typeLabel = {mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'}[type]||'';
   const periodeStr = `${data.periode.debut} → ${data.periode.fin}`;
 
@@ -28681,7 +28690,7 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   const kpiCell = (label, val, color=BLEU) => new TableCell({
     width:{size:4680,type:WidthType.DXA},
     borders:borders(color),
-    shading:{fill:color+'15',type:ShadingType.CLEAR},
+    shading:{fill:lighten(color),type:ShadingType.CLEAR},
     margins:{top:120,bottom:120,left:160,right:160},
     children:[
       new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:String(val),bold:true,size:36,color,font:'Arial'})]}),
