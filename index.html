@@ -1220,6 +1220,20 @@ tr:hover td { background:var(--bg); }
         🗂️ Clôturer le cycle
       </button>
     </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-bottom:14px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div><label class="form-label" style="font-size:.68rem">Période — début</label>
+          <input class="form-input" type="month" id="hist-debut" style="padding:6px 8px;font-size:.78rem" onchange="renderHistoriqueChart()"></div>
+        <div><label class="form-label" style="font-size:.68rem">Période — fin</label>
+          <input class="form-input" type="month" id="hist-fin" style="padding:6px 8px;font-size:.78rem" onchange="renderHistoriqueChart()"></div>
+        <button class="btn btn-outline btn-sm" style="font-size:.72rem" onclick="document.getElementById('hist-debut').value='';document.getElementById('hist-fin').value='';renderHistoriqueChart()">Tout voir</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="filter-chip active" data-hmetric="depenses"  onclick="toggleHistMetric(this)">💰 Dépenses</button>
+        <button class="filter-chip active" data-hmetric="objectifs" onclick="toggleHistMetric(this)">🎯 Objectifs</button>
+        <button class="filter-chip active" data-hmetric="achats"    onclick="toggleHistMetric(this)">🛒 Achats</button>
+      </div>
+    </div>
     <canvas id="chart-historique" style="max-height:260px"></canvas>
     <div id="dash-historique-empty" style="display:none;color:var(--text3);text-align:center;padding:30px;font-size:.82rem">
       Aucune donnée historique — la première clôture de cycle créera les données.
@@ -23319,8 +23333,36 @@ setInterval(syncQueue, 15000);
 
 // ── Polling temps réel toutes les 10s ──
 let _fbPoll = false;
+// ── Ré-essaye d'envoyer vers Firebase les écritures restées en attente (faites hors-ligne) ──
+async function flushFbQueue() {
+  const pending = Object.keys(fbQueue);
+  if(!pending.length) return;
+  let ok = 0;
+  for(const key of pending) {
+    try {
+      const raw = localStorage.getItem('hb_'+key);
+      const ts  = parseInt(localStorage.getItem('hb_ts_'+key)||'0');
+      if(raw==null) { delete fbQueue[key]; continue; }
+      const ctrl = new AbortController();
+      const tid  = setTimeout(()=>ctrl.abort(), 8000);
+      const r = await fetch(`${FB}/${key}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({data:JSON.parse(raw), ts}), signal: ctrl.signal
+      });
+      clearTimeout(tid);
+      if(r.ok) { delete fbQueue[key]; ok++; }
+    } catch(e) { /* toujours hors-ligne, on réessaiera au prochain passage */ }
+  }
+  fbOnline = Object.keys(fbQueue).length < pending.length ? true : fbOnline;
+  updateSyncIndicator(Date.now());
+  if(ok>0 && typeof showToast==='function') showToast(`🔄 ${ok} modification(s) resynchronisée(s)`);
+}
+window.addEventListener('online', () => { fbOnline = true; flushFbQueue(); pollFirebase(); });
+window.addEventListener('offline', () => { fbOnline = false; updateSyncIndicator(); });
+
 async function pollFirebase() {
   if(_fbPoll) return; _fbPoll = true;
+  await flushFbQueue(); // d'abord renvoyer ce qui était en attente hors-ligne
   let changed = false;
   const keys = ['stocks','budget','taches','locatifs','chantiers','events','child','childHealth','childMeds','childNotes','childActivites','objectifs','dettes','maintenance','engagements','ressources','creances','courses','tresorerie','routines','cryptos','depensesChantier','projetsMailson','depensesProjets','charges','hygieneParentale','historique','urgences'];
   for(const k of keys) {
@@ -23775,6 +23817,7 @@ function toggleAlerte(id) {
   renderStocks(); renderDashboard(); updateBadges(); showToast(`${s.nom} → ${s.alerte}`);
 }
 function deleteStock(id) {
+  if(!confirm('Supprimer cet article du stock ?')) return;
   state.stocks = state.stocks.filter(s=>s.id!==id);
   save('stocks');
   syncUrgenceFromStock(id, true); // ← nettoyer urgences + courses orphelines
@@ -23842,7 +23885,7 @@ function addBudget() {
   save('budget'); closeModal('modal-budget'); renderBudget(); renderDashboard(); showToast('✅ Dépense ajoutée');
   clearForm(['b-nom','b-prev','b-reel']);
 }
-function deleteBudget(i) { state.budget.splice(i,1); save('budget'); renderBudget(); showToast('Dépense supprimée'); }
+function deleteBudget(i) { if(!confirm('Supprimer cette ligne de budget ?')) return; state.budget.splice(i,1); save('budget'); renderBudget(); showToast('Dépense supprimée'); }
 
 // ══ TACHES ══
 function renderTaches() {
@@ -23894,7 +23937,7 @@ function toggleTache(id) {
   const t = state.taches.find(x=>x.id===id); if (!t) return;
   t.done = !t.done; save('taches'); renderTaches(); updateBadges(); showToast(t.done?'✅ Tâche terminée!':'↩️ Tâche rouverte');
 }
-function deleteTache(id) { state.taches = state.taches.filter(t=>t.id!==id); save('taches'); renderTaches(); updateBadges(); }
+function deleteTache(id) { if(!confirm('Supprimer cette tâche ?')) return; state.taches = state.taches.filter(t=>t.id!==id); save('taches'); renderTaches(); updateBadges(); }
 function addTache() {
   const nom = v('ta-nom'); if (!nom) return showToast('❌ Description requise');
   state.taches.push({id:Date.now(),nom,priorite:v('ta-prio'),qui:v('ta-qui'),date:v('ta-date'),done:false});
@@ -23970,7 +24013,7 @@ function togglePaiement(i) {
   l.paiement = cycle[(cycle.indexOf(l.paiement)+1)%3];
   save('locatifs'); renderLocatifs(); renderDashboard(); showToast(`Paiement → ${l.paiement}`);
 }
-function deleteLocatif(i) { state.locatifs.splice(i,1); save('locatifs'); renderLocatifs(); renderDashboard(); }
+function deleteLocatif(i) { if(!confirm('Supprimer ce bien immobilier ?')) return; state.locatifs.splice(i,1); save('locatifs'); renderLocatifs(); renderDashboard(); }
 function addLocatif() {
   const nom = v('l-nom'); if (!nom) return showToast('❌ Nom requis');
   state.locatifs.push({nom,type:v('l-type'),loyer:+v('l-loyer')||0,locataire:v('l-locataire'),statut:v('l-statut'),contact:v('l-contact'),paiement:v('l-paiement'),notes:v('l-notes')});
@@ -24263,10 +24306,10 @@ function addChildActivite() {
   save('childActivites'); closeModal('modal-child-activite'); renderEnfant(); showToast('✅ Activité ajoutée');
   clearForm(['ca-nom','ca-jour','ca-heure']);
 }
-function deleteChildHealth(i){state.childHealth.splice(i,1);save('childHealth');renderEnfant();}
-function deleteChildMed(i){state.childMeds.splice(i,1);save('childMeds');renderEnfant();}
-function deleteChildNote(i){state.childNotes.splice(i,1);save('childNotes');renderEnfant();}
-function deleteChildActivite(i){state.childActivites.splice(i,1);save('childActivites');renderEnfant();}
+function deleteChildHealth(i){ if(!confirm('Supprimer cette entrée santé ?')) return; state.childHealth.splice(i,1);save('childHealth');renderEnfant();}
+function deleteChildMed(i){ if(!confirm('Supprimer ce médicament ?')) return; state.childMeds.splice(i,1);save('childMeds');renderEnfant();}
+function deleteChildNote(i){ if(!confirm('Supprimer cette note ?')) return; state.childNotes.splice(i,1);save('childNotes');renderEnfant();}
+function deleteChildActivite(i){ if(!confirm('Supprimer cette activité ?')) return; state.childActivites.splice(i,1);save('childActivites');renderEnfant();}
 
 // ══ OBJECTIFS ══
 function renderObjectifs() {
@@ -24430,8 +24473,9 @@ function stepObjPct(id, step) {
   liveObjPct(id, newPct);
   updateObjPctById(id, newPct);
 }
-function deleteObjectif(i){state.objectifs.splice(i,1);save('objectifs');renderObjectifs();}
+function deleteObjectif(i){ if(!confirm('Supprimer cet objectif ?')) return; state.objectifs.splice(i,1);save('objectifs');renderObjectifs();}
 function deleteObjectifById(id){
+  if(!confirm('Supprimer cet objectif ?')) return;
   state.objectifs = state.objectifs.filter(o=>String(o.id)!==String(id));
   save('objectifs'); renderObjectifs(); updateBadges();
 }
@@ -24838,7 +24882,7 @@ function toggleMaint(i) {
   save('maintenance'); renderMaintenance(); updateBadges();
   showToast(state.maintenance[i].done ? '✅ Résolu !' : '↩️ Réouvert');
 }
-function deleteMaint(i) { state.maintenance.splice(i,1); save('maintenance'); renderMaintenance(); updateBadges(); }
+function deleteMaint(i) { if(!confirm('Supprimer cette tâche de maintenance ?')) return; state.maintenance.splice(i,1); save('maintenance'); renderMaintenance(); updateBadges(); }
 function resetMaintModal() {
   document.getElementById('mnt-edit-id').value='';
   document.getElementById('mmnt-title').textContent='🔧 Nouvelle tâche maintenance';
@@ -24937,7 +24981,7 @@ function toggleEng(i) {
   save('engagements'); renderEngagements(); updateBadges();
   showToast(state.engagements[i].done ? '✅ Engagement honoré !' : '↩️ Réouvert');
 }
-function deleteEng(i){ state.engagements.splice(i,1); save('engagements'); renderEngagements(); updateBadges(); }
+function deleteEng(i){ if(!confirm('Supprimer cet engagement ?')) return; state.engagements.splice(i,1); save('engagements'); renderEngagements(); updateBadges(); }
 function resetEngModal() {
   document.getElementById('eng-edit-id').value='';
   document.getElementById('meng-title').textContent='🤝 Nouvel engagement';
@@ -26542,6 +26586,7 @@ function saveCourse() {
 }
 
 function deleteCourse(i) {
+  if(!confirm('Supprimer cet article de la liste de courses ?')) return;
   state.courses.splice(i,1); save('courses'); renderCourses();
 }
 
@@ -28422,20 +28467,53 @@ function collectRapportData() {
   const projets = s.projetsMailson||[];
   const projetsBudget = projets.reduce((a,b)=>a+(b.budget||0),0);
 
+  // ── Achats (courses cochées) ──
+  const courses = s.courses||[];
+  const achatsTotal = courses.filter(c=>c.done).reduce((a,c)=>a+(c.prix||0),0);
+
+  // ── Si la période demandée est une période PASSÉE déjà clôturée, on utilise
+  //    les vraies données historiques de ce(s) cycle(s) plutôt que l'état actuel. ──
+  let usingHistorique = false;
+  const histMatch = (s.historique||[]).filter(h => h.periode && debut && fin && h.periode>=debut && h.periode<=fin);
+  let hBudgetPrev=budgetPrev, hBudgetReel=budgetReel, hLoyers=loyersTotal, hSolde=soldeTotal,
+      hCreances=creancesTotal, hDettes=dettesTotal, hCharges=chargesTotal, hTaches=tachesFaites,
+      hObj=objAtteints, hAchats=achatsTotal, hScore=null;
+  if(histMatch.length) {
+    usingHistorique = true;
+    histMatch.sort((a,b)=>(a.periode||'').localeCompare(b.periode||''));
+    const dernier = histMatch[histMatch.length-1];
+    // Cumuls sur la période (données remises à zéro à chaque clôture)
+    hBudgetPrev = histMatch.reduce((a,h)=>a+(h.budgetPrev||0),0);
+    hBudgetReel = histMatch.reduce((a,h)=>a+(h.budgetReel||0),0);
+    hCharges    = histMatch.reduce((a,h)=>a+(h.chargesTotal||0),0);
+    hTaches     = histMatch.reduce((a,h)=>a+(h.tachesFaites||0),0);
+    hObj        = histMatch.reduce((a,h)=>a+(h.objAtteints||0),0);
+    hAchats     = histMatch.reduce((a,h)=>a+(h.achatsTotal||0),0);
+    // Valeurs de fin de période (soldes cumulés, non remis à zéro)
+    hLoyers   = dernier.loyersTotal ?? loyersTotal;
+    hSolde    = dernier.tresorSolde ?? soldeTotal;
+    hCreances = dernier.creancesTotal ?? creancesTotal;
+    hDettes   = dernier.dettesTotal ?? dettesTotal;
+    hScore    = dernier.scoreGestion ?? null;
+  }
+
   return {
     periode: { debut, fin, type: rapportType },
+    periodeHistorique: usingHistorique, // true = données réelles de la période clôturée, false = état actuel (cycle en cours)
+    scoreHistorique: hScore,
     famille: document.getElementById('rapp-famille').value || 'Famille',
     date: now.toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'}),
-    budget: { previsionnel: budgetPrev, reel: budgetReel, ecart: ecartBudget, categories: (s.budget||[]).map(b=>({nom:b.nom||b.catCode||'',prev:b.prev||0,reel:b.reel||0})) },
-    tresorerie: { soldes, soldeTotal, nbMouvements: tresorerie.length },
+    budget: { previsionnel: hBudgetPrev, reel: hBudgetReel, ecart: hBudgetPrev-hBudgetReel, categories: usingHistorique?[]:(s.budget||[]).map(b=>({nom:b.nom||b.catCode||'',prev:b.prev||0,reel:b.reel||0})) },
+    tresorerie: { soldes, soldeTotal: hSolde, nbMouvements: tresorerie.length },
     ressources: { total: totalRessources, nb: ressources.length, sources: ressources.slice(-5).map(r=>({source:r.source||'',montant:r.montant||0,date:r.date||''})) },
-    immobilier: { total: locatifs.length, occupes: biensOccupés, loyersTotal, loyersImpayés, biens: locatifs.map(l=>({nom:l.nom||'',statut:l.statut||'',loyer:l.loyer||0,paiement:l.paiement||''})) },
-    creances: { total: creancesTotal, enCours: creancesEnCours, reglees: creancesReglees, liste: creances.filter(c=>!c.regle).map(c=>({nom:c.nom,montant:c.montant,date:c.date||''})) },
-    dettes: { total: dettesTotal, reglees: dettesReglees, enCours: dettes.filter(d=>d.statut!=='réglé').length, liste: dettes.filter(d=>d.statut!=='réglé').map(d=>({nom:d.nom,montant:+d.montant-(+d.regle||0),date:d.date||''})) },
-    charges: { total: chargesTotal, payees: chargesPayees, impayees: chargesImpayées, detail: charges.map(c=>({type:c.type,montant:c.montant||0,statut:c.statut||''})) },
-    taches: { total: taches.length, faites: tachesFaites, enCours: tachesEnCours },
+    immobilier: { total: locatifs.length, occupes: biensOccupés, loyersTotal: hLoyers, loyersImpayés, biens: locatifs.map(l=>({nom:l.nom||'',statut:l.statut||'',loyer:l.loyer||0,paiement:l.paiement||''})) },
+    creances: { total: hCreances, enCours: creancesEnCours, reglees: creancesReglees, liste: creances.filter(c=>!c.regle).map(c=>({nom:c.nom,montant:c.montant,date:c.date||''})) },
+    dettes: { total: hDettes, reglees: dettesReglees, enCours: dettes.filter(d=>d.statut!=='réglé').length, liste: dettes.filter(d=>d.statut!=='réglé').map(d=>({nom:d.nom,montant:+d.montant-(+d.regle||0),date:d.date||''})) },
+    charges: { total: hCharges, payees: chargesPayees, impayees: chargesImpayées, detail: charges.map(c=>({type:c.type,montant:c.montant||0,statut:c.statut||''})) },
+    taches: { total: taches.length, faites: hTaches, enCours: tachesEnCours },
     stocks: { total: stocks.length, critiques: stocksCrit, faibles: stocksFaib },
-    objectifs: { total: objectifs.length, atteints: objAtteints },
+    objectifs: { total: objectifs.length, atteints: hObj },
+    achats: { total: hAchats },
     projets: { total: projets.length, budget: projetsBudget },
   };
 }
@@ -28605,7 +28683,7 @@ async function genererRapport() {
     setRappProgress(30, '📝 Analyse des données…');
 
     // ── Analyse générée localement (aucun appel réseau, 100% gratuit) ──
-    const score = Math.max(50, calculerScore());
+    const score = Math.max(50, data.scoreHistorique ?? calculerScore());
     const analyse = genererAnalyseLocale(data, sections, score);
 
     setRappProgress(55, '📝 Construction du document Word…');
@@ -28777,7 +28855,7 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
   );
 
   // Score de gestion — badge visuel (jauge en anneau)
-  const score = Math.max(50, analyse.score_gestion || 70);
+  const score = Math.max(50, data.scoreHistorique ?? analyse.score_gestion ?? 70);
   const scoreCol = score>=80?VERT:score>=60?OR:ROUGE;
   children.push(await chartImg({
     type:'doughnut',
@@ -29057,11 +29135,19 @@ async function buildDocxRapport(data, analyse, sections, type, famille) {
 // ═══════════════════════════════════════════════════════════════
 
 let histView = 'mensuel';
+let histMetrics = {depenses:true, objectifs:true, achats:true};
 
 function setHistView(btn) {
   document.querySelectorAll('[data-hview]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   histView = btn.dataset.hview;
+  renderHistoriqueChart();
+}
+
+function toggleHistMetric(btn) {
+  const m = btn.dataset.hmetric;
+  histMetrics[m] = !histMetrics[m];
+  btn.classList.toggle('active', histMetrics[m]);
   renderHistoriqueChart();
 }
 
@@ -29078,6 +29164,7 @@ function snapshotCycle(type, periode) {
   const chargesTotal = (s.charges||[]).filter(c=>c.statut==='payé').reduce((a,b)=>a+(b.montant||0),0);
   const tachesFaites = (s.taches||[]).filter(t=>t.done).length;
   const objAtteints = (s.objectifs||[]).filter(o=>o.atteint).length;
+  const achatsTotal = (s.courses||[]).filter(c=>c.done).reduce((a,c)=>a+(c.prix||0),0);
   const scoreGestion = calculerScore();
 
   return {
@@ -29096,6 +29183,7 @@ function snapshotCycle(type, periode) {
     chargesTotal,
     tachesFaites,
     objAtteints,
+    achatsTotal,
     scoreGestion,
   };
 }
@@ -29280,7 +29368,7 @@ async function genererRapportSilent(type, periode) {
   const sections = {budget:true,tresor:true,loyers:true,creances:true,charges:true,taches:true,stocks:true,objectifs:true};
 
   // ── Analyse générée localement (aucun appel réseau, 100% gratuit) ──
-  const score = Math.max(50, calculerScore());
+  const score = Math.max(50, data.scoreHistorique ?? calculerScore());
   const analyse = genererAnalyseLocale(data, sections, score);
 
   await buildDocxRapport(data, analyse, sections, type, famille);
@@ -29327,7 +29415,14 @@ function checkAutoClose() {
 
 // ── Graphique de performance historique ──
 function renderHistoriqueChart() {
-  const hist = (state.historique||[]).filter(h=>h.type===(histView==='trimestriel'?'trimestriel':histView==='annuel'?'annuel':'mensuel'));
+  let hist = (state.historique||[]).filter(h=>h.type===(histView==='trimestriel'?'trimestriel':histView==='annuel'?'annuel':'mensuel'));
+
+  // Filtre par période choisie (début/fin), si renseignée
+  const fDebut = document.getElementById('hist-debut')?.value || '';
+  const fFin   = document.getElementById('hist-fin')?.value   || '';
+  if(fDebut) hist = hist.filter(h=>(h.periode||'') >= fDebut);
+  if(fFin)   hist = hist.filter(h=>(h.periode||'') <= fFin);
+
   const el   = document.getElementById('chart-historique');
   const empty= document.getElementById('dash-historique-empty');
   if(!el) return;
@@ -29338,7 +29433,7 @@ function renderHistoriqueChart() {
       empty.innerHTML = `<div style="padding:30px;text-align:center;color:var(--text3)">
         <div style="font-size:2rem;margin-bottom:8px">📊</div>
         <div style="font-weight:700;font-size:.9rem;margin-bottom:4px">Pas encore d'historique</div>
-        <div style="font-size:.78rem">Clôturez votre premier cycle mensuel<br>pour voir apparaître les graphiques de performance.</div>
+        <div style="font-size:.78rem">Clôturez votre premier cycle mensuel<br>pour voir apparaître les graphiques de performance,<br>ou élargissez la période sélectionnée.</div>
       </div>`;
       empty.style.display='block';
     }
@@ -29354,34 +29449,36 @@ function renderHistoriqueChart() {
   const budgetPrev   = hist.map(h=>Math.round((h.budgetPrev||0)/1000));
   const budgetReel   = hist.map(h=>Math.round((h.budgetReel||0)/1000));
   const loyers       = hist.map(h=>Math.round((h.loyersTotal||0)/1000));
+  const objData      = hist.map(h=>h.objAtteints||0);
+  const achatsData   = hist.map(h=>Math.round((h.achatsTotal||0)/1000));
+
+  const datasets = [
+    {
+      type:'line', label:'Score gestion /100', data:scoreData,
+      borderColor:'#2D6A4F', backgroundColor:'rgba(45,106,79,.1)',
+      tension:.3, fill:true, yAxisID:'y2', pointRadius:5,
+      pointBackgroundColor: scoreData.map(s=>s>=80?'#2D6A4F':s>=60?'#D4AC0D':'#C0392B'),
+    },
+  ];
+  if(histMetrics.depenses) {
+    datasets.push(
+      { type:'bar', label:'Budget prévu (K XAF)', data:budgetPrev, backgroundColor:'rgba(59,130,246,.55)', borderRadius:4, yAxisID:'y' },
+      { type:'bar', label:'Dépenses réelles (K XAF)', data:budgetReel,
+        backgroundColor: budgetReel.map((v,i)=>v<=budgetPrev[i]?'rgba(45,106,79,.7)':'rgba(193,68,14,.75)'), borderRadius:4, yAxisID:'y' },
+      { type:'line', label:'Loyers (K XAF)', data:loyers, borderColor:'#FAB833', borderDash:[4,4], tension:.3, pointRadius:4, yAxisID:'y' },
+    );
+  }
+  if(histMetrics.achats) {
+    datasets.push({ type:'bar', label:'Achats effectués (K XAF)', data:achatsData, backgroundColor:'rgba(142,68,173,.6)', borderRadius:4, yAxisID:'y' });
+  }
+  if(histMetrics.objectifs) {
+    datasets.push({ type:'line', label:'Objectifs atteints (nb)', data:objData, borderColor:'#16A085', borderDash:[2,2], tension:.3, pointRadius:4, yAxisID:'y3' });
+  }
 
   if(_charts['historique']) { _charts['historique'].destroy(); delete _charts['historique']; }
 
   _charts['historique'] = new Chart(el.getContext('2d'), {
-    data: {
-      labels,
-      datasets: [
-        {
-          type:'line', label:'Score gestion /100', data:scoreData,
-          borderColor:'#2D6A4F', backgroundColor:'rgba(45,106,79,.1)',
-          tension:.3, fill:true, yAxisID:'y2', pointRadius:5,
-          pointBackgroundColor: scoreData.map(s=>s>=80?'#2D6A4F':s>=60?'#D4AC0D':'#C0392B'),
-        },
-        {
-          type:'bar', label:'Budget prévu (K XAF)', data:budgetPrev,
-          backgroundColor:'rgba(59,130,246,.55)', borderRadius:4, yAxisID:'y',
-        },
-        {
-          type:'bar', label:'Dépenses réelles (K XAF)', data:budgetReel,
-          backgroundColor: budgetReel.map((v,i)=>v<=budgetPrev[i]?'rgba(45,106,79,.7)':'rgba(193,68,14,.75)'),
-          borderRadius:4, yAxisID:'y',
-        },
-        {
-          type:'line', label:'Loyers (K XAF)', data:loyers,
-          borderColor:'#FAB833', borderDash:[4,4], tension:.3, pointRadius:4, yAxisID:'y',
-        },
-      ]
-    },
+    data: { labels, datasets },
     options: {
       responsive:true, maintainAspectRatio:true,
       interaction:{ mode:'index', intersect:false },
@@ -29390,13 +29487,15 @@ function renderHistoriqueChart() {
         tooltip:{ callbacks:{
           label: ctx => {
             if(ctx.dataset.yAxisID==='y2') return ` Score : ${ctx.raw}/100`;
+            if(ctx.dataset.yAxisID==='y3') return ` ${ctx.dataset.label} : ${ctx.raw}`;
             return ` ${ctx.dataset.label} : ${ctx.raw}K XAF`;
           }
         }}
       },
       scales:{
         y:  { position:'left',  grid:{color:'rgba(128,128,128,.1)'}, ticks:{font:{size:10}, callback:v=>v+'K'} },
-        y2: { position:'right', min:0, max:100, grid:{display:false}, ticks:{font:{size:10}, callback:v=>v+'%'} }
+        y2: { position:'right', min:0, max:100, grid:{display:false}, ticks:{font:{size:10}, callback:v=>v+'%'} },
+        y3: { display:false, min:0 },
       }
     }
   });
